@@ -1,0 +1,9 @@
+{
+  "apps": [
+    {
+      "name": "Taco Slash Commands",
+			"script": "node",
+			"args": "dist/index.js"
+    }
+  ]
+}
