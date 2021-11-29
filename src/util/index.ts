@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { ButtonStyle, ComponentContext, ComponentType, InteractionResponseFlags, MessageOptions } from 'slash-create';
-import { TrelloBoard } from './types';
+import { TrelloBoard, TrelloList } from './types';
 
 export function truncate(text: string, limit = 2000) {
   return text.length > limit ? text.slice(0, limit - 1) + '…' : text;
@@ -83,6 +83,11 @@ export const noAuthResponse: MessageOptions = {
   ]
 }
 
+export const noBoardSelectedResponse: MessageOptions = {
+  content: 'Select a board to switch to before using this command!',
+  ephemeral: true
+}
+
 export function isElevated(user: string) {
   if (!process.env.COMMANDS_ELEVATED) return false;
   return process.env.COMMANDS_ELEVATED.split(',').includes(user);
@@ -102,6 +107,13 @@ export function getBoardTextLabel(board: TrelloBoard) {
     board.subscribed ? '🔔' : '',
     board.closed ? '🗃️' : '',
   ].filter(v => !!v).join('')} ${truncate(board.name, 85)} (${board.shortLink})`;
+}
+
+export function getListTextLabel(list: TrelloList, subscribed?: boolean) {
+  return `${[
+    subscribed || list.subscribed ? '🔔' : '',
+    list.closed ? '🗃️' : '',
+  ].filter(v => !!v).join('')} ${truncate(list.name, 90)}`;
 }
 
 export function sortBoards(boards: TrelloBoard[]) {

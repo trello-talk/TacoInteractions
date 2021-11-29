@@ -1,4 +1,19 @@
-// TODO update types
+type TrelloPermissionLevel = 'public' | 'private' | 'org' | 'observers';
+type TrelloBackgroundBrightness = 'dark' | 'light';
+type TrelloBackgroundSize = 'normal' | 'full';
+type TrelloColor =
+  | 'green'
+  | 'yellow'
+  | 'red'
+  | 'orange'
+  | 'lime'
+  | 'purple'
+  | 'blue'
+  | 'sky'
+  | 'pink'
+  | 'black';
+
+// TODO update board type
 export interface TrelloBoard {
   id: string;
   name: string;
@@ -17,16 +32,83 @@ export interface TrelloBoard {
   };
   prefs?: {
     backgroundTopColor?: string;
-    backgroundImageScaled: { url: string }[];
-    permissionLevel: string;
-    comments: string;
-    invitations: string;
-    voting: string;
-    cardCovers: boolean;
-    isTemplate: boolean;
-    hideVotes: boolean;
+    backgroundImageScaled: TrelloScaledImage[];
+    permissionLevel: TrelloPermissionLevel;
+    voting: TrelloPermissionLevel;
+    comments: TrelloPermissionLevel;
+    invitations: TrelloPermissionLevel;
     selfJoin: boolean;
+    cardCovers: boolean;
+    canBePublic: boolean;
+    canBeOrg: boolean;
+    canBePrivate: boolean;
+    canInvite: boolean;
   };
+  lists?: TrelloList[];
+  cards?: TrelloCard[];
+}
+
+// TODO update card type
+export interface TrelloCard {
+  id: string;
+  name: string;
+  idShort: number;
+  desc?: string;
+  cover: {
+    sharedSourceUrl: string;
+    idAttachment?: string;
+    edgeColor: string;
+    brightness: TrelloBackgroundBrightness;
+    size: TrelloBackgroundSize;
+    color: TrelloColor;
+    imageUrl?: string;
+    scaled?: TrelloScaledImage[];
+  };
+  dueComplete?: boolean;
+  due?: string;
+  dueReminder?: number | null;
+  idAttachmentCover?: string;
+  membersVoted: any[]; // TODO
+  labels: TrelloLabel[];
+  attachments: any[]; // TODO
+  stickers: any[]; // TODO
+  checklists: any[]; // TODO
+  members: any[]; // TODO
+  idList: string;
+  shortLink: string;
+  shortUrl: string;
+  subscribed: boolean;
+  closed: boolean;
+  pos: number;
+}
+
+export interface TrelloList {
+  id: string;
+  name: string;
+  subscribed: boolean;
+  closed: boolean;
+  pos: number;
+}
+
+export interface TrelloLabel {
+  id: string;
+  name: string;
+  color: TrelloColor;
+}
+
+export interface TrelloScaledImage {
+  width: number;
+  height: number;
+  url: string;
+}
+
+export interface TrelloUser {
+  id: number;
+  avatarHash?: string;
+  fullName?: string;
+  avatarUrl?: string;
+  username: string;
+  initials: string;
 }
 
 export enum PrivacySetting {

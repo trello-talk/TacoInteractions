@@ -3,6 +3,11 @@ import Trello from './trello';
 import { AxiosResponse } from 'axios';
 import { TrelloBoard, TrelloBoardStar, TrelloMember } from './types';
 
+export interface TrelloBoardSubscriptions {
+  cards: Record<string, boolean>;
+  lists: Record<string, boolean>;
+}
+
 export class TrelloAPIError extends Error {
   status: number;
 
@@ -89,4 +94,43 @@ export async function unstarBoard(token: string, id: string, boardID: string): P
 
   await recacheKey(key, JSON.stringify(member));
   return true;
+}
+
+export async function getBoard(token: string, id: string, memberId: string, requireSubs = false): Promise<[TrelloBoard, TrelloBoardSubscriptions]> {
+  const key = `trello.board:${id}`;
+  const subsKey = `trello.board.sub:${id}:${memberId}`;
+  const cached = await client.get(key);
+  const cachedSubs = await client.get(subsKey);
+  if (cached) {
+    if (cachedSubs) return [JSON.parse(cached), JSON.parse(cachedSubs)];
+    if (!requireSubs) return [JSON.parse(cached), null];
+  };
+
+  const trello = new Trello(token);
+  const response = await trello.getBoard(id);
+  if (response.status >= 400) throw new TrelloAPIError(response);
+
+  // Seperate user-tied props from board
+  const board: TrelloBoard = response.data;
+  const subscribedLists: Record<string, boolean> = {};
+  const subscribedCards: Record<string, boolean> = {};
+
+  for (const list of board.lists!) {
+    subscribedLists[list.id] = list.subscribed;
+    delete list.subscribed;
+  }
+
+  for (const card of board.cards!) {
+    subscribedCards[card.id] = card.subscribed;
+    delete card.subscribed;
+  }
+
+  const subscriptions: TrelloBoardSubscriptions = {
+    lists: subscribedLists,
+    cards: subscribedCards,
+  };
+
+  await client.set(key, JSON.stringify(response.data), 'EX', 3 * 60 * 60);
+  await client.set(subsKey, JSON.stringify(subscriptions), 'EX', 3 * 60 * 60);
+  return [response.data, subscriptions];
 }

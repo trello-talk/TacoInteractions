@@ -1,18 +1,18 @@
 import { AxiosResponse } from "axios";
 import { AutocompleteContext, CommandContext, SlashCommand } from "slash-create";
-import { getBoardTextLabel, isElevated, noAuthResponse, sortBoards } from "./util";
-import { getMember, TrelloAPIError } from "./util/api";
+import { getBoardTextLabel, getListTextLabel, isElevated, noAuthResponse, sortBoards } from "./util";
+import { getBoard, getMember, TrelloAPIError } from "./util/api";
 import { prisma } from "./util/prisma";
-import { TrelloBoard } from "./util/types";
+import { TrelloBoard, TrelloList } from "./util/types";
 import fuzzy from 'fuzzy';
 
-interface AutocompleteBoardOptions {
+interface AutocompleteItemOptions<T = any> {
   query?: string;
-  filter?(value: TrelloBoard, index: number, array: TrelloBoard[]): boolean;
+  filter?(value: T, index: number, array: T[]): boolean;
 }
 
 export default abstract class Command extends SlashCommand {
-  async autocompleteBoards(ctx: AutocompleteContext, opts: AutocompleteBoardOptions) {
+  async autocompleteBoards(ctx: AutocompleteContext, opts: AutocompleteItemOptions<TrelloBoard>) {
     const query = opts.query || ctx.options.board;
     const userData = await prisma.user.findUnique({
       where: { userID: ctx.user.id }
@@ -33,6 +33,34 @@ export default abstract class Command extends SlashCommand {
       });
       return result
         .map((res) => ({ name: getBoardTextLabel(res.original), value: res.original.id }))
+        .slice(0, 25);
+    } catch (e) {
+      this.onAutocompleteError(e, ctx)
+      return [];
+    }
+  }
+
+  async autocompleteLists(ctx: AutocompleteContext, opts: AutocompleteItemOptions<TrelloList>) {
+    const query = opts.query || ctx.options.board;
+    const userData = await prisma.user.findUnique({
+      where: { userID: ctx.user.id }
+    });
+
+    if (!userData || !userData.trelloToken || !userData.currentBoard) return [];
+
+    try {
+      const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
+      const lists = board.lists.filter(opts.filter || (() => true)).sort((a, b) => a.pos - b.pos);
+
+      if (!query) return lists
+        .map((l) => ({ name: getListTextLabel(l, subs.lists[l.id]), value: l.id }))
+        .slice(0, 25);
+
+      const result = fuzzy.filter(query, lists, {
+        extract: (list) => list.name
+      });
+      return result
+        .map((res) => ({ name: getListTextLabel(res.original, subs.lists[res.original.id]), value: res.original.id }))
         .slice(0, 25);
     } catch (e) {
       this.onAutocompleteError(e, ctx)

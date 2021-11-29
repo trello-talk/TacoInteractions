@@ -89,9 +89,9 @@ export default class Trello {
           'memberships'
         ],
         members: 'all',
-        member_fields: ['username', 'fullName', 'id'],
+        member_fields: ['username', 'fullName', 'memberType'],
         lists: 'all',
-        list_fields: ['name', 'closed'],
+        list_fields: ['name', 'subscribed', 'closed', 'pos'],
         cards: 'all',
         card_fields: ['name', 'idList', 'shortLink', 'subscribed', 'closed'],
         labels: 'all',
@@ -138,6 +138,7 @@ export default class Trello {
   /**
    * Gets all cards on a board
    * @param id The board's ID
+   * @deprecated
    */
   getAllLists(id: string) {
     return this._request({
