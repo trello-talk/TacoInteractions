@@ -1,11 +1,10 @@
 import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
 import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
-import { getBoardTextLabel, noAuthResponse, sortBoards, truncate } from '../../util';
+import { noAuthResponse, truncate } from '../../util';
 import { createQueryPrompt } from '../../util/prompt';
 import { getMember, updateBoardInMember } from '../../util/api';
 import { ActionType, createAction } from '../../util/actions';
-import fuzzy from 'fuzzy';
 import Trello from '../../util/trello';
 
 export default class WatchBoardCommand extends SlashCommand {
@@ -24,31 +23,7 @@ export default class WatchBoardCommand extends SlashCommand {
   }
 
   async autocomplete(ctx: AutocompleteContext) {
-    const value = ctx.options.board;
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-
-    if (!userData || !userData.trelloToken) return [];
-
-    try {
-      const member = await getMember(userData.trelloToken, userData.trelloID);
-      const boards = sortBoards(member.boards.filter(b => !b.closed));
-
-      if (!value) return boards
-        .map((b) => ({ name: getBoardTextLabel(b), value: b.id }))
-        .slice(0, 25);
-
-      const result = fuzzy.filter(value, boards, {
-        extract: (board) => board.name
-      });
-      return result
-        .map((res) => ({ name: getBoardTextLabel(res.original), value: res.original.id }))
-        .slice(0, 25);
-    } catch (e) {
-      this.onAutocompleteError(e, ctx)
-      return [];
-    }
+    return this.autocompleteBoards(ctx, { filter: b => !b.closed });
   }
 
   async run(ctx: CommandContext) {
