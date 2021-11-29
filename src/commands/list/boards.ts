@@ -82,9 +82,7 @@ export default class BoardsCommand extends SlashCommand {
         title: `Boards (${boards.length.toLocaleString()})`,
         pages: splitMessage(boards.map(
           (board) =>
-            `${board.closed ? '🗃️ ' : ''}${board.subscribed ? '🔔 ' : ''}${board.starred ? '⭐ ' : ''}\`${
-              board.shortLink
-            }\` ${truncate(board.name, 50)}`
+            `${board.closed ? '🗃️ ' : ''}${board.subscribed ? '🔔 ' : ''}${board.starred ? '⭐ ' : ''} [${truncate(board.name, 50)}](${board.shortUrl})`
         ).join('\n'), { maxLength: 4096 })
       },
       ctx.messageID!

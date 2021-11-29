@@ -44,8 +44,8 @@ export interface TrelloBoard {
     canBePrivate: boolean;
     canInvite: boolean;
   };
-  lists?: TrelloList[];
-  cards?: TrelloCard[];
+  lists: TrelloList[];
+  cards: TrelloCard[];
 }
 
 // TODO update card type
