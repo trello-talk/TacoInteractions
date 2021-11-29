@@ -33,6 +33,12 @@ export enum PrivacySetting {
   PUBLIC = 'public'
 }
 
+export interface TrelloBoardStar {
+  id: string;
+  idBoard: string;
+  pos: number;
+}
+
 export interface TrelloMember {
   username: string;
   fullName: string;
@@ -44,6 +50,7 @@ export interface TrelloMember {
   idOrganizations: string[];
   products: number[];
   boards: TrelloBoard[];
+  boardStars: TrelloBoardStar[];
   prefs?: {
     privacy?: {
       avatar: PrivacySetting;
@@ -54,3 +61,4 @@ export interface TrelloMember {
     marketingOptIn: { optedIn: boolean };
   };
 }
+

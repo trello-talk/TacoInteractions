@@ -49,7 +49,8 @@ export default class Trello {
       url: `/members/${id}`,
       params: {
         boards: boardFilter,
-        board_fields: ['subscribed', 'starred', 'pinned', 'name', 'shortLink', 'shortUrl', 'closed']
+        board_fields: ['subscribed', 'starred', 'name', 'shortLink', 'shortUrl', 'closed'],
+        boardStars: true
       }
     });
   }
@@ -57,6 +58,7 @@ export default class Trello {
   /**
    * Gets the member's board stars
    * @param id The member's ID
+   * @deprecated
    */
   getBoardStars(id: string) {
     return this._request({

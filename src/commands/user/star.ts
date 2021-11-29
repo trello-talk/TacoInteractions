@@ -3,10 +3,9 @@ import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
 import { getBoardTextLabel, noAuthResponse, sortBoards, truncate } from '../../util';
 import { createQueryPrompt } from '../../util/prompt';
-import { getMember, updateBoardInMember } from '../../util/api';
+import { getMember, starBoard, unstarBoard, updateBoardInMember } from '../../util/api';
 import { ActionType, createAction } from '../../util/actions';
 import fuzzy from 'fuzzy';
-import Trello from '../../util/trello';
 
 export default class StarCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -63,18 +62,10 @@ export default class StarCommand extends SlashCommand {
     if (ctx.options.board) {
       const board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
       if (board) {
-        const trello = new Trello(userData.trelloToken);
-        let boardData: any = { starred: !board.starred };
-        if (board.starred) {
-          const stars = await trello.getBoardStars(userData.trelloID)
-          const star = stars.data.find(star => star.idBoard === board.id);
-          if (!star) return "Could not find the board's star. Try again later.";
-          await trello.unstarBoard(userData.trelloID, star.id);
-        } else {
-          const response = await trello.starBoard(userData.trelloID, board.id);
-          boardData = response.data;
-        }
-        await updateBoardInMember(member.id, board.id, boardData);
+        if (board.starred)
+          await unstarBoard(userData.trelloToken, userData.trelloID, board.id); else
+          await starBoard(userData.trelloToken, userData.trelloID, board.id);
+        await updateBoardInMember(member.id, board.id, { starred: !board.starred });
 
         return `${board.starred ? 'Unstarred' : 'Starred'} the "${truncate(board.name, 100)}" board.`;
       }
