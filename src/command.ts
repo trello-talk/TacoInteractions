@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import { AutocompleteContext, CommandContext, SlashCommand } from "slash-create";
-import { getBoardTextLabel, getListTextLabel, isElevated, noAuthResponse, sortBoards } from "./util";
+import { getBoardTextLabel, getListTextLabel, isElevated, noAuthResponse, sortBoards, sortLists } from "./util";
 import { getBoard, getMember, TrelloAPIError } from "./util/api";
 import { prisma } from "./util/prisma";
 import { TrelloBoard, TrelloList } from "./util/types";
@@ -50,7 +50,7 @@ export default abstract class Command extends SlashCommand {
 
     try {
       const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
-      const lists = board.lists.filter(opts?.filter || (() => true)).sort((a, b) => a.pos - b.pos);
+      const lists = sortLists(board.lists.filter(opts?.filter || (() => true)));
 
       if (!query) return lists
         .map((l) => ({ name: getListTextLabel(l, subs.lists[l.id]), value: l.id }))

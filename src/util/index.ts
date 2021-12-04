@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { ButtonStyle, ComponentContext, ComponentType, InteractionResponseFlags, MessageOptions } from 'slash-create';
-import { TrelloBoard, TrelloList } from './types';
+import { TrelloBoard, TrelloCard, TrelloList } from './types';
 
 export function truncate(text: string, limit = 2000) {
   return text.length > limit ? text.slice(0, limit - 1) + '…' : text;
@@ -124,6 +124,26 @@ export function sortBoards(boards: TrelloBoard[]) {
     if (!a.closed && b.closed) return -1;
     if (a.name < b.name) return -1;
     if (a.name > b.name) return 1;
+    return 0;
+  });
+}
+
+export function sortLists(list: TrelloList[]) {
+  return list.sort((a, b) => {
+    if (a.closed && !b.closed) return 1;
+    if (!a.closed && b.closed) return -1;
+    if (a.pos < b.pos) return -1;
+    if (a.pos > b.pos) return 1;
+    return 0;
+  });
+}
+
+export function sortCards(card: TrelloCard[]) {
+  return card.sort((a, b) => {
+    if (a.closed && !b.closed) return 1;
+    if (!a.closed && b.closed) return -1;
+    if (a.pos < b.pos) return -1;
+    if (a.pos > b.pos) return 1;
     return 0;
   });
 }
