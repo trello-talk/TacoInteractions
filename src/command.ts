@@ -12,8 +12,8 @@ interface AutocompleteItemOptions<T = any> {
 }
 
 export default abstract class Command extends SlashCommand {
-  async autocompleteBoards(ctx: AutocompleteContext, opts: AutocompleteItemOptions<TrelloBoard>) {
-    const query = opts.query || ctx.options.board;
+  async autocompleteBoards(ctx: AutocompleteContext, opts?: AutocompleteItemOptions<TrelloBoard>) {
+    const query = opts?.query || ctx.options.board;
     const userData = await prisma.user.findUnique({
       where: { userID: ctx.user.id }
     });
@@ -22,7 +22,7 @@ export default abstract class Command extends SlashCommand {
 
     try {
       const member = await getMember(userData.trelloToken, userData.trelloID);
-      const boards = sortBoards(member.boards.filter(opts.filter || (() => true)));
+      const boards = sortBoards(member.boards.filter(opts?.filter || (() => true)));
 
       if (!query) return boards
         .map((b) => ({ name: getBoardTextLabel(b), value: b.id }))
@@ -40,8 +40,8 @@ export default abstract class Command extends SlashCommand {
     }
   }
 
-  async autocompleteLists(ctx: AutocompleteContext, opts: AutocompleteItemOptions<TrelloList>) {
-    const query = opts.query || ctx.options.board;
+  async autocompleteLists(ctx: AutocompleteContext, opts?: AutocompleteItemOptions<TrelloList>) {
+    const query = opts?.query || ctx.options.list;
     const userData = await prisma.user.findUnique({
       where: { userID: ctx.user.id }
     });
@@ -50,7 +50,7 @@ export default abstract class Command extends SlashCommand {
 
     try {
       const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
-      const lists = board.lists.filter(opts.filter || (() => true)).sort((a, b) => a.pos - b.pos);
+      const lists = board.lists.filter(opts?.filter || (() => true)).sort((a, b) => a.pos - b.pos);
 
       if (!query) return lists
         .map((l) => ({ name: getListTextLabel(l, subs.lists[l.id]), value: l.id }))

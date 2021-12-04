@@ -6,7 +6,7 @@ import SlashCommand from '../../command';
 export default class ClearAuthCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
-      name: 'clearauth',
+      name: 'clear-auth',
       description: 'Remove your authentication data.',
       deferEphemeral: true
     });

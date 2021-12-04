@@ -34,16 +34,14 @@ export default class StarCommand extends SlashCommand {
 
     const member = await getMember(userData.trelloToken, userData.trelloID);
 
-    if (ctx.options.board) {
-      const board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
-      if (board) {
-        if (board.starred)
-          await unstarBoard(userData.trelloToken, userData.trelloID, board.id); else
-          await starBoard(userData.trelloToken, userData.trelloID, board.id);
-        await updateBoardInMember(member.id, board.id, { starred: !board.starred });
+    const board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
+    if (board) {
+      if (board.starred)
+        await unstarBoard(userData.trelloToken, userData.trelloID, board.id); else
+        await starBoard(userData.trelloToken, userData.trelloID, board.id);
+      await updateBoardInMember(member.id, board.id, { starred: !board.starred });
 
-        return `${board.starred ? 'Unstarred' : 'Starred'} the "${truncate(board.name, 100)}" board.`;
-      }
+      return `${board.starred ? 'Unstarred' : 'Starred'} the "${truncate(board.name, 100)}" board.`;
     }
 
     const boards = member.boards.filter(b => !b.closed);

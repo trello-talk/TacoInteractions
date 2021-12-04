@@ -6,7 +6,7 @@ import SlashCommand from '../../command';
 export default class ClearDataCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
-      name: 'cleardata',
+      name: 'clear-data',
       description: 'Remove your user data.',
       deferEphemeral: true
     });

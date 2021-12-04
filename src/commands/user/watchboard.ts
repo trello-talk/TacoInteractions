@@ -10,7 +10,7 @@ import Trello from '../../util/trello';
 export default class WatchBoardCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
-      name: 'watchboard',
+      name: 'watch-board',
       description: 'Subscribe to a board to get notifications on Trello.com.',
       options: [{
         type: CommandOptionType.STRING,
@@ -35,15 +35,13 @@ export default class WatchBoardCommand extends SlashCommand {
 
     const member = await getMember(userData.trelloToken, userData.trelloID);
 
-    if (ctx.options.board) {
-      const board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
-      if (board) {
-        const trello = new Trello(userData.trelloToken);
-        const response = await trello.updateBoard(board.id, { subscribed: !board.subscribed });
-        await updateBoardInMember(member.id, board.id, response.data);
+    const board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
+    if (board) {
+      const trello = new Trello(userData.trelloToken);
+      const response = await trello.updateBoard(board.id, { subscribed: !board.subscribed });
+      await updateBoardInMember(member.id, board.id, response.data);
 
-        return `${board.subscribed ? 'Stopped' : 'Started'} watching the "${truncate(board.name, 100)}" board.`;
-      }
+      return `${board.subscribed ? 'Stopped' : 'Started'} watching the "${truncate(board.name, 100)}" board.`;
     }
 
     const boards = member.boards.filter(b => !b.closed);

@@ -34,16 +34,14 @@ export default class SwitchCommand extends SlashCommand {
 
     const member = await getMember(userData.trelloToken, userData.trelloID);
 
-    if (ctx.options.board) {
-      const board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
-      if (board) {
-        await prisma.user.update({
-          where: { userID: ctx.user.id },
-          data: { currentBoard: board.id }
-        });
+    const board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
+    if (board) {
+      await prisma.user.update({
+        where: { userID: ctx.user.id },
+        data: { currentBoard: board.id }
+      });
 
-        return `Switched to the "${truncate(board.name, 100)}" board.`;
-      }
+      return `Switched to the "${truncate(board.name, 100)}" board.`;
     }
 
     const boards = member.boards.filter(b => !b.closed);
