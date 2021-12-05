@@ -2,9 +2,7 @@ import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } 
 import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
 import { noAuthResponse, truncate } from '../../util';
-import { createQueryPrompt } from '../../util/prompt';
 import { getMember, updateBoardInMember } from '../../util/api';
-import { ActionType, createAction } from '../../util/actions';
 import Trello from '../../util/trello';
 import { createT } from '../../util/locale';
 
@@ -16,9 +14,8 @@ export default class WatchBoardCommand extends SlashCommand {
       options: [{
         type: CommandOptionType.STRING,
         name: 'board',
-        description: 'The board to watch.',
-        autocomplete: true,
-        required: true
+        description: 'The board to watch, defaults to the selected board.',
+        autocomplete: true
       }]
     });
   }
@@ -37,38 +34,14 @@ export default class WatchBoardCommand extends SlashCommand {
     const member = await getMember(userData.trelloToken, userData.trelloID);
     const t = createT(userData.locale);
 
-    const board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
-    if (board) {
-      const trello = new Trello(userData.trelloToken);
-      const response = await trello.updateBoard(board.id, { subscribed: !board.subscribed });
-      await updateBoardInMember(member.id, board.id, response.data);
+    let board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
+    if (!board) board = member.boards.find(b => b.id === userData.currentBoard);
+    if (!board) return t('query.not_found', { context: 'board' });
 
-      return `${board.subscribed ? 'Stopped' : 'Started'} watching the "${truncate(board.name, 100)}" board.`;
-    }
+    const trello = new Trello(userData.trelloToken);
+    const response = await trello.updateBoard(board.id, { subscribed: !board.subscribed });
+    await updateBoardInMember(member.id, board.id, response.data);
 
-    const boards = member.boards.filter(b => !b.closed);
-    if (!boards.length) return 'You have no boards to watch.';
-
-    const action = await createAction(ActionType.BOARD_WATCH, ctx.user.id);
-    await ctx.defer();
-    await ctx.fetch();
-    return await createQueryPrompt(
-      {
-        content: 'Select a board to watch.',
-        placeholder: `Select a board... (${boards.length.toLocaleString()})`,
-        values: boards,
-        display: boards.map(b => ({
-          label: truncate(b.name, 100),
-          description: [
-            b.starred ? 'Starred' : '',
-            b.subscribed ? 'Watched' : '',
-          ].filter(v => !!v).join(' & '),
-          value: b.id
-        })),
-        action
-      },
-      ctx.messageID!,
-      t
-    );
+    return t(board.subscribed ? 'watchboard.unwatched' : 'watchboard.watched', { board: truncate(board.name, 100) });
   }
 }

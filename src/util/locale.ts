@@ -1,4 +1,5 @@
-import i18next from 'i18next';
+import { User } from '@prisma/client';
+import i18next, { TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
 import { isInDist } from './dev';
 import { prisma } from './prisma';
@@ -24,8 +25,13 @@ export function createT(lang: string) {
 }
 
 export async function createUserT(id: string) {
+  const [t] = await createAndGetUserT(id);
+  return t;
+}
+
+export async function createAndGetUserT(id: string): Promise<[TFunction, User]> {
   const userData = await prisma.user.findUnique({
     where: { userID: id }
   });
-  return userData?.locale ? i18next.getFixedT(userData.locale) : i18next.t;
+  return [userData?.locale ? i18next.getFixedT(userData.locale) : i18next.t, userData];
 }

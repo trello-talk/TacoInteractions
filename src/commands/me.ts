@@ -24,7 +24,6 @@ export default class MeCommand extends SlashCommand {
     const member = await getMember(userData.trelloToken, userData.trelloID);
     const t = createT(userData.locale);
 
-    // TODO add more stuff to prompt
     const embed: MessageEmbedOptions = {
       author: {
         name: member.fullName

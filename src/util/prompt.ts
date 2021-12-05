@@ -2,7 +2,7 @@ import { TFunction } from 'i18next';
 import { ButtonStyle, ComponentContext, ComponentType, EditMessageOptions } from 'slash-create';
 import { deleteInteraction } from '.';
 import { Action, actions } from './actions';
-import { createUserT } from './locale';
+import { createAndGetUserT } from './locale';
 import { client } from './redis';
 
 export enum PromptType {
@@ -77,7 +77,7 @@ export interface SelectPrompt extends PromptBase {
 export type Prompt = ListPrompt | QueryPrompt | SelectPrompt;
 
 export async function handlePrompt(ctx: ComponentContext) {
-  const t = await createUserT(ctx.user.id);
+  const [t, data] = await createAndGetUserT(ctx.user.id);
 
   if (ctx.message.interaction!.user.id !== ctx.user.id)
     return ctx.send({
@@ -101,11 +101,11 @@ export async function handlePrompt(ctx: ComponentContext) {
 
   switch (type) {
     case PromptType.LIST:
-      return handleListPrompt(ctx, prompt as ListPrompt, action, t);
+      return handleListPrompt(ctx, prompt as ListPrompt, action, t, data?.locale);
     case PromptType.QUERY:
-      return handleQueryPrompt(ctx, prompt as QueryPrompt, action, t);
+      return handleQueryPrompt(ctx, prompt as QueryPrompt, action, t, data?.locale);
     case PromptType.SELECT:
-      return handleSelectPrompt(ctx, prompt as SelectPrompt, action, t);
+      return handleSelectPrompt(ctx, prompt as SelectPrompt, action, t, data?.locale);
     default:
       return ctx.send({
         content: t('interactions.prompt_no_function'),
@@ -143,7 +143,8 @@ async function handoffAction(ctx: ComponentContext, actionID: string, data: any,
 export async function createListPrompt(
   options: Omit<ListPrompt, 'page' | 'type'>,
   messageID: string,
-  t: TFunction
+  t: TFunction,
+  lang?: string
 ): Promise<EditMessageOptions> {
   const prompt: ListPrompt = {
     ...options,
@@ -177,8 +178,7 @@ export async function createListPrompt(
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            // TODO localize numbers
-            label: `${t('common.page')} ${prompt.page.toLocaleString()}/${prompt.pages.length.toLocaleString()}`,
+            label: `${t('common.page')} ${prompt.page.toLocaleString(lang)}/${prompt.pages.length.toLocaleString(lang)}`,
             custom_id: 'none',
             disabled: true
           },
@@ -203,7 +203,7 @@ export async function createListPrompt(
   };
 }
 
-async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, action: PromptAction, t: TFunction) {
+async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, action: PromptAction, t: TFunction, lang?: string) {
   // Filter out actions that shouldn't be possible
   if (
     (prompt.page <= 1 && action === PromptAction.PREVIOUS) ||
@@ -255,8 +255,7 @@ async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, actio
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            // TODO localize numbers
-            label: `${t('common.page')} ${prompt.page.toLocaleString()}/${prompt.pages.length.toLocaleString()}`,
+            label: `${t('common.page')} ${prompt.page.toLocaleString(lang)}/${prompt.pages.length.toLocaleString(lang)}`,
             custom_id: 'none',
             disabled: true
           },
@@ -284,7 +283,8 @@ async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, actio
 export async function createQueryPrompt(
   options: Omit<QueryPrompt, 'page' | 'type'>,
   messageID: string,
-  t: TFunction
+  t: TFunction,
+  lang?: string
 ): Promise<EditMessageOptions> {
   const prompt: QueryPrompt = {
     ...options,
@@ -297,7 +297,7 @@ export async function createQueryPrompt(
   const max = Math.ceil(prompt.display.length / 25);
   const offset = (prompt.page - 1) * 25;
   return {
-    content: prompt.content || 'Select an item below...',
+    content: prompt.content || t('interactions.prompt_select_item'),
     ...(prompt.title || prompt.footer ? {
       embeds: [{
       ...(prompt.title ? { title: prompt.title, } : {}),
@@ -331,8 +331,7 @@ export async function createQueryPrompt(
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            // TODO localize numbers
-            label: `${t('common.page')} ${prompt.page.toLocaleString()}/${max.toLocaleString()}`,
+            label: `${t('common.page')} ${prompt.page.toLocaleString(lang)}/${max.toLocaleString(lang)}`,
             custom_id: 'none',
             disabled: true
           },
@@ -357,7 +356,7 @@ export async function createQueryPrompt(
   };
 }
 
-async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, action: PromptAction, t: TFunction) {
+async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, action: PromptAction, t: TFunction, lang?: string) {
   const max = Math.ceil(prompt.display.length / 25);
 
   // Filter out actions that shouldn't be possible
@@ -423,8 +422,7 @@ async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, act
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            // TODO localize numbers
-            label: `${t('common.page')} ${prompt.page.toLocaleString()}/${max.toLocaleString()}`,
+            label: `${t('common.page')} ${prompt.page.toLocaleString(lang)}/${max.toLocaleString(lang)}`,
             custom_id: 'none',
             disabled: true
           },
@@ -452,7 +450,8 @@ async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, act
 export async function createSelectPrompt(
   options: Omit<SelectPrompt, 'page' | 'type' | 'selected'>,
   messageID: string,
-  selected?: number[]
+  selected?: number[],
+  lang?: string
 ): Promise<EditMessageOptions> {
   const prompt: SelectPrompt = {
     ...options,
@@ -508,7 +507,7 @@ export async function createSelectPrompt(
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            label: `Page ${prompt.page.toLocaleString()}/${max.toLocaleString()}`,
+            label: `Page ${prompt.page.toLocaleString(lang)}/${max.toLocaleString(lang)}`,
             custom_id: 'none',
             disabled: true
           },
@@ -539,7 +538,7 @@ export async function createSelectPrompt(
   };
 }
 
-async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, action: PromptAction, t: TFunction) {
+async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, action: PromptAction, t: TFunction, lang?: string) {
   const max = Math.ceil(prompt.display.length / 25);
 
   // Filter out actions that shouldn't be possible
@@ -585,8 +584,7 @@ async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, a
     embeds: [
       {
         title: prompt.title,
-        // TODO localize
-        description: `${selected} item(s) selected`,
+        description: t('interactions.items_selected', { count: selected }),
         ...(prompt.footer ? { footer: { text: prompt.footer } } : {})
       }
     ],
@@ -619,8 +617,7 @@ async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, a
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            // TODO localize numbers
-            label: `${t('common.page')} ${prompt.page.toLocaleString()}/${max.toLocaleString()}`,
+            label: `${t('common.page')} ${prompt.page.toLocaleString(lang)}/${max.toLocaleString(lang)}`,
             custom_id: 'none',
             disabled: true
           },

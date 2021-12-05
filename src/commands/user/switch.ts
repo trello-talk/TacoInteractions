@@ -2,12 +2,8 @@ import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } 
 import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
 import { noAuthResponse, truncate } from '../../util';
-import { createQueryPrompt } from '../../util/prompt';
 import { getMember } from '../../util/api';
-import { ActionType, createAction } from '../../util/actions';
 import { createT } from '../../util/locale';
-
-// TODO localize
 export default class SwitchCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -38,38 +34,13 @@ export default class SwitchCommand extends SlashCommand {
     const t = createT(userData.locale);
 
     const board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
-    if (board) {
-      await prisma.user.update({
-        where: { userID: ctx.user.id },
-        data: { currentBoard: board.id }
-      });
+    if (!board) return t('switch.not_found');
 
-      return `Switched to the "${truncate(board.name, 100)}" board.`;
-    }
+    await prisma.user.update({
+      where: { userID: ctx.user.id },
+      data: { currentBoard: board.id }
+    });
 
-    const boards = member.boards.filter(b => !b.closed);
-    if (!boards.length) return 'You have no boards to switch to.';
-
-    const action = await createAction(ActionType.USER_SWITCH, ctx.user.id);
-    await ctx.defer();
-    await ctx.fetch();
-    return await createQueryPrompt(
-      {
-        content: 'Select a board to switch to.',
-        placeholder: `Select a board... (${boards.length.toLocaleString()})`,
-        values: boards,
-        display: boards.map(b => ({
-          label: truncate(b.name, 100),
-          description: [
-            b.starred ? 'Starred' : '',
-            b.subscribed ? 'Watched' : '',
-          ].filter(v => !!v).join(' & '),
-          value: b.id
-        })),
-        action
-      },
-      ctx.messageID!,
-      t
-    );
+    return t('switch.success', { board: truncate(board.name, 100) });
   }
 }
