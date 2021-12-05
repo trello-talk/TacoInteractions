@@ -3,6 +3,7 @@ import SlashCommand from '../../command';
 import { noAuthResponse, sortCards, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getBoard } from '../../util/api';
+import { createT } from '../../util/locale';
 import { prisma } from '../../util/prisma';
 import { createListPrompt } from '../../util/prompt';
 
@@ -32,6 +33,7 @@ export default class ListCommand extends SlashCommand {
     if (!userData || !userData.trelloToken) return noAuthResponse;
 
     const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
+    const t = createT(userData.locale);
 
     const list = board.lists.find(l => l.id === ctx.options.list || l.name === ctx.options.list);
     if (list) {
@@ -47,10 +49,11 @@ export default class ListCommand extends SlashCommand {
               `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} ${truncate(card.name, 100)}`
           ).join('\n'), { maxLength: 4096 })
         },
-        ctx.messageID!
+        ctx.messageID!,
+        t
       );
     }
     
-    return "Couldn't find that list.";
+    return t('query.not_found', { context: 'list' });
   }
 }

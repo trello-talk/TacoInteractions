@@ -1,9 +1,10 @@
 import dotenv from 'dotenv';
 import { SlashCreator, FastifyServer } from 'slash-create';
+import { isInDist } from './util/dev';
 import path from 'path';
 
 let dotenvPath = path.join(process.cwd(), '.env');
-if (path.parse(process.cwd()).name === 'dist') dotenvPath = path.join(process.cwd(), '..', '.env');
+if (isInDist) dotenvPath = path.join(process.cwd(), '..', '.env');
 dotenv.config({ path: dotenvPath });
 
 import { client, connect } from './util/redis';
@@ -11,6 +12,7 @@ import { handlePrompt } from './util/prompt';
 import { Action, actions, load as loadActions } from './util/actions';
 import { logger } from './logger';
 import { deleteInteraction } from './util';
+import { createUserT, init as initLocale } from './util/locale';
 
 export const creator = new SlashCreator({
   applicationID: process.env.DISCORD_APP_ID,
@@ -39,9 +41,10 @@ creator.withServer(new FastifyServer()).registerCommandsIn(path.join(__dirname, 
 creator.on('componentInteraction', async (ctx) => {
   if (ctx.customID === 'none') return ctx.acknowledge();
   else if (ctx.customID === 'delete') {
+    const t = await createUserT(ctx.user.id);
     if (ctx.message.interaction!.user.id !== ctx.user.id)
       return ctx.send({
-        content: '❌ Only the person who executed this command can delete the response.',
+        content: t(['interactions.delete_wrong_user', 'interactions.wrong_user']),
         ephemeral: true
       });
     try {
@@ -49,16 +52,17 @@ creator.on('componentInteraction', async (ctx) => {
     } catch (e) {}
   } else if (ctx.customID.startsWith('prompt:')) return handlePrompt(ctx);
   else if (ctx.customID.startsWith('action:')) {
+    const t = await createUserT(ctx.user.id);
     if (ctx.message.interaction!.user.id !== ctx.user.id)
       return ctx.send({
-        content: '❌ Only the person who executed this command can do this.',
+        content: t('interactions.wrong_user'),
         ephemeral: true
       });
 
     const [, actionID, actionType] = ctx.customID.split(':');
     if (!actionID && !actionType)
       return ctx.send({
-        content: '🔥 No action ID or action type was provided. Contact support if you see this.',
+        content: t('interactions.prompt_no_action_id_or_type'),
         ephemeral: true
       });
 
@@ -73,7 +77,7 @@ creator.on('componentInteraction', async (ctx) => {
       const actionCache = await client.get(`action:${actionID}`);
       if (!actionCache)
         return ctx.send({
-          content: '❌ The action to this prompt has expired, try again later.',
+          content:  t('interactions.prompt_action_expired'),
           ephemeral: true
         });
 
@@ -83,13 +87,13 @@ creator.on('componentInteraction', async (ctx) => {
 
     if (!actions.has(action.type))
       return ctx.send({
-        content: '🔥 The action to this prompt has an invalid type. Contact support if you see this.',
+        content: t('interactions.prompt_action_invalid_type'),
         ephemeral: true
       });
 
     if (actions.get(action.type).requiresData)
       return ctx.send({
-        content: '🔥 The action to this component requires data. Contact support if you see this.',
+        content: t('interactions.prompt_action_requires_data'),
         ephemeral: true
       });
 
@@ -106,6 +110,7 @@ if (process.env.COMMANDS_DEV_GUILD) {
 }
 
 (async () => {
+  await initLocale();
   await connect();
   await loadActions();
   await creator.startServer();

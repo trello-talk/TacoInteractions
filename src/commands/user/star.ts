@@ -5,7 +5,9 @@ import { noAuthResponse, truncate } from '../../util';
 import { createQueryPrompt } from '../../util/prompt';
 import { getMember, starBoard, unstarBoard, updateBoardInMember } from '../../util/api';
 import { ActionType, createAction } from '../../util/actions';
+import { createT } from '../../util/locale';
 
+// TODO localize
 export default class StarCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -33,6 +35,7 @@ export default class StarCommand extends SlashCommand {
     if (!userData || !userData.trelloToken) return noAuthResponse;
 
     const member = await getMember(userData.trelloToken, userData.trelloID);
+    const t = createT(userData.locale);
 
     const board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
     if (board) {
@@ -65,7 +68,7 @@ export default class StarCommand extends SlashCommand {
         })),
         action
       },
-      ctx.messageID!
+      ctx.messageID!, t
     );
   }
 }

@@ -138,9 +138,10 @@ export interface TrelloMember {
       avatar: PrivacySetting;
       fullName: PrivacySetting;
     };
+    locale: string;
     colorBlind: boolean;
     sendSummaries: boolean;
-    marketingOptIn: { optedIn: boolean };
   };
+  marketingOptIn: { optedIn: boolean };
 }
 

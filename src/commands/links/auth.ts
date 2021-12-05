@@ -1,5 +1,6 @@
 import { SlashCommand, SlashCreator, ComponentType, ButtonStyle } from 'slash-create';
 
+// TODO localize
 export default class AuthCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {

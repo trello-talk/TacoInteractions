@@ -3,6 +3,7 @@ import SlashCommand from '../../command';
 import { noAuthResponse, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getMember } from '../../util/api';
+import { createT } from '../../util/locale';
 import { prisma } from '../../util/prisma';
 import { createListPrompt } from '../../util/prompt';
 
@@ -57,6 +58,7 @@ export default class BoardsCommand extends SlashCommand {
     if (!userData || !userData.trelloToken) return noAuthResponse;
 
     const member = await getMember(userData.trelloToken, userData.trelloID);
+    const t = createT(userData.locale);
 
     let boards = member.boards;
     switch (ctx.options.filter as TrelloBoardsFilter) {
@@ -73,19 +75,21 @@ export default class BoardsCommand extends SlashCommand {
         boards = boards.filter(b => b.starred);
         break;
     }
-    if (!boards.length) return 'No boards to list.';
+    if (!boards.length) return t('query.no_list', { context: 'board' });
 
     await ctx.defer();
     await ctx.fetch();
     return await createListPrompt(
       {
-        title: `Boards (${boards.length.toLocaleString()})`,
+        // TODO localize number
+        title: `${t('common.boards')} (${boards.length.toLocaleString()})`,
         pages: splitMessage(boards.map(
           (board) =>
             `${board.closed ? '🗃️ ' : ''}${board.subscribed ? '🔔 ' : ''}${board.starred ? '⭐ ' : ''} [${truncate(board.name, 50)}](${board.shortUrl})`
         ).join('\n'), { maxLength: 4096 })
       },
-      ctx.messageID!
+      ctx.messageID!,
+      t
     );
   }
 }

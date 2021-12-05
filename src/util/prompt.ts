@@ -1,6 +1,8 @@
+import { TFunction } from 'i18next';
 import { ButtonStyle, ComponentContext, ComponentType, EditMessageOptions } from 'slash-create';
 import { deleteInteraction } from '.';
 import { Action, actions } from './actions';
+import { createUserT } from './locale';
 import { client } from './redis';
 
 export enum PromptType {
@@ -75,9 +77,11 @@ export interface SelectPrompt extends PromptBase {
 export type Prompt = ListPrompt | QueryPrompt | SelectPrompt;
 
 export async function handlePrompt(ctx: ComponentContext) {
+  const t = await createUserT(ctx.user.id);
+
   if (ctx.message.interaction!.user.id !== ctx.user.id)
     return ctx.send({
-      content: '❌ Only the person who executed this command can delete the response.',
+      content: t(['interactions.prompt_wrong_user', 'interactions.wrong_user']),
       ephemeral: true
     });
 
@@ -88,7 +92,7 @@ export async function handlePrompt(ctx: ComponentContext) {
     if (action === PromptAction.STOP) return await deleteInteraction(ctx);
     await ctx.acknowledge();
     if (type === PromptType.LIST) await ctx.editParent({ components: [] });
-    await ctx.sendFollowUp({ content: 'This prompt has expired.', ephemeral: true });
+    await ctx.sendFollowUp({ content: t('interactions.prompt_expired'), ephemeral: true });
     if (type !== PromptType.LIST) await ctx.delete();
     return;
   }
@@ -97,30 +101,30 @@ export async function handlePrompt(ctx: ComponentContext) {
 
   switch (type) {
     case PromptType.LIST:
-      return handleListPrompt(ctx, prompt as ListPrompt, action);
+      return handleListPrompt(ctx, prompt as ListPrompt, action, t);
     case PromptType.QUERY:
-      return handleQueryPrompt(ctx, prompt as QueryPrompt, action);
+      return handleQueryPrompt(ctx, prompt as QueryPrompt, action, t);
     case PromptType.SELECT:
-      return handleSelectPrompt(ctx, prompt as SelectPrompt, action);
+      return handleSelectPrompt(ctx, prompt as SelectPrompt, action, t);
     default:
       return ctx.send({
-        content: '🔥 This type of prompt does not have a function. Contact support if you see this.',
+        content: t('interactions.prompt_no_function'),
         ephemeral: true
       });
   }
 }
 
-async function handoffAction(ctx: ComponentContext, actionID: string, data: any) {
+async function handoffAction(ctx: ComponentContext, actionID: string, data: any, t: TFunction) {
   if (!actionID)
     return ctx.send({
-      content: '🔥 No action ID was provided. Contact support if you see this.',
+      content: t('interactions.prompt_no_action_id'),
       ephemeral: true
     });
 
   const actionCache = await client.get(`action:${actionID}`);
   if (!actionCache)
     return ctx.send({
-      content: '❌ The action to this prompt has expired, try again later.',
+      content: t('interactions.prompt_action_expired'),
       ephemeral: true
     });
 
@@ -129,7 +133,7 @@ async function handoffAction(ctx: ComponentContext, actionID: string, data: any)
 
   if (!actions.has(action.type))
     return ctx.send({
-      content: '🔥 The action to this prompt has an invalid type. Contact support if you see this.',
+      content: t('interactions.prompt_action_invalid_type'),
       ephemeral: true
     });
 
@@ -138,7 +142,8 @@ async function handoffAction(ctx: ComponentContext, actionID: string, data: any)
 
 export async function createListPrompt(
   options: Omit<ListPrompt, 'page' | 'type'>,
-  messageID: string
+  messageID: string,
+  t: TFunction
 ): Promise<EditMessageOptions> {
   const prompt: ListPrompt = {
     ...options,
@@ -172,7 +177,8 @@ export async function createListPrompt(
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            label: `Page ${prompt.page.toLocaleString()}/${prompt.pages.length.toLocaleString()}`,
+            // TODO localize numbers
+            label: `${t('common.page')} ${prompt.page.toLocaleString()}/${prompt.pages.length.toLocaleString()}`,
             custom_id: 'none',
             disabled: true
           },
@@ -197,7 +203,7 @@ export async function createListPrompt(
   };
 }
 
-async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, action: PromptAction) {
+async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, action: PromptAction, t: TFunction) {
   // Filter out actions that shouldn't be possible
   if (
     (prompt.page <= 1 && action === PromptAction.PREVIOUS) ||
@@ -249,7 +255,8 @@ async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, actio
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            label: `Page ${prompt.page.toLocaleString()}/${prompt.pages.length.toLocaleString()}`,
+            // TODO localize numbers
+            label: `${t('common.page')} ${prompt.page.toLocaleString()}/${prompt.pages.length.toLocaleString()}`,
             custom_id: 'none',
             disabled: true
           },
@@ -276,7 +283,8 @@ async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, actio
 
 export async function createQueryPrompt(
   options: Omit<QueryPrompt, 'page' | 'type'>,
-  messageID: string
+  messageID: string,
+  t: TFunction
 ): Promise<EditMessageOptions> {
   const prompt: QueryPrompt = {
     ...options,
@@ -323,7 +331,8 @@ export async function createQueryPrompt(
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            label: `Page ${prompt.page.toLocaleString()}/${max.toLocaleString()}`,
+            // TODO localize numbers
+            label: `${t('common.page')} ${prompt.page.toLocaleString()}/${max.toLocaleString()}`,
             custom_id: 'none',
             disabled: true
           },
@@ -348,7 +357,7 @@ export async function createQueryPrompt(
   };
 }
 
-async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, action: PromptAction) {
+async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, action: PromptAction, t: TFunction) {
   const max = Math.ceil(prompt.display.length / 25);
 
   // Filter out actions that shouldn't be possible
@@ -370,7 +379,7 @@ async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, act
       return;
     case PromptAction.SELECT:
       await client.del(`prompt:${ctx.message.id}`);
-      return handoffAction(ctx, prompt.action, prompt.values[parseInt(ctx.values[0], 10)]);
+      return handoffAction(ctx, prompt.action, prompt.values[parseInt(ctx.values[0], 10)], t);
   }
 
   // Set cache
@@ -414,7 +423,8 @@ async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, act
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            label: `Page ${prompt.page.toLocaleString()}/${max.toLocaleString()}`,
+            // TODO localize numbers
+            label: `${t('common.page')} ${prompt.page.toLocaleString()}/${max.toLocaleString()}`,
             custom_id: 'none',
             disabled: true
           },
@@ -529,7 +539,7 @@ export async function createSelectPrompt(
   };
 }
 
-async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, action: PromptAction) {
+async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, action: PromptAction, t: TFunction) {
   const max = Math.ceil(prompt.display.length / 25);
 
   // Filter out actions that shouldn't be possible
@@ -558,7 +568,8 @@ async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, a
       return handoffAction(
         ctx,
         prompt.action,
-        prompt.selected.reduce((a, b) => a.concat(b), []).map((i) => prompt.values[i])
+        prompt.selected.reduce((a, b) => a.concat(b), []).map((i) => prompt.values[i]),
+        t
       );
   }
 
@@ -574,6 +585,7 @@ async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, a
     embeds: [
       {
         title: prompt.title,
+        // TODO localize
         description: `${selected} item(s) selected`,
         ...(prompt.footer ? { footer: { text: prompt.footer } } : {})
       }
@@ -607,7 +619,8 @@ async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, a
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            label: `Page ${prompt.page.toLocaleString()}/${max.toLocaleString()}`,
+            // TODO localize numbers
+            label: `${t('common.page')} ${prompt.page.toLocaleString()}/${max.toLocaleString()}`,
             custom_id: 'none',
             disabled: true
           },
@@ -621,7 +634,7 @@ async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, a
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SUCCESS,
-            label: 'Save',
+            label: t('common.done'),
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.DONE}`
           },
           {

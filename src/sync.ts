@@ -2,10 +2,11 @@
 
 import dotenv from 'dotenv';
 import { SlashCreator } from 'slash-create';
+import { isInDist } from './util/dev';
 import path from 'path';
 
 let dotenvPath = path.join(process.cwd(), '.env');
-if (path.parse(process.cwd()).name === 'dist') dotenvPath = path.join(process.cwd(), '..', '.env');
+if (isInDist) dotenvPath = path.join(process.cwd(), '..', '.env');
 dotenv.config({ path: dotenvPath });
 
 import { logger } from './logger';

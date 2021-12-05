@@ -3,6 +3,7 @@ import { ActionType } from '../../util/actions';
 import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
 
+// TODO localize
 export default class ClearDataCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {

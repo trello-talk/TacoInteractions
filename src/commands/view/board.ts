@@ -3,6 +3,7 @@ import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
 import { noAuthResponse, truncate } from '../../util';
 import { getMember } from '../../util/api';
+import { createT } from '../../util/locale';
 
 export default class BoardCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -30,10 +31,11 @@ export default class BoardCommand extends SlashCommand {
     if (!userData || !userData.trelloToken) return noAuthResponse;
 
     const member = await getMember(userData.trelloToken, userData.trelloID);
+    const t = createT(userData.locale);
 
     let board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
     if (!board) board = member.boards.find(b => b.id === userData.currentBoard);
-    if (!board) return 'No board was given, try selecting a board first.';
+    if (!board) return t('query.not_found', { context: 'board' });
     
     const boardColor = board.prefs && board.prefs.backgroundTopColor ?
       parseInt(board.prefs.backgroundTopColor.slice(1), 16) : 0;

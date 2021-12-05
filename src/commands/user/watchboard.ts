@@ -6,6 +6,7 @@ import { createQueryPrompt } from '../../util/prompt';
 import { getMember, updateBoardInMember } from '../../util/api';
 import { ActionType, createAction } from '../../util/actions';
 import Trello from '../../util/trello';
+import { createT } from '../../util/locale';
 
 export default class WatchBoardCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -34,6 +35,7 @@ export default class WatchBoardCommand extends SlashCommand {
     if (!userData || !userData.trelloToken) return noAuthResponse;
 
     const member = await getMember(userData.trelloToken, userData.trelloID);
+    const t = createT(userData.locale);
 
     const board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
     if (board) {
@@ -65,7 +67,8 @@ export default class WatchBoardCommand extends SlashCommand {
         })),
         action
       },
-      ctx.messageID!
+      ctx.messageID!,
+      t
     );
   }
 }
