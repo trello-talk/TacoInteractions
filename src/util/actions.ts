@@ -10,25 +10,25 @@ export enum ActionType {
 
   USER_CLEAR_DATA = 0,
   USER_CLEAR_AUTH = 1,
-  USER_SWITCH = 2,
+  USER_SWITCH = 2, // @deprecated
 
   BOARD_VIEW = 100,
-  BOARD_WATCH = 101,
+  BOARD_WATCH = 101, // @deprecated
   BOARD_ARCHIVE = 102,
-  BOARD_STAR = 110,
+  BOARD_STAR = 110, // @deprecated
 
-  CARD_VIEW = 200,
+  CARD_VIEW = 200, // @deprecated
   CARD_WATCH = 201,
   CARD_ARCHIVE = 202,
   CARD_DELETE = 203,
   CARD_CREATE = 204,
   CARD_COMMENT = 210,
 
-  LIST_VIEW = 300,
+  LIST_VIEW = 300, // @deprecated
   LIST_WATCH = 301,
   LIST_ARCHIVE = 302,
 
-  LABEL_VIEW = 400,
+  LABEL_VIEW = 400, // @deprecated
   // 401
   // 402
   LABEL_DELETE = 403
