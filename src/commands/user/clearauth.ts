@@ -2,8 +2,8 @@ import { SlashCreator, CommandContext, ComponentType, ButtonStyle } from 'slash-
 import { ActionType } from '../../util/actions';
 import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
+import { createT } from '../../util/locale';
 
-// TODO localize
 export default class ClearAuthCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -18,14 +18,16 @@ export default class ClearAuthCommand extends SlashCommand {
       where: { userID: ctx.user.id }
     });
 
+    const t = createT(userData?.locale);
+
     if (!userData || !userData.trelloToken)
       return {
-        content: 'No authentication data was found.',
+        content: t('clearauth.no_auth'),
         ephemeral: true
       };
 
     return {
-      content: 'Are you sure you want to remove your authentication data?',
+      content: t('clearauth.confirm'),
       ephemeral: true,
       components: [
         {
@@ -34,13 +36,13 @@ export default class ClearAuthCommand extends SlashCommand {
             {
               type: ComponentType.BUTTON,
               style: ButtonStyle.DESTRUCTIVE,
-              label: 'Yes',
+              label: t('common.yes'),
               custom_id: `action::${ActionType.USER_CLEAR_AUTH}`
             },
             {
               type: ComponentType.BUTTON,
               style: ButtonStyle.SECONDARY,
-              label: 'No',
+              label: t('common.no'),
               custom_id: 'delete'
             }
           ]

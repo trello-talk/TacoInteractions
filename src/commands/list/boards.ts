@@ -81,8 +81,7 @@ export default class BoardsCommand extends SlashCommand {
     await ctx.fetch();
     return await createListPrompt(
       {
-        // TODO localize number
-        title: `${t('common.boards')} (${boards.length.toLocaleString()})`,
+        title: `${t('common.boards')} (${boards.length.toLocaleString(userData.locale)})`,
         pages: splitMessage(boards.map(
           (board) =>
             `${board.closed ? '🗃️ ' : ''}${board.subscribed ? '🔔 ' : ''}${board.starred ? '⭐ ' : ''} [${truncate(board.name, 50)}](${board.shortUrl})`

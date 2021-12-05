@@ -43,7 +43,7 @@ export default class ListCommand extends SlashCommand {
       await ctx.fetch();
       return await createListPrompt(
         {
-          title: `Cards in "${truncate(list.name, 100)}" (${cards.length.toLocaleString()})`,
+          title: t('list.title', { list: truncate(list.name, 100), cards: cards.length }),
           pages: splitMessage(cards.map(
             (card) =>
               `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} ${truncate(card.name, 100)}`

@@ -1,6 +1,6 @@
-import { SlashCommand, SlashCreator, ComponentType, ButtonStyle } from 'slash-create';
+import { SlashCommand, SlashCreator, ComponentType, ButtonStyle, CommandContext } from 'slash-create';
+import { createUserT } from '../../util/locale';
 
-// TODO localize
 export default class AuthCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -10,9 +10,10 @@ export default class AuthCommand extends SlashCommand {
     });
   }
 
-  async run() {
+  async run(ctx: CommandContext) {
+    const t = await createUserT(ctx.user.id);
     return {
-      content: 'You can authenticate with Trello using the button below:',
+      content: t('auth.content'),
       ephemeral: true,
       components: [
         {
@@ -21,7 +22,7 @@ export default class AuthCommand extends SlashCommand {
             {
               type: ComponentType.BUTTON,
               style: ButtonStyle.LINK,
-              label: 'Authenticate with Trello',
+              label: t('auth.button'),
               url: process.env.AUTH_LINK
             }
           ]

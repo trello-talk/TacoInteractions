@@ -76,8 +76,7 @@ export default class ListsCommand extends SlashCommand {
     await ctx.fetch();
     return await createListPrompt(
       {
-        // TODO localize number
-        title: `${t('common.lists')} (${lists.length.toLocaleString()})`,
+        title: `${t('common.lists')} (${lists.length.toLocaleString(userData.locale)})`,
         pages: splitMessage(lists.map(
           (list) =>
             `${list.closed ? '🗃️ ' : ''}${subs.lists[list.id] || list.subscribed ? '🔔 ' : ''} ${truncate(list.name, 50)} (${board.cards.filter(c => c.idList == list.id).length.toLocaleString()} card[s])`

@@ -1,4 +1,5 @@
 import { ActionFunction, ActionType } from '../util/actions';
+import { createT } from '../util/locale';
 import { prisma } from '../util/prisma';
 import Trello from '../util/trello';
 
@@ -9,8 +10,10 @@ export const action: ActionFunction = {
       where: { userID: action.user }
     });
 
+    const t = createT(userData?.locale);
+
     if (!userData || !userData.trelloToken)
-      return void ctx.editParent('No authentication data was found.', { components: [] });
+      return void ctx.editParent(t('clearauth.no_auth'), { components: [] });
 
     await new Trello(userData.trelloToken).invalidate();
     await prisma.user.update({
@@ -18,6 +21,6 @@ export const action: ActionFunction = {
       data: { trelloID: null, trelloToken: null }
     });
 
-    return void ctx.editParent('Removed authentication data.', { components: [] });
+    return void ctx.editParent(t('clearauth.done'), { components: [] });
   }
 };
