@@ -3,7 +3,7 @@ import SlashCommand from '../../command';
 import { noAuthResponse, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getBoard } from '../../util/api';
-import { createT } from '../../util/locale';
+import { createT, formatNumber } from '../../util/locale';
 import { prisma } from '../../util/prisma';
 import { createListPrompt } from '../../util/prompt';
 
@@ -56,7 +56,8 @@ export default class ListsCommand extends SlashCommand {
     const t = createT(userData.locale);
 
     let lists = board.lists;
-    switch (ctx.options.filter as TrelloListsFilter) {
+    const filter: TrelloListsFilter = ctx.options.filter || TrelloListsFilter.OPEN;
+    switch (filter) {
       case TrelloListsFilter.ALL:
         break;
       case TrelloListsFilter.ARCHIVED:
@@ -66,7 +67,6 @@ export default class ListsCommand extends SlashCommand {
         lists = lists.filter(l => subs.lists[l.id] || l.subscribed);
         break;
       case TrelloListsFilter.OPEN:
-      default:
         lists = lists.filter(l => !l.closed);
         break;
     }
@@ -76,11 +76,11 @@ export default class ListsCommand extends SlashCommand {
     await ctx.fetch();
     return await createListPrompt(
       {
-        title: `${t('common.lists')} (${lists.length.toLocaleString(userData.locale)})`,
+        title: `${t('lists.list', { context: filter.toLowerCase() })} (${formatNumber(lists.length, userData.locale)})`,
         pages: splitMessage(lists.map(
           (list) =>
-            `${list.closed ? '🗃️ ' : ''}${subs.lists[list.id] || list.subscribed ? '🔔 ' : ''} ${truncate(list.name, 50)} (${board.cards.filter(c => c.idList == list.id).length.toLocaleString()} card[s])`
-        ).join('\n'), { maxLength: 4096 })
+            `${list.closed ? '🗃️ ' : ''}${subs.lists[list.id] || list.subscribed ? '🔔 ' : ''} ${truncate(list.name, 50)} (${formatNumber(board.cards.filter(c => c.idList == list.id).length, userData?.locale)} card[s])`
+        ).join('\n'), { maxLength: 1000 })
       },
       ctx.messageID!,
       t

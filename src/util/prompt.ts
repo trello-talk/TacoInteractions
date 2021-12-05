@@ -2,7 +2,7 @@ import { TFunction } from 'i18next';
 import { ButtonStyle, ComponentContext, ComponentType, EditMessageOptions } from 'slash-create';
 import { deleteInteraction } from '.';
 import { Action, actions } from './actions';
-import { createAndGetUserT } from './locale';
+import { createAndGetUserT, formatNumber } from './locale';
 import { client } from './redis';
 
 export enum PromptType {
@@ -178,7 +178,7 @@ export async function createListPrompt(
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            label: `${t('common.page')} ${prompt.page.toLocaleString(lang)}/${prompt.pages.length.toLocaleString(lang)}`,
+            label: `${t('common.page')} ${formatNumber(prompt.page, lang)}/${formatNumber(prompt.pages.length, lang)}`,
             custom_id: 'none',
             disabled: true
           },
@@ -255,7 +255,7 @@ async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, actio
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            label: `${t('common.page')} ${prompt.page.toLocaleString(lang)}/${prompt.pages.length.toLocaleString(lang)}`,
+            label: `${t('common.page')} ${formatNumber(prompt.page, lang)}/${formatNumber(prompt.pages.length, lang)}`,
             custom_id: 'none',
             disabled: true
           },
@@ -331,7 +331,7 @@ export async function createQueryPrompt(
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            label: `${t('common.page')} ${prompt.page.toLocaleString(lang)}/${max.toLocaleString(lang)}`,
+            label: `${t('common.page')} ${formatNumber(prompt.page, lang)}/${formatNumber(max, lang)}`,
             custom_id: 'none',
             disabled: true
           },
@@ -422,7 +422,7 @@ async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, act
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            label: `${t('common.page')} ${prompt.page.toLocaleString(lang)}/${max.toLocaleString(lang)}`,
+            label: `${t('common.page')} ${formatNumber(prompt.page, lang)}/${formatNumber(max, lang)}`,
             custom_id: 'none',
             disabled: true
           },
@@ -450,6 +450,7 @@ async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, act
 export async function createSelectPrompt(
   options: Omit<SelectPrompt, 'page' | 'type' | 'selected'>,
   messageID: string,
+  t: TFunction,
   selected?: number[],
   lang?: string
 ): Promise<EditMessageOptions> {
@@ -507,7 +508,7 @@ export async function createSelectPrompt(
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            label: `Page ${prompt.page.toLocaleString(lang)}/${max.toLocaleString(lang)}`,
+            label: `${t('common.page')} ${formatNumber(prompt.page, lang)}/${formatNumber(max, lang)}`,
             custom_id: 'none',
             disabled: true
           },
@@ -617,7 +618,7 @@ async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, a
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SECONDARY,
-            label: `${t('common.page')} ${prompt.page.toLocaleString(lang)}/${max.toLocaleString(lang)}`,
+            label: `${t('common.page')} ${formatNumber(prompt.page, lang)}/${formatNumber(max, lang)}`,
             custom_id: 'none',
             disabled: true
           },

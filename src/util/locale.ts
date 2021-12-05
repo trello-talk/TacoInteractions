@@ -35,3 +35,11 @@ export async function createAndGetUserT(id: string): Promise<[TFunction, User]> 
   });
   return [userData?.locale ? i18next.getFixedT(userData.locale) : i18next.t, userData];
 }
+
+export function formatNumber(number: number, lang: string) {
+  try {
+    return new Intl.NumberFormat(lang.replace('_', '-')).format(number);
+  } catch (e) {
+    return number.toLocaleString();
+  }
+}

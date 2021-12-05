@@ -56,17 +56,6 @@ export default class Trello {
   }
 
   /**
-   * Gets the member's board stars
-   * @param id The member's ID
-   * @deprecated
-   */
-  getBoardStars(id: string) {
-    return this._request({
-      url: `/members/${id}/boardStars`
-    });
-  }
-
-  /**
    * Gets the information on a board
    * @param id The board's ID
    */
@@ -93,7 +82,7 @@ export default class Trello {
         lists: 'all',
         list_fields: ['name', 'subscribed', 'closed', 'pos'],
         cards: 'all',
-        card_fields: ['name', 'idList', 'shortLink', 'subscribed', 'closed'],
+        card_fields: ['name', 'idList', 'shortLink', 'subscribed', 'closed', 'idLabels', 'due', 'dueComplete'],
         labels: 'all',
         label_fields: ['name', 'color'],
         organization: true

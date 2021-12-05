@@ -75,6 +75,7 @@ export interface TrelloCard {
   checklists: any[]; // TODO
   members: any[]; // TODO
   idList: string;
+  idLabels: string[];
   shortLink: string;
   shortUrl: string;
   subscribed: boolean;
