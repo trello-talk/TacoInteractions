@@ -10,7 +10,7 @@ export const init = async () => {
     fallbackLng: 'en',
     ns: ['bot', 'commands'],
     defaultNS: 'commands',
-    debug: true,
+    debug: process.env.COMMANDS_DEBUG === 'true',
     interpolation: {
       escapeValue: false
     },

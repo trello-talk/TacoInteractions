@@ -1,8 +1,9 @@
 import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
+import { stripIndents } from 'common-tags';
 import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
-import { noAuthResponse, truncate } from '../../util';
-import { getMember } from '../../util/api';
+import { formatTime, noAuthResponse, truncate } from '../../util';
+import { getBoard, getMember } from '../../util/api';
 import { createT } from '../../util/locale';
 
 export default class BoardCommand extends SlashCommand {
@@ -30,13 +31,21 @@ export default class BoardCommand extends SlashCommand {
 
     if (!userData || !userData.trelloToken) return noAuthResponse;
 
-    const member = await getMember(userData.trelloToken, userData.trelloID);
     const t = createT(userData.locale);
+    let boardID = ctx.options.board || userData.currentBoard;
 
-    let board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
-    if (!board) board = member.boards.find(b => b.id === userData.currentBoard);
-    if (!board) return t('query.not_found', { context: 'board' });
-    
+    if ((!ctx.options.board || /^[a-f0-9]{24}$/.test(ctx.options.board)) && !userData.currentBoard) return t('query.not_found', { context: 'board' });
+
+    if (ctx.options.board) {
+      const member = await getMember(userData.trelloToken, userData.trelloID);
+      let board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
+      if (!board) board = member.boards.find(b => b.id === userData.currentBoard);
+      if (!board) return t('query.not_found', { context: 'board' });
+      boardID = board.id;
+    }
+
+    const [board] = await getBoard(userData.trelloToken, boardID, userData.trelloID);
+
     const boardColor = board.prefs && board.prefs.backgroundTopColor ?
       parseInt(board.prefs.backgroundTopColor.slice(1), 16) : 0;
     const backgroundImg = board.prefs && board.prefs.backgroundImageScaled ?
@@ -51,6 +60,17 @@ export default class BoardCommand extends SlashCommand {
           color: boardColor,
           description: board.desc ? truncate(board.desc, 4096) : undefined,
           image: backgroundImg ? { url: backgroundImg } : undefined,
+          fields: [{
+            // Information
+            name: t('common.info'),
+            value: stripIndents`
+              ${board.closed ? `🗃️ *${t('board.is_archived')}*` : ''}
+
+              ${board.dateLastActivity ? `**${t('common.last_activity')}:** ${formatTime(board.dateLastActivity)}` : ''}
+              ${board.organization ? `**${t('common.org')}:** [${truncate(board.organization.displayName), 50}](https://trello.com/${board.organization.name})` : ''}
+              ${backgroundImg ? `**${t('common.bg_img')}:** [${t('common.link')}](${backgroundImg})\n` : ''}
+            `
+          }]
         }
       ]
     };

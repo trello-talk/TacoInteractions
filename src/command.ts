@@ -1,28 +1,33 @@
 import { AxiosResponse } from "axios";
+import { User } from '@prisma/client';
 import { AutocompleteContext, CommandContext, SlashCommand } from "slash-create";
-import { getBoardTextLabel, getListTextLabel, isElevated, noAuthResponse, sortBoards, sortLists } from "./util";
+import { getBoardTextLabel, getCardTextLabel, getLabelTextLabel, getListTextLabel, isElevated, noAuthResponse, sortBoards, sortLists } from "./util";
 import { getBoard, getMember, TrelloAPIError } from "./util/api";
 import { prisma } from "./util/prisma";
-import { TrelloBoard, TrelloList } from "./util/types";
+import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from "./util/types";
 import fuzzy from 'fuzzy';
 
 interface AutocompleteItemOptions<T = any> {
+  userData?: User;
   query?: string;
   filter?(value: T, index: number, array: T[]): boolean;
 }
 
 export default abstract class Command extends SlashCommand {
-  async autocompleteBoards(ctx: AutocompleteContext, opts?: AutocompleteItemOptions<TrelloBoard>) {
-    const query = opts?.query || ctx.options.board;
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
+  async autocompleteBoards(ctx: AutocompleteContext, opts: AutocompleteItemOptions<TrelloBoard> = {}) {
+    const query = opts.query || ctx.options.board;
+    if (opts.userData === undefined) {
+      opts.userData = await prisma.user.findUnique({
+        where: { userID: ctx.user.id }
+      });
+    }
+    const userData = opts.userData;
 
     if (!userData || !userData.trelloToken) return [];
 
     try {
       const member = await getMember(userData.trelloToken, userData.trelloID);
-      const boards = sortBoards(member.boards.filter(opts?.filter || (() => true)));
+      const boards = sortBoards(member.boards.filter(opts.filter || (() => true)));
 
       if (!query) return boards
         .map((b) => ({ name: getBoardTextLabel(b), value: b.id }))
@@ -40,17 +45,20 @@ export default abstract class Command extends SlashCommand {
     }
   }
 
-  async autocompleteLists(ctx: AutocompleteContext, opts?: AutocompleteItemOptions<TrelloList>) {
-    const query = opts?.query || ctx.options.list;
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
+  async autocompleteLists(ctx: AutocompleteContext, opts: AutocompleteItemOptions<TrelloList> = {}) {
+    const query = opts.query || ctx.options.list;
+    if (opts.userData === undefined) {
+      opts.userData = await prisma.user.findUnique({
+        where: { userID: ctx.user.id }
+      });
+    }
+    const userData = opts.userData;
 
     if (!userData || !userData.trelloToken || !userData.currentBoard) return [];
 
     try {
       const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
-      const lists = sortLists(board.lists.filter(opts?.filter || (() => true)));
+      const lists = sortLists(board.lists.filter(opts.filter || (() => true)));
 
       if (!query) return lists
         .map((l) => ({ name: getListTextLabel(l, subs.lists[l.id]), value: l.id }))
@@ -61,6 +69,70 @@ export default abstract class Command extends SlashCommand {
       });
       return result
         .map((res) => ({ name: getListTextLabel(res.original, subs.lists[res.original.id]), value: res.original.id }))
+        .slice(0, 25);
+    } catch (e) {
+      this.onAutocompleteError(e, ctx)
+      return [];
+    }
+  }
+
+  async autocompleteCards(ctx: AutocompleteContext, opts: AutocompleteItemOptions<TrelloCard> = {}) {
+    const query = opts.query || ctx.options.card;
+    if (opts.userData === undefined) {
+      opts.userData = await prisma.user.findUnique({
+        where: { userID: ctx.user.id }
+      });
+    }
+    const userData = opts.userData;
+
+    if (!userData || !userData.trelloToken || !userData.currentBoard) return [];
+
+    try {
+      const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
+      // TODO sort cards
+      const cards = board.cards.filter(opts.filter || (() => true));
+
+      if (!query) return cards
+        .map((l) => ({ name: getCardTextLabel(l, subs.cards[l.id]), value: l.id }))
+        .slice(0, 25);
+
+      const result = fuzzy.filter(query, cards, {
+        extract: (card) => card.name
+      });
+      return result
+        .map((res) => ({ name: getCardTextLabel(res.original, subs.lists[res.original.id]), value: res.original.id }))
+        .slice(0, 25);
+    } catch (e) {
+      this.onAutocompleteError(e, ctx)
+      return [];
+    }
+  }
+
+  async autocompleteLabels(ctx: AutocompleteContext, opts: AutocompleteItemOptions<TrelloLabel> = {}) {
+    const query = opts.query || ctx.options.label;
+    if (opts.userData === undefined) {
+      opts.userData = await prisma.user.findUnique({
+        where: { userID: ctx.user.id }
+      });
+    }
+    const userData = opts.userData;
+
+    if (!userData || !userData.trelloToken || !userData.currentBoard) return [];
+
+    try {
+      const [board] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
+      // TODO sort labels
+      const labels = board.labels.filter(opts.filter || (() => true));
+
+      if (!query) return labels
+        .map((l) => ({ name: getLabelTextLabel(l), value: l.id }))
+        .slice(0, 25);
+
+      const result = fuzzy.filter(query, labels, {
+        extract: (label) => label.name
+      });
+      return result
+        .map((res) => ({ name: getLabelTextLabel(res.original), value: res.original.id }))
         .slice(0, 25);
     } catch (e) {
       this.onAutocompleteError(e, ctx)
@@ -87,6 +159,7 @@ export default abstract class Command extends SlashCommand {
           where: { userID: ctx.user.id },
           data: { trelloID: null, trelloToken: null }
         });
+        // TODO localize
         return ctx.send('Your authentication token has expired! Please re-authenticate to continue.', { components: noAuthResponse.components })
       }
     }
@@ -101,6 +174,7 @@ export default abstract class Command extends SlashCommand {
       });
     }
 
+    // TODO localize
     if (err instanceof TrelloAPIError)
       return ctx.send("An error occurred with Trello's API!\n" + err.toString());
     else return ctx.send('An error occurred!\n' + err.toString());

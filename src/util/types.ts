@@ -46,6 +46,7 @@ export interface TrelloBoard {
   };
   lists: TrelloList[];
   cards: TrelloCard[];
+  labels: TrelloLabel[];
 }
 
 // TODO update card type

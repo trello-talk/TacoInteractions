@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 import { ButtonStyle, ComponentContext, ComponentType, InteractionResponseFlags, MessageOptions } from 'slash-create';
-import { TrelloBoard, TrelloCard, TrelloList } from './types';
+import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './types';
 
 export function truncate(text: string, limit = 2000) {
   return text.length > limit ? text.slice(0, limit - 1) + '…' : text;
@@ -28,6 +28,11 @@ export async function iterateFolder(
       else if (stat.isDirectory()) await iterateFolder(filePath, callback, extension);
     })
   );
+}
+
+export function formatTime(dateString: string) {
+  const timestamp = Math.round(new Date(dateString).valueOf() / 1000);
+  return `<t:${timestamp}:F> *(<t:${timestamp}:R>)*`;
 }
 
 export interface SplitOptions {
@@ -65,6 +70,7 @@ export function splitMessage(
   return messages.concat(msg).filter((m) => m);
 }
 
+// TODO localize
 export const noAuthResponse: MessageOptions = {
   content: 'You have not authenticated with Trello!',
   ephemeral: true,
@@ -114,6 +120,18 @@ export function getListTextLabel(list: TrelloList, subscribed?: boolean) {
     subscribed || list.subscribed ? '🔔' : '',
     list.closed ? '🗃️' : '',
   ].filter(v => !!v).join('')} ${truncate(list.name, 90)}`;
+}
+
+export function getCardTextLabel(card: TrelloCard, subscribed?: boolean) {
+  return `${[
+    subscribed || card.subscribed ? '🔔' : '',
+    card.closed ? '🗃️' : '',
+  ].filter(v => !!v).join('')} ${truncate(card.name, 90)}`;
+}
+
+export function getLabelTextLabel(label: TrelloLabel) {
+  // TODO add color
+  return `${truncate(label.name, 100)}`;
 }
 
 export function sortBoards(boards: TrelloBoard[]) {
