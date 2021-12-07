@@ -91,7 +91,7 @@ export async function handlePrompt(ctx: ComponentContext) {
   const promptCache = await client.get(`prompt:${ctx.message.id}`);
 
   if (!promptCache) {
-    if (action === PromptAction.STOP) return await deleteInteraction(ctx);
+    if (action === PromptAction.STOP) return await deleteInteraction(ctx, t);
     await ctx.acknowledge();
     if (type === PromptType.LIST) await ctx.editParent({ components: [] });
     await ctx.sendFollowUp({ content: t('interactions.prompt_expired'), ephemeral: true });
@@ -223,7 +223,7 @@ async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, actio
       prompt.page++;
       break;
     case PromptAction.STOP:
-      await deleteInteraction(ctx);
+      await deleteInteraction(ctx, t);
       await client.del(`prompt:${ctx.message.id}`);
       if (prompt.action) await client.del(`action:${prompt.action}`);
       return;
@@ -377,7 +377,7 @@ async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, act
       prompt.page++;
       break;
     case PromptAction.STOP:
-      await deleteInteraction(ctx);
+      await deleteInteraction(ctx, t);
       await client.del(`prompt:${ctx.message.id}`);
       if (prompt.action) await client.del(`action:${prompt.action}`);
       return;
@@ -560,7 +560,7 @@ async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, a
       prompt.page++;
       break;
     case PromptAction.STOP:
-      await deleteInteraction(ctx);
+      await deleteInteraction(ctx, t);
       await client.del(`prompt:${ctx.message.id}`);
       if (prompt.action) await client.del(`action:${prompt.action}`);
       return;
@@ -568,7 +568,7 @@ async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, a
       prompt.selected[prompt.page - 1] = [...new Set(prompt.values.map((v) => parseInt(v, 10)))];
       break;
     case PromptAction.DONE:
-      await deleteInteraction(ctx);
+      await deleteInteraction(ctx, t);
       await client.del(`prompt:${ctx.message.id}`);
       return handoffAction(
         ctx,

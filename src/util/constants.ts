@@ -59,6 +59,20 @@ export const LABEL_COLORS: Record<string, number> = {
   black: 0x344563
 }
 
+export const LABEL_EMOJIS: Record<string, string> = {
+  none: '<:labelNone:917659406244663346>',
+  green: '<:labelGreen:917659218037837834>',
+  yellow: '<:labelYellow:917659218176266290>',
+  red: '<:labelRed:917659218025250826>',
+  orange: '<:labelOrange:917659217983340604>',
+  lime: '<:labelLime:917659217983315998>',
+  purple: '<:labelPurple:917659217450663967>',
+  blue: '<:labelBlue:917659217958141963>',
+  sky: '<:labelSky:917659218155294760>',
+  pink: '<:labelPink:917659218004295720>',
+  black: '<:labelBlack:917659217958141962>'
+}
+
 export const IMAGE_ATTACHMENT_HOST = 'https://trello-attachments.s3.amazonaws.com/';
 
 export const EMOJIS: Record<string, string> = {

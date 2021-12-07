@@ -1,7 +1,7 @@
 import { client } from './redis';
 import Trello from './trello';
 import { AxiosResponse } from 'axios';
-import { TrelloBoard, TrelloBoardStar, TrelloMember } from './types';
+import { TrelloBoard, TrelloBoardStar, TrelloCard, TrelloMember } from './types';
 
 export interface TrelloBoardSubscriptions {
   cards: Record<string, boolean>;
@@ -133,4 +133,17 @@ export async function getBoard(token: string, id: string, memberId: string, requ
   await client.set(key, JSON.stringify(response.data), 'EX', 3 * 60 * 60);
   await client.set(subsKey, JSON.stringify(subscriptions), 'EX', 3 * 60 * 60);
   return [response.data, subscriptions];
+}
+
+export async function getCard(token: string, id: string): Promise<TrelloCard> {
+  const key = `trello.card:${id}`;
+  const cached = await client.get(key);
+  if (cached) return JSON.parse(cached);
+
+  const trello = new Trello(token);
+  const response = await trello.getCard(id);
+  if (response.status >= 400) throw new TrelloAPIError(response);
+
+  await client.set(key, JSON.stringify(response.data), 'EX', 30 * 60);
+  return response.data;
 }

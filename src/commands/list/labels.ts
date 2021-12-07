@@ -3,6 +3,7 @@ import SlashCommand from '../../command';
 import { noAuthResponse, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getBoard } from '../../util/api';
+import { LABEL_EMOJIS } from '../../util/constants';
 import { createT, formatNumber } from '../../util/locale';
 import { prisma } from '../../util/prisma';
 import { createListPrompt } from '../../util/prompt';
@@ -44,25 +45,24 @@ export default class LabelsCommand extends SlashCommand {
 
     const [board] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
 
-    let lists = board.lists;
+    let labels = board.labels;
     const filter: TrelloLabelsFilter = ctx.options.filter || TrelloLabelsFilter.ALL;
     switch (filter) {
       case TrelloLabelsFilter.ALL:
         break;
       case TrelloLabelsFilter.CARDS:
-        lists = lists.filter(l => board.cards.some(c => c.idLabels.includes(l.id)));
+        labels = labels.filter(l => board.cards.some(c => c.idLabels.includes(l.id)));
         break;
     }
-    if (!lists.length) return t('query.no_list', { context: 'list' });
+    if (!labels.length) return t('query.no_list', { context: 'label' });
 
-    // TODO use emojis for label colors
     await ctx.defer();
     await ctx.fetch();
     return await createListPrompt(
       {
-        title: `${t('labels.list', { context: filter.toLowerCase() })} (${formatNumber(board.labels.length, userData.locale)})`,
-        pages: splitMessage(board.labels.map(
-          (label) => `${truncate(label.name, 50)}${label.color ? ` (${t(`common.label_color.${label.color}`)})` : ''}`
+        title: `${t('labels.list', { context: filter.toLowerCase() })} (${formatNumber(labels.length, userData.locale)})`,
+        pages: splitMessage(labels.map(
+          (label) => `${label.color ? LABEL_EMOJIS[label.color] : LABEL_EMOJIS.none} ${truncate(label.name, 50)}`
         ).join('\n'))
       },
       ctx.messageID!,

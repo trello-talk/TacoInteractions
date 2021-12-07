@@ -8,6 +8,24 @@ export function truncate(text: string, limit = 2000) {
   return text.length > limit ? text.slice(0, limit - 1) + '…' : text;
 }
 
+export function truncateList(texts: string[], t: TFunction, limit = 256, sep = '\n') {
+  const result = [];
+  const maxItemLen = t('common.more', { count: texts.length }).length;
+  for (const text of texts) {
+
+    if (result.join(sep).length + sep.length + (maxItemLen > text.length ? maxItemLen : text.length) > limit) {
+      result.push(`*${t('common.more', { count: texts.length - result.length })}*`);
+      break;
+    }
+    result.push(text);
+  }
+  return result.join(sep);
+}
+
+export function toColorInt(hex: string) {
+  return parseInt(hex.slice(1), 16);
+}
+
 export async function iterateFolder(
   folderPath: string,
   callback: (filePath: string) => void | Promise<void>,
@@ -71,7 +89,6 @@ export function splitMessage(
   return messages.concat(msg).filter((m) => m);
 }
 
-// TODO localize
 export function noAuthResponse(t: TFunction): MessageOptions {
   return {
     content: t('auth.no_auth'),
@@ -103,8 +120,8 @@ export function isElevated(user: string) {
   return process.env.COMMANDS_ELEVATED.split(',').includes(user);
 }
 
-export async function deleteInteraction(ctx: ComponentContext) {
-  if (ctx.message.flags === InteractionResponseFlags.EPHEMERAL) await ctx.editParent('You can dismiss this message.', { components: [] })
+export async function deleteInteraction(ctx: ComponentContext, t: TFunction) {
+  if (ctx.message.flags === InteractionResponseFlags.EPHEMERAL) await ctx.editParent(t('interactions.dismiss'), { components: [] })
   else {
     await ctx.acknowledge();
     await ctx.delete();

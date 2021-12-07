@@ -48,7 +48,7 @@ creator.on('componentInteraction', async (ctx) => {
         ephemeral: true
       });
     try {
-      await deleteInteraction(ctx);
+      await deleteInteraction(ctx, t);
     } catch (e) {}
   } else if (ctx.customID.startsWith('prompt:')) return handlePrompt(ctx);
   else if (ctx.customID.startsWith('action:')) {

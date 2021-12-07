@@ -32,7 +32,7 @@ export default class ListCommand extends SlashCommand {
     const t = createT(userData?.locale);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
-    const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
+    const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
 
     const list = board.lists.find(l => l.id === ctx.options.list || l.name === ctx.options.list);
     if (list) {

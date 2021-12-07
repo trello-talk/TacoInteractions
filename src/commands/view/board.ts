@@ -2,7 +2,7 @@ import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } 
 import { stripIndents } from 'common-tags';
 import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
-import { formatTime, noAuthResponse, truncate } from '../../util';
+import { noAuthResponse, truncate } from '../../util';
 import { getBoard, getMember } from '../../util/api';
 import { createT } from '../../util/locale';
 
@@ -64,8 +64,6 @@ export default class BoardCommand extends SlashCommand {
             value: stripIndents`
               ${board.closed ? `🗃️ *${t('board.is_archived')}*` : ''}
               **${t('common.visibility')}:** ${t(`common.perm_levels.${board.prefs.permissionLevel}`)}
-
-              ${board.dateLastActivity ? `**${t('common.last_activity')}:** ${formatTime(board.dateLastActivity)}` : ''}
               ${board.organization ? `**${t('common.org')}:** [${truncate(board.organization.displayName), 50}](https://trello.com/${board.organization.name})` : ''}
               ${backgroundImg ? `**${t('common.bg_img')}:** [${t('common.link')}](${backgroundImg})\n` : ''}
             `
