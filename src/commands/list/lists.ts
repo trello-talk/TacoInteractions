@@ -49,11 +49,10 @@ export default class ListsCommand extends SlashCommand {
     const userData = await prisma.user.findUnique({
       where: { userID: ctx.user.id }
     });
-
-    if (!userData || !userData.trelloToken) return noAuthResponse;
+    const t = createT(userData?.locale);
+    if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
     const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
-    const t = createT(userData.locale);
 
     let lists = board.lists;
     const filter: TrelloListsFilter = ctx.options.filter || TrelloListsFilter.OPEN;

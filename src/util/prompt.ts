@@ -26,6 +26,8 @@ export interface PromptBase {
   title?: string;
   /** The footer text of the prompt */
   footer?: string;
+  /** The embed color of the prompt */
+  color?: number;
   /** The page the list is currently on */
   page: number;
   /** The action redis key that is determined by this prompt, TTL should be updated with this key */
@@ -160,6 +162,7 @@ export async function createListPrompt(
       {
         title: prompt.title,
         description: prompt.pages[prompt.page - 1],
+        color: prompt.color,
         ...(prompt.footer ? { footer: { text: prompt.footer } } : {})
       }
     ],
@@ -237,6 +240,7 @@ async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, actio
       {
         title: prompt.title,
         description: prompt.pages[prompt.page - 1],
+        color: prompt.color,
         ...(prompt.footer ? { footer: { text: prompt.footer } } : {})
       }
     ],
@@ -298,9 +302,10 @@ export async function createQueryPrompt(
   const offset = (prompt.page - 1) * 25;
   return {
     content: prompt.content || t('interactions.prompt_select_item'),
-    ...(prompt.title || prompt.footer ? {
+    ...(prompt.title || prompt.footer || prompt.color ? {
       embeds: [{
-      ...(prompt.title ? { title: prompt.title, } : {}),
+        title: prompt.title,
+        color: prompt.color,
       ...(prompt.footer ? { footer: { text: prompt.footer } } : {})
     }] } : {}),
     components: [

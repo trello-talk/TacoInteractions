@@ -1,4 +1,5 @@
 import { promises as fs } from 'fs';
+import { TFunction } from 'i18next';
 import path from 'path';
 import { ButtonStyle, ComponentContext, ComponentType, InteractionResponseFlags, MessageOptions } from 'slash-create';
 import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './types';
@@ -71,24 +72,27 @@ export function splitMessage(
 }
 
 // TODO localize
-export const noAuthResponse: MessageOptions = {
-  content: 'You have not authenticated with Trello!',
-  ephemeral: true,
-  components: [
-    {
-      type: ComponentType.ACTION_ROW,
-      components: [
-        {
-          type: ComponentType.BUTTON,
-          style: ButtonStyle.LINK,
-          label: 'Authenticate with Trello',
-          url: process.env.AUTH_LINK
-        }
-      ]
-    }
-  ]
+export function noAuthResponse(t: TFunction): MessageOptions {
+  return {
+    content: t('auth.no_auth'),
+    ephemeral: true,
+    components: [
+      {
+        type: ComponentType.ACTION_ROW,
+        components: [
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.LINK,
+            label: t('auth.button'),
+            url: process.env.AUTH_LINK
+          }
+        ]
+      }
+    ]
+  }
 }
 
+// @deprecated
 export const noBoardSelectedResponse: MessageOptions = {
   content: 'Select a board to switch to before using this command!',
   ephemeral: true
@@ -112,26 +116,25 @@ export function getBoardTextLabel(board: TrelloBoard) {
     board.starred ? '⭐' : '',
     board.subscribed ? '🔔' : '',
     board.closed ? '🗃️' : '',
-  ].filter(v => !!v).join('')} ${truncate(board.name, 85)} (${board.shortLink})`;
+  ].filter(v => !!v).join('')} ${truncate(board.name, 85)} (${board.shortLink})`.trim();
 }
 
 export function getListTextLabel(list: TrelloList, subscribed?: boolean) {
   return `${[
     subscribed || list.subscribed ? '🔔' : '',
     list.closed ? '🗃️' : '',
-  ].filter(v => !!v).join('')} ${truncate(list.name, 90)}`;
+  ].filter(v => !!v).join('')} ${truncate(list.name, 90)}`.trim();
 }
 
 export function getCardTextLabel(card: TrelloCard, subscribed?: boolean) {
   return `${[
     subscribed || card.subscribed ? '🔔' : '',
     card.closed ? '🗃️' : '',
-  ].filter(v => !!v).join('')} ${truncate(card.name, 90)}`;
+  ].filter(v => !!v).join('')} ${truncate(card.name, 90)}`.trim();
 }
 
-export function getLabelTextLabel(label: TrelloLabel) {
-  // TODO add color
-  return `${truncate(label.name, 100)}`;
+export function getLabelTextLabel(label: TrelloLabel, t: TFunction) {
+  return `${truncate(label.name, 30)}${label.color ? ` (${t(`common.label_color.${label.color}`)})` : ''}`.trim();
 }
 
 export function sortBoards(boards: TrelloBoard[]) {

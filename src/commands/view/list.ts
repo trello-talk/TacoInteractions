@@ -29,15 +29,21 @@ export default class ListCommand extends SlashCommand {
     const userData = await prisma.user.findUnique({
       where: { userID: ctx.user.id }
     });
-
-    if (!userData || !userData.trelloToken) return noAuthResponse;
+    const t = createT(userData?.locale);
+    if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
     const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
-    const t = createT(userData.locale);
 
     const list = board.lists.find(l => l.id === ctx.options.list || l.name === ctx.options.list);
     if (list) {
       const cards = sortCards(board.cards.filter(c => c.idList === list.id));
+
+      if (!cards.length) return {
+        embeds: [{
+          title: t('list.title', { label: truncate(list.name, 100), cards: 0 }),
+          description: `*${t('list.none')}*`
+        }]
+      }
 
       await ctx.defer();
       await ctx.fetch();

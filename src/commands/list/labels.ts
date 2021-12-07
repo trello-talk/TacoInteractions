@@ -27,7 +27,7 @@ export default class LabelsCommand extends SlashCommand {
             value: TrelloLabelsFilter.ALL
           },
           {
-            name: 'Cards',
+            name: 'Assigned to Cards',
             value: TrelloLabelsFilter.CARDS
           }
         ]
@@ -39,11 +39,10 @@ export default class LabelsCommand extends SlashCommand {
     const userData = await prisma.user.findUnique({
       where: { userID: ctx.user.id }
     });
+    const t = createT(userData?.locale);
+    if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
-    if (!userData || !userData.trelloToken) return noAuthResponse;
-
-    const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
-    const t = createT(userData.locale);
+    const [board] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
 
     let lists = board.lists;
     const filter: TrelloLabelsFilter = ctx.options.filter || TrelloLabelsFilter.ALL;
@@ -56,13 +55,14 @@ export default class LabelsCommand extends SlashCommand {
     }
     if (!lists.length) return t('query.no_list', { context: 'list' });
 
+    // TODO use emojis for label colors
     await ctx.defer();
     await ctx.fetch();
     return await createListPrompt(
       {
         title: `${t('labels.list', { context: filter.toLowerCase() })} (${formatNumber(board.labels.length, userData.locale)})`,
         pages: splitMessage(board.labels.map(
-          (label) => truncate(label.name, 50)
+          (label) => `${truncate(label.name, 50)}${label.color ? ` (${t(`common.label_color.${label.color}`)})` : ''}`
         ).join('\n'))
       },
       ctx.messageID!,

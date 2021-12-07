@@ -27,11 +27,10 @@ export default class StarCommand extends SlashCommand {
     const userData = await prisma.user.findUnique({
       where: { userID: ctx.user.id }
     });
-
-    if (!userData || !userData.trelloToken) return noAuthResponse;
+    const t = createT(userData?.locale);
+    if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
     const member = await getMember(userData.trelloToken, userData.trelloID);
-    const t = createT(userData.locale);
 
     let board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
     if (!board) board = member.boards.find(b => b.id === userData.currentBoard);

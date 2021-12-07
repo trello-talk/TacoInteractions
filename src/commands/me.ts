@@ -18,11 +18,11 @@ export default class MeCommand extends SlashCommand {
     const userData = await prisma.user.findUnique({
       where: { userID: ctx.user.id }
     });
+    const t = createT(userData?.locale);
 
-    if (!userData || !userData.trelloToken) return noAuthResponse;
+    if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
     const member = await getMember(userData.trelloToken, userData.trelloID);
-    const t = createT(userData.locale);
 
     const embed: MessageEmbedOptions = {
       author: {

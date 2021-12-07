@@ -6,6 +6,7 @@ import { getBoard, getMember, TrelloAPIError } from "./util/api";
 import { prisma } from "./util/prisma";
 import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from "./util/types";
 import fuzzy from 'fuzzy';
+import { createT } from "./util/locale";
 
 interface AutocompleteItemOptions<T = any> {
   userData?: User;
@@ -116,6 +117,7 @@ export default abstract class Command extends SlashCommand {
       });
     }
     const userData = opts.userData;
+    const t = createT(userData?.locale);
 
     if (!userData || !userData.trelloToken || !userData.currentBoard) return [];
 
@@ -125,14 +127,14 @@ export default abstract class Command extends SlashCommand {
       const labels = board.labels.filter(opts.filter || (() => true));
 
       if (!query) return labels
-        .map((l) => ({ name: getLabelTextLabel(l), value: l.id }))
+        .map((l) => ({ name: getLabelTextLabel(l, t), value: l.id }))
         .slice(0, 25);
 
       const result = fuzzy.filter(query, labels, {
         extract: (label) => label.name
       });
       return result
-        .map((res) => ({ name: getLabelTextLabel(res.original), value: res.original.id }))
+        .map((res) => ({ name: getLabelTextLabel(res.original, t), value: res.original.id }))
         .slice(0, 25);
     } catch (e) {
       this.onAutocompleteError(e, ctx)
@@ -155,12 +157,12 @@ export default abstract class Command extends SlashCommand {
     if ('response' in err) {
       const response = (err as any).response as AxiosResponse;
       if (response.status === 401 && response.data === 'invalid token') {
-        await prisma.user.update({
+        const userData = await prisma.user.update({
           where: { userID: ctx.user.id },
           data: { trelloID: null, trelloToken: null }
         });
-        // TODO localize
-        return ctx.send('Your authentication token has expired! Please re-authenticate to continue.', { components: noAuthResponse.components })
+        const t = createT(userData?.locale);
+        return ctx.send(t('auth.expired'), { components: noAuthResponse(t).components })
       }
     }
 

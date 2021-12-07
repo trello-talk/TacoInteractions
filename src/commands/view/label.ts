@@ -3,6 +3,7 @@ import SlashCommand from '../../command';
 import { noAuthResponse, sortCards, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getBoard } from '../../util/api';
+import { LABEL_COLORS } from '../../util/constants';
 import { createT } from '../../util/locale';
 import { prisma } from '../../util/prisma';
 import { createListPrompt } from '../../util/prompt';
@@ -29,21 +30,29 @@ export default class LabelCommand extends SlashCommand {
     const userData = await prisma.user.findUnique({
       where: { userID: ctx.user.id }
     });
-
-    if (!userData || !userData.trelloToken) return noAuthResponse;
+    const t = createT(userData?.locale);
+    if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
     const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
-    const t = createT(userData.locale);
 
     const label = board.labels.find(l => l.id === ctx.options.label);
     if (label) {
       const cards = sortCards(board.cards.filter(c => c.idLabels.includes(label.id)));
+
+      if (!cards.length) return {
+        embeds: [{
+          title: t('label.title', { label: truncate(label.name, 100), cards: 0 }),
+          color: label.color ? LABEL_COLORS[label.color] : undefined,
+          description: `*${t('label.none')}*`
+        }]
+      }
 
       await ctx.defer();
       await ctx.fetch();
       return await createListPrompt(
         {
           title: t('label.title', { label: truncate(label.name, 100), cards: cards.length }),
+          color: label.color ? LABEL_COLORS[label.color] : undefined,
           pages: splitMessage(cards.map(
             (card) =>
               `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} ${truncate(card.name, 100)}`

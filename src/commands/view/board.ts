@@ -28,10 +28,9 @@ export default class BoardCommand extends SlashCommand {
     const userData = await prisma.user.findUnique({
       where: { userID: ctx.user.id }
     });
+    const t = createT(userData?.locale);
+    if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
-    if (!userData || !userData.trelloToken) return noAuthResponse;
-
-    const t = createT(userData.locale);
     let boardID = ctx.options.board || userData.currentBoard;
 
     if ((!ctx.options.board || /^[a-f0-9]{24}$/.test(ctx.options.board)) && !userData.currentBoard) return t('query.not_found', { context: 'board' });
@@ -51,7 +50,6 @@ export default class BoardCommand extends SlashCommand {
     const backgroundImg = board.prefs && board.prefs.backgroundImageScaled ?
       board.prefs.backgroundImageScaled.reverse()[1].url : null;
 
-    // TODO add more board info
     return {
       embeds: [
         {
@@ -65,12 +63,16 @@ export default class BoardCommand extends SlashCommand {
             name: t('common.info'),
             value: stripIndents`
               ${board.closed ? `🗃️ *${t('board.is_archived')}*` : ''}
+              **${t('common.visibility')}:** ${t(`common.perm_levels.${board.prefs.permissionLevel}`)}
 
               ${board.dateLastActivity ? `**${t('common.last_activity')}:** ${formatTime(board.dateLastActivity)}` : ''}
               ${board.organization ? `**${t('common.org')}:** [${truncate(board.organization.displayName), 50}](https://trello.com/${board.organization.name})` : ''}
               ${backgroundImg ? `**${t('common.bg_img')}:** [${t('common.link')}](${backgroundImg})\n` : ''}
             `
-          }]
+          }],
+          footer: {
+            text: t('board.footer', { lists: board.lists.filter(c => !c.closed).length, cards: board.cards.filter(c => !c.closed).length })
+          }
         }
       ]
     };
