@@ -13,7 +13,6 @@ type TrelloColor =
   | 'pink'
   | 'black';
 
-// TODO update board type
 export interface TrelloBoard {
   id: string;
   name: string;
@@ -49,7 +48,6 @@ export interface TrelloBoard {
   labels: TrelloLabel[];
 }
 
-// TODO update card type
 export interface TrelloCard {
   id: string;
   name: string;
@@ -69,12 +67,12 @@ export interface TrelloCard {
   due?: string;
   dueReminder?: number | null;
   idAttachmentCover?: string;
-  membersVoted: any[]; // TODO
+  membersVoted: TrelloUser[];
   labels: TrelloLabel[];
-  attachments: any[]; // TODO
-  stickers: any[]; // TODO
-  checklists: any[]; // TODO
-  members: any[]; // TODO
+  attachments: TrelloAttachment[];
+  stickers: TrelloSticker[];
+  checklists: TrelloChecklist[];
+  members: TrelloUser[];
   idList: string;
   idLabels: string[];
   shortLink: string;
@@ -98,6 +96,33 @@ export interface TrelloLabel {
   color: TrelloColor;
 }
 
+export interface TrelloAttachment {
+  id: string;
+  url: string;
+  name: string;
+  edgeColor: string | null;
+}
+
+export interface TrelloSticker {
+  id: string;
+  image: string;
+  imageUrl: string;
+  imageScaled: TrelloScaledImage[];
+}
+
+export interface TrelloChecklist {
+  id: string;
+  name: string;
+  checkItems: TrelloCheckItem[];
+}
+
+export interface TrelloCheckItem {
+  id: string;
+  name: string;
+  state: 'incomplete' | 'complete';
+  pos: number;
+}
+
 export interface TrelloScaledImage {
   width: number;
   height: number;
@@ -105,7 +130,7 @@ export interface TrelloScaledImage {
 }
 
 export interface TrelloUser {
-  id: number;
+  id: string;
   avatarHash?: string;
   fullName?: string;
   avatarUrl?: string;

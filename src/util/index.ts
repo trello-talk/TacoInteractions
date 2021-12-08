@@ -1,3 +1,4 @@
+import { stripIndentTransformer, TemplateTag } from 'common-tags';
 import { promises as fs } from 'fs';
 import { TFunction } from 'i18next';
 import path from 'path';
@@ -25,6 +26,12 @@ export function truncateList(texts: string[], t: TFunction, limit = 256, sep = '
 export function toColorInt(hex: string) {
   return parseInt(hex.slice(1), 16);
 }
+
+/** Strip indents, extra newlines and trim the result. */
+export const stripIndentsAndNewlines = new TemplateTag(
+  stripIndentTransformer('all'),
+  { onEndResult: endResult => endResult.replace(/[^\S\n]+$/gm, '').replace(/^\n/, '').replace(/\n(\n+)/g, '\n') }
+);
 
 export async function iterateFolder(
   folderPath: string,
@@ -109,12 +116,13 @@ export function noAuthResponse(t: TFunction): MessageOptions {
   }
 }
 
-// @deprecated
-export const noBoardSelectedResponse: MessageOptions = {
-  content: 'Select a board to switch to before using this command!',
-  ephemeral: true
+export function noBoardSelectedResponse(t: TFunction): MessageOptions {
+  return {
+    content: t('switch.no_board_command'),
+    ephemeral: true
+  }
+  
 }
-
 export function isElevated(user: string) {
   if (!process.env.COMMANDS_ELEVATED) return false;
   return process.env.COMMANDS_ELEVATED.split(',').includes(user);

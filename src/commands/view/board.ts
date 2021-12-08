@@ -1,8 +1,7 @@
 import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
-import { stripIndents } from 'common-tags';
 import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
-import { noAuthResponse, truncate } from '../../util';
+import { noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { getBoard, getMember } from '../../util/api';
 import { createT } from '../../util/locale';
 
@@ -61,7 +60,7 @@ export default class BoardCommand extends SlashCommand {
           fields: [{
             // Information
             name: t('common.info'),
-            value: stripIndents`
+            value: stripIndentsAndNewlines`
               ${board.closed ? `🗃️ *${t('board.is_archived')}*` : ''}
               **${t('common.visibility')}:** ${t(`common.perm_levels.${board.prefs.permissionLevel}`)}
               ${board.organization ? `**${t('common.org')}:** [${truncate(board.organization.displayName), 50}](https://trello.com/${board.organization.name})` : ''}
