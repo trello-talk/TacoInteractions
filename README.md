@@ -1,2 +1,2 @@
-# Taco Slash Commands
+# Taco Interactions
 TODO

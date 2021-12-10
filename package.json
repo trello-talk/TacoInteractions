@@ -1,9 +1,10 @@
 {
-  "name": "taco-slash-commands",
-  "version": "1.0.0",
-  "description": "Taco Bot over Slash commands",
+  "name": "taco-interactions",
+  "version": "8.0.0",
+  "description": "Taco Bot over Discord Interactions: Manage Trello boards straight from Discord!",
   "main": "dist/index.js",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "start": "cd dist && node index.js",
     "build": "npx rimraf dist && npx tsc",
