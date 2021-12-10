@@ -1,6 +1,6 @@
 import { SlashCreator, CommandContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, splitMessage } from '../../util';
+import { noAuthResponse, noBoardSelectedResponse, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getBoard } from '../../util/api';
 import { createT, formatNumber } from '../../util/locale';
@@ -51,6 +51,7 @@ export default class ListsCommand extends SlashCommand {
     });
     const t = createT(userData?.locale);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
+    if (!userData.currentBoard) return noBoardSelectedResponse(t);
 
     const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
 

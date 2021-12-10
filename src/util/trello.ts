@@ -26,7 +26,9 @@ export default class Trello {
     // Body Format
     if (options.data && options.isForm) {
       const body = new URLSearchParams();
-      Object.keys(options.data).forEach((key) => body.append(key, options.data[key]));
+      Object.keys(options.data).forEach((key) => {
+        if (options.data[key] !== undefined) body.append(key, options.data[key]);
+      });
       options.headers['Content-Type'] = 'application/x-www-form-urlencoded';
       options.data = body.toString();
     }

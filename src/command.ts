@@ -94,14 +94,14 @@ export default abstract class Command extends SlashCommand {
       const cards = board.cards.filter(opts.filter || (() => true));
 
       if (!query) return cards
-        .map((l) => ({ name: getCardTextLabel(l, subs.cards[l.id]), value: l.id }))
+        .map((c) => ({ name: getCardTextLabel(c, board.lists, subs.cards[c.id]), value: c.id }))
         .slice(0, 25);
 
       const result = fuzzy.filter(query, cards, {
         extract: (card) => card.name
       });
       return result
-        .map((res) => ({ name: getCardTextLabel(res.original, subs.lists[res.original.id]), value: res.original.id }))
+        .map((res) => ({ name: getCardTextLabel(res.original, board.lists, subs.lists[res.original.id]), value: res.original.id }))
         .slice(0, 25);
     } catch (e) {
       this.onAutocompleteError(e, ctx)
@@ -123,8 +123,7 @@ export default abstract class Command extends SlashCommand {
 
     try {
       const [board] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
-      // TODO sort labels
-      const labels = board.labels.filter(opts.filter || (() => true));
+      const labels = board.labels.filter(opts.filter || (() => true)).sort((a, b) => a.name.localeCompare(b.name));
 
       if (!query) return labels
         .map((l) => ({ name: getLabelTextLabel(l, t), value: l.id }))
@@ -176,7 +175,7 @@ export default abstract class Command extends SlashCommand {
       });
     }
 
-    // TODO localize
+    // ? should i even localize this
     if (err instanceof TrelloAPIError)
       return ctx.send("An error occurred with Trello's API!\n" + err.toString());
     else return ctx.send('An error occurred!\n' + err.toString());

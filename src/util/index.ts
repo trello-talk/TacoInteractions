@@ -151,11 +151,12 @@ export function getListTextLabel(list: TrelloList, subscribed?: boolean) {
   ].filter(v => !!v).join('')} ${truncate(list.name, 90)}`.trim();
 }
 
-export function getCardTextLabel(card: TrelloCard, subscribed?: boolean) {
+export function getCardTextLabel(card: TrelloCard, lists: TrelloList[], subscribed?: boolean) {
+  const listName = lists.find(list => list.id === card.idList).name;
   return `${[
     subscribed || card.subscribed ? '🔔' : '',
     card.closed ? '🗃️' : '',
-  ].filter(v => !!v).join('')} ${truncate(card.name, 90)}`.trim();
+  ].filter(v => !!v).join('')} ${truncate(card.name, 65)} (${truncate(listName, 20)})`.trim();
 }
 
 export function getLabelTextLabel(label: TrelloLabel, t: TFunction) {

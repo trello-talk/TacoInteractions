@@ -1,6 +1,6 @@
 import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, sortCards, splitMessage } from '../../util';
+import { noAuthResponse, noBoardSelectedResponse, sortCards, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getBoard } from '../../util/api';
 import { LABEL_COLORS } from '../../util/constants';
@@ -17,7 +17,8 @@ export default class LabelCommand extends SlashCommand {
         type: CommandOptionType.STRING,
         name: 'label',
         description: 'The label to view.',
-        autocomplete: true
+        autocomplete: true,
+        required: true
       }]
     });
   }
@@ -32,6 +33,7 @@ export default class LabelCommand extends SlashCommand {
     });
     const t = createT(userData?.locale);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
+    if (!userData.currentBoard) return noBoardSelectedResponse(t);
 
     const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
 

@@ -1,6 +1,6 @@
 import { SlashCreator, CommandContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, splitMessage } from '../../util';
+import { noAuthResponse, noBoardSelectedResponse, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getBoard } from '../../util/api';
 import { createT, formatNumber } from '../../util/locale';
@@ -66,6 +66,7 @@ export default class CardsCommand extends SlashCommand {
     });
     const t = createT(userData?.locale);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
+    if (!userData.currentBoard) return noBoardSelectedResponse(t);
 
     const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
 
@@ -102,7 +103,7 @@ export default class CardsCommand extends SlashCommand {
         title: `${t('cards.list', { context: filter.toLowerCase() })} (${formatNumber(cards.length, userData.locale)})`,
         pages: splitMessage(cards.map(
           (card) =>
-            `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} [${truncate(card.name, 50)}](${card.shortUrl}) (${truncate(board.lists.find(l => l.id === card.idList).name, 25)})`
+            `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} [${truncate(card.name, 25)}](https://trello.com/c/${card.shortLink} "${truncate(card.name, 50)}") (${truncate(board.lists.find(l => l.id === card.idList).name, 25)})`
         ).join('\n'), { maxLength: 1000 }),
       },
       ctx.messageID!,

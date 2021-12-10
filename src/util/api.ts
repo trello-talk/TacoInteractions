@@ -59,7 +59,7 @@ export async function updateBoardInMember(
     if (board.id === boardId) Object.assign(board, options);
   });
 
-  await recacheKey(key, JSON.stringify(member));
+  await recacheKey(key, member);
   return true;
 }
 
@@ -76,7 +76,7 @@ export async function starBoard(token: string, id: string, boardID: string): Pro
   const newBoardStar: TrelloBoardStar = response.data;
   member.boardStars.push(newBoardStar);
 
-  await recacheKey(key, JSON.stringify(member));
+  await recacheKey(key, member);
   return true;
 }
 
@@ -92,7 +92,7 @@ export async function unstarBoard(token: string, id: string, boardID: string): P
   const key = `trello.member:${id}`;
   member.boardStars = member.boardStars.filter((star) => star.idBoard !== boardID);
 
-  await recacheKey(key, JSON.stringify(member));
+  await recacheKey(key, member);
   return true;
 }
 
@@ -133,6 +133,29 @@ export async function getBoard(token: string, id: string, memberId: string, requ
   await client.set(key, JSON.stringify(response.data), 'EX', 3 * 60 * 60);
   await client.set(subsKey, JSON.stringify(subscriptions), 'EX', 3 * 60 * 60);
   return [response.data, subscriptions];
+}
+
+export async function uncacheBoard(id: string): Promise<number> {
+  return await client.del(`trello.board:${id}`);
+}
+
+export async function updateBoardSub(
+  memberId: string,
+  boardId: string,
+  itemId: string,
+  type: 'list' | 'card',
+  value: boolean
+): Promise<boolean> {
+  const key = `trello.board.sub:${boardId}:${memberId}`;
+  const cached = await client.get(key);
+  if (!cached) return false;
+
+  const subs: TrelloBoardSubscriptions = JSON.parse(cached);
+  if (type === 'list') subs.lists[itemId] = value;
+  else if (type === 'card') subs.cards[itemId] = value;
+
+  await recacheKey(key, subs);
+  return true;
 }
 
 export async function getCard(token: string, id: string): Promise<TrelloCard> {

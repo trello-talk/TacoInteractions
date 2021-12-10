@@ -1,6 +1,6 @@
 import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, sortCards, splitMessage } from '../../util';
+import { noAuthResponse, noBoardSelectedResponse, sortCards, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getBoard } from '../../util/api';
 import { createT } from '../../util/locale';
@@ -16,7 +16,8 @@ export default class ListCommand extends SlashCommand {
         type: CommandOptionType.STRING,
         name: 'list',
         description: 'The list to view.',
-        autocomplete: true
+        autocomplete: true,
+        required: true
       }]
     });
   }
@@ -31,6 +32,7 @@ export default class ListCommand extends SlashCommand {
     });
     const t = createT(userData?.locale);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
+    if (!userData.currentBoard) return noBoardSelectedResponse(t);
 
     const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
 
