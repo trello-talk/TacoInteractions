@@ -12,13 +12,15 @@ export default class ListCommand extends SlashCommand {
     super(creator, {
       name: 'list',
       description: 'View cards in a Trello list on your selected board.',
-      options: [{
-        type: CommandOptionType.STRING,
-        name: 'list',
-        description: 'The list to view.',
-        autocomplete: true,
-        required: true
-      }]
+      options: [
+        {
+          type: CommandOptionType.STRING,
+          name: 'list',
+          description: 'The list to view.',
+          autocomplete: true,
+          required: true
+        }
+      ]
     });
   }
 
@@ -36,26 +38,36 @@ export default class ListCommand extends SlashCommand {
 
     const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
 
-    const list = board.lists.find(l => l.id === ctx.options.list || l.name === ctx.options.list);
+    const list = board.lists.find((l) => l.id === ctx.options.list || l.name === ctx.options.list);
     if (list) {
-      const cards = sortCards(board.cards.filter(c => c.idList === list.id));
+      const cards = sortCards(board.cards.filter((c) => c.idList === list.id));
 
-      if (!cards.length) return {
-        embeds: [{
-          title: t('list.title', { label: truncate(list.name, 100), cards: 0 }),
-          description: `*${t('list.none')}*`
-        }]
-      }
+      if (!cards.length)
+        return {
+          embeds: [
+            {
+              title: t('list.title', { label: truncate(list.name, 100), cards: 0 }),
+              description: `*${t('list.none')}*`
+            }
+          ]
+        };
 
       await ctx.defer();
       await ctx.fetch();
       return await createListPrompt(
         {
           title: t('list.title', { list: truncate(list.name, 100), cards: cards.length }),
-          pages: splitMessage(cards.map(
-            (card) =>
-              `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} ${truncate(card.name, 100)}`
-          ).join('\n'))
+          pages: splitMessage(
+            cards
+              .map(
+                (card) =>
+                  `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} ${truncate(
+                    card.name,
+                    100
+                  )}`
+              )
+              .join('\n')
+          )
         },
         ctx.messageID!,
         t

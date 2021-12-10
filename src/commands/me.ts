@@ -36,7 +36,7 @@ export default class MeCommand extends SlashCommand {
       footer: {
         text: t('me.footer', { boards: member.boards.length, orgs: member.idOrganizations.length })
       }
-    }
+    };
 
     return {
       ephemeral: true,

@@ -1,17 +1,7 @@
 type TrelloPermissionLevel = 'public' | 'private' | 'org' | 'observers';
 type TrelloBackgroundBrightness = 'dark' | 'light';
 type TrelloBackgroundSize = 'normal' | 'full';
-type TrelloColor =
-  | 'green'
-  | 'yellow'
-  | 'red'
-  | 'orange'
-  | 'lime'
-  | 'purple'
-  | 'blue'
-  | 'sky'
-  | 'pink'
-  | 'black';
+type TrelloColor = 'green' | 'yellow' | 'red' | 'orange' | 'lime' | 'purple' | 'blue' | 'sky' | 'pink' | 'black';
 
 export interface TrelloBoard {
   id: string;
@@ -171,4 +161,3 @@ export interface TrelloMember {
   };
   marketingOptIn: { optedIn: boolean };
 }
-

@@ -9,18 +9,20 @@ export default class SwitchCommand extends SlashCommand {
     super(creator, {
       name: 'switch',
       description: 'Switch your board context to interact with board elements.',
-      options: [{
-        type: CommandOptionType.STRING,
-        name: 'board',
-        description: 'The board to switch to.',
-        autocomplete: true,
-        required: true
-      }]
+      options: [
+        {
+          type: CommandOptionType.STRING,
+          name: 'board',
+          description: 'The board to switch to.',
+          autocomplete: true,
+          required: true
+        }
+      ]
     });
   }
 
   async autocomplete(ctx: AutocompleteContext) {
-    return this.autocompleteBoards(ctx, { filter: b => !b.closed });
+    return this.autocompleteBoards(ctx, { filter: (b) => !b.closed });
   }
 
   async run(ctx: CommandContext) {
@@ -32,7 +34,7 @@ export default class SwitchCommand extends SlashCommand {
 
     const member = await getMember(userData.trelloToken, userData.trelloID);
 
-    const board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
+    const board = member.boards.find((b) => b.id === ctx.options.board || b.shortLink === ctx.options.board);
     if (!board) return t('switch.not_found');
 
     await prisma.user.update({

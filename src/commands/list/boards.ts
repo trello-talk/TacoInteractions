@@ -12,7 +12,7 @@ enum TrelloBoardsFilter {
   OPEN = 'Open',
   ARCHIVED = 'Archived',
   WATCHED = 'Watched',
-  STARRED = 'Starred',
+  STARRED = 'Starred'
 }
 
 export default class BoardsCommand extends SlashCommand {
@@ -20,33 +20,35 @@ export default class BoardsCommand extends SlashCommand {
     super(creator, {
       name: 'boards',
       description: 'List Trello boards.',
-      options: [{
-        type: CommandOptionType.STRING,
-        name: 'filter',
-        description: 'Filter boards to list.',
-        choices: [
-          {
-            name: 'All',
-            value: TrelloBoardsFilter.ALL
-          },
-          {
-            name: 'Open',
-            value: TrelloBoardsFilter.OPEN
-          },
-          {
-            name: 'Archived',
-            value: TrelloBoardsFilter.ARCHIVED
-          },
-          {
-            name: 'Watched',
-            value: TrelloBoardsFilter.WATCHED
-          },
-          {
-            name: 'Starred',
-            value: TrelloBoardsFilter.STARRED
-          }
-        ]
-      }]
+      options: [
+        {
+          type: CommandOptionType.STRING,
+          name: 'filter',
+          description: 'Filter boards to list.',
+          choices: [
+            {
+              name: 'All',
+              value: TrelloBoardsFilter.ALL
+            },
+            {
+              name: 'Open',
+              value: TrelloBoardsFilter.OPEN
+            },
+            {
+              name: 'Archived',
+              value: TrelloBoardsFilter.ARCHIVED
+            },
+            {
+              name: 'Watched',
+              value: TrelloBoardsFilter.WATCHED
+            },
+            {
+              name: 'Starred',
+              value: TrelloBoardsFilter.STARRED
+            }
+          ]
+        }
+      ]
     });
   }
 
@@ -63,16 +65,16 @@ export default class BoardsCommand extends SlashCommand {
     const filter: TrelloBoardsFilter = ctx.options.filter || TrelloBoardsFilter.OPEN;
     switch (filter) {
       case TrelloBoardsFilter.OPEN:
-        boards = boards.filter(b => !b.closed);
+        boards = boards.filter((b) => !b.closed);
         break;
       case TrelloBoardsFilter.ARCHIVED:
-        boards = boards.filter(b => b.closed);
+        boards = boards.filter((b) => b.closed);
         break;
       case TrelloBoardsFilter.WATCHED:
-        boards = boards.filter(b => b.subscribed);
+        boards = boards.filter((b) => b.subscribed);
         break;
       case TrelloBoardsFilter.STARRED:
-        boards = boards.filter(b => b.starred);
+        boards = boards.filter((b) => b.starred);
         break;
     }
     if (!boards.length) return t('query.no_list', { context: 'board' });
@@ -81,11 +83,21 @@ export default class BoardsCommand extends SlashCommand {
     await ctx.fetch();
     return await createListPrompt(
       {
-        title: `${t('boards.list', { context: filter.toLowerCase() })} (${formatNumber(boards.length, userData.locale)})`,
-        pages: splitMessage(boards.map(
-          (board) =>
-            `${board.closed ? '🗃️ ' : ''}${board.subscribed ? '🔔 ' : ''}${board.starred ? '⭐ ' : ''} [${truncate(board.name, 50)}](${board.shortUrl})`
-        ).join('\n'))
+        title: `${t('boards.list', { context: filter.toLowerCase() })} (${formatNumber(
+          boards.length,
+          userData.locale
+        )})`,
+        pages: splitMessage(
+          boards
+            .map(
+              (board) =>
+                `${board.closed ? '🗃️ ' : ''}${board.subscribed ? '🔔 ' : ''}${board.starred ? '⭐ ' : ''} [${truncate(
+                  board.name,
+                  50
+                )}](${board.shortUrl})`
+            )
+            .join('\n')
+        )
       },
       ctx.messageID!,
       t

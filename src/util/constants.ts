@@ -44,7 +44,7 @@ export const STICKER_EMOJIS: Record<string, string> = {
   'taco-robot': '632444553810411559',
   'taco-sleeping': '632444556092112927',
   'taco-trophy': '632444556025135124'
-}
+};
 
 export const LABEL_COLORS: Record<string, number> = {
   green: 0x61bd4f,
@@ -57,7 +57,7 @@ export const LABEL_COLORS: Record<string, number> = {
   sky: 0x00c2e0,
   pink: 0xc9558f,
   black: 0x344563
-}
+};
 
 export const LABEL_EMOJIS: Record<string, string> = {
   none: '<:labelNone:917659406244663346>',
@@ -71,11 +71,11 @@ export const LABEL_EMOJIS: Record<string, string> = {
   sky: '<:labelSky:917659218155294760>',
   pink: '<:labelPink:917659218004295720>',
   black: '<:labelBlack:917659217958141962>'
-}
+};
 
 export const IMAGE_ATTACHMENT_HOST = 'https://trello-attachments.s3.amazonaws.com/';
 
 export const EMOJIS: Record<string, string> = {
   check: '<:check:632444546684551183>',
   uncheck: '<:uncheck:632444550115491910>'
-}
+};

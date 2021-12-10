@@ -83,6 +83,8 @@ export default class AddLabelCommand extends SlashCommand {
     await trello.addLabel(userData.currentBoard, { name, color: ctx.options.color });
     await uncacheBoard(userData.currentBoard);
 
-    return t('addlabel.done', { label: `${ctx.options.color ? LABEL_EMOJIS[ctx.options.color] : LABEL_EMOJIS.none} ${truncate(name, 100)}`});
+    return t('addlabel.done', {
+      label: `${ctx.options.color ? LABEL_EMOJIS[ctx.options.color] : LABEL_EMOJIS.none} ${truncate(name, 100)}`
+    });
   }
 }

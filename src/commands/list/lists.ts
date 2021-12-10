@@ -19,29 +19,31 @@ export default class ListsCommand extends SlashCommand {
     super(creator, {
       name: 'lists',
       description: 'List Trello lists on your selected board.',
-      options: [{
-        type: CommandOptionType.STRING,
-        name: 'filter',
-        description: 'Filter lists to list.',
-        choices: [
-          {
-            name: 'All',
-            value: TrelloListsFilter.ALL
-          },
-          {
-            name: 'Open',
-            value: TrelloListsFilter.OPEN
-          },
-          {
-            name: 'Archived',
-            value: TrelloListsFilter.ARCHIVED
-          },
-          {
-            name: 'Watched',
-            value: TrelloListsFilter.WATCHED
-          }
-        ]
-      }]
+      options: [
+        {
+          type: CommandOptionType.STRING,
+          name: 'filter',
+          description: 'Filter lists to list.',
+          choices: [
+            {
+              name: 'All',
+              value: TrelloListsFilter.ALL
+            },
+            {
+              name: 'Open',
+              value: TrelloListsFilter.OPEN
+            },
+            {
+              name: 'Archived',
+              value: TrelloListsFilter.ARCHIVED
+            },
+            {
+              name: 'Watched',
+              value: TrelloListsFilter.WATCHED
+            }
+          ]
+        }
+      ]
     });
   }
 
@@ -61,13 +63,13 @@ export default class ListsCommand extends SlashCommand {
       case TrelloListsFilter.ALL:
         break;
       case TrelloListsFilter.ARCHIVED:
-        lists = lists.filter(l => l.closed);
+        lists = lists.filter((l) => l.closed);
         break;
       case TrelloListsFilter.WATCHED:
-        lists = lists.filter(l => subs.lists[l.id] || l.subscribed);
+        lists = lists.filter((l) => subs.lists[l.id] || l.subscribed);
         break;
       case TrelloListsFilter.OPEN:
-        lists = lists.filter(l => !l.closed);
+        lists = lists.filter((l) => !l.closed);
         break;
     }
     if (!lists.length) return t('query.no_list', { context: 'list' });
@@ -77,10 +79,18 @@ export default class ListsCommand extends SlashCommand {
     return await createListPrompt(
       {
         title: `${t('lists.list', { context: filter.toLowerCase() })} (${formatNumber(lists.length, userData.locale)})`,
-        pages: splitMessage(lists.map(
-          (list) =>
-            `${list.closed ? '🗃️ ' : ''}${subs.lists[list.id] || list.subscribed ? '🔔 ' : ''} ${truncate(list.name, 50)} (${formatNumber(board.cards.filter(c => c.idList == list.id).length, userData?.locale)} card[s])`
-        ).join('\n'), { maxLength: 1000 })
+        pages: splitMessage(
+          lists
+            .map(
+              (list) =>
+                `${list.closed ? '🗃️ ' : ''}${subs.lists[list.id] || list.subscribed ? '🔔 ' : ''} ${truncate(
+                  list.name,
+                  50
+                )} (${formatNumber(board.cards.filter((c) => c.idList == list.id).length, userData?.locale)} card[s])`
+            )
+            .join('\n'),
+          { maxLength: 1000 }
+        )
       },
       ctx.messageID!,
       t

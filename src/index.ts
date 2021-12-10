@@ -77,7 +77,7 @@ creator.on('componentInteraction', async (ctx) => {
       const actionCache = await client.get(`action:${actionID}`);
       if (!actionCache)
         return ctx.send({
-          content:  t('interactions.prompt_action_expired'),
+          content: t('interactions.prompt_action_expired'),
           ephemeral: true
         });
 

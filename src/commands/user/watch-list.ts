@@ -11,18 +11,20 @@ export default class WatchListCommand extends SlashCommand {
     super(creator, {
       name: 'watch-list',
       description: 'Subscribe to a list to get notifications on Trello.com.',
-      options: [{
-        type: CommandOptionType.STRING,
-        name: 'list',
-        description: 'The list to watch.',
-        autocomplete: true,
-        required: true
-      }]
+      options: [
+        {
+          type: CommandOptionType.STRING,
+          name: 'list',
+          description: 'The list to watch.',
+          autocomplete: true,
+          required: true
+        }
+      ]
     });
   }
 
   async autocomplete(ctx: AutocompleteContext) {
-    return this.autocompleteLists(ctx, { filter: l => !l.closed });
+    return this.autocompleteLists(ctx, { filter: (l) => !l.closed });
   }
 
   async run(ctx: CommandContext) {
@@ -34,7 +36,7 @@ export default class WatchListCommand extends SlashCommand {
     if (!userData.currentBoard) return noBoardSelectedResponse(t);
 
     const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
-    const list = board.lists.find(l => l.id === ctx.options.list || l.name === ctx.options.list);
+    const list = board.lists.find((l) => l.id === ctx.options.list || l.name === ctx.options.list);
     if (!list) return t('query.not_found', { context: 'list' });
 
     const subbed = !subs.lists[list.id];

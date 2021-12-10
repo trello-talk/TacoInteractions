@@ -12,8 +12,7 @@ export const action: ActionFunction = {
 
     const t = createT(userData?.locale);
 
-    if (!userData)
-      return void ctx.editParent(t('cleardata.no_data'), { components: [] });
+    if (!userData) return void ctx.editParent(t('cleardata.no_data'), { components: [] });
 
     try {
       if (userData.trelloToken) await new Trello(userData.trelloToken).invalidate();

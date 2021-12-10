@@ -11,18 +11,20 @@ export default class WatchCardCommand extends SlashCommand {
     super(creator, {
       name: 'watch-card',
       description: 'Subscribe to a card to get notifications on Trello.com.',
-      options: [{
-        type: CommandOptionType.STRING,
-        name: 'card',
-        description: 'The card to watch.',
-        autocomplete: true,
-        required: true
-      }]
+      options: [
+        {
+          type: CommandOptionType.STRING,
+          name: 'card',
+          description: 'The card to watch.',
+          autocomplete: true,
+          required: true
+        }
+      ]
     });
   }
 
   async autocomplete(ctx: AutocompleteContext) {
-    return this.autocompleteCards(ctx, { filter: c => !c.closed });
+    return this.autocompleteCards(ctx, { filter: (c) => !c.closed });
   }
 
   async run(ctx: CommandContext) {
@@ -34,7 +36,7 @@ export default class WatchCardCommand extends SlashCommand {
     if (!userData.currentBoard) return noBoardSelectedResponse(t);
 
     const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
-    const card = board.cards.find(c => c.id === ctx.options.card || c.shortLink === ctx.options.card);
+    const card = board.cards.find((c) => c.id === ctx.options.card || c.shortLink === ctx.options.card);
     if (!card) return t('query.not_found', { context: 'card' });
 
     const subbed = !subs.cards[card.id];

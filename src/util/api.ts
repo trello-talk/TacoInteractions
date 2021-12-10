@@ -96,7 +96,12 @@ export async function unstarBoard(token: string, id: string, boardID: string): P
   return true;
 }
 
-export async function getBoard(token: string, id: string, memberId: string, requireSubs = false): Promise<[TrelloBoard, TrelloBoardSubscriptions]> {
+export async function getBoard(
+  token: string,
+  id: string,
+  memberId: string,
+  requireSubs = false
+): Promise<[TrelloBoard, TrelloBoardSubscriptions]> {
   const key = `trello.board:${id}`;
   const subsKey = `trello.board.sub:${id}:${memberId}`;
   const cached = await client.get(key);
@@ -104,7 +109,7 @@ export async function getBoard(token: string, id: string, memberId: string, requ
   if (cached) {
     if (cachedSubs) return [JSON.parse(cached), JSON.parse(cachedSubs)];
     if (!requireSubs) return [JSON.parse(cached), null];
-  };
+  }
 
   const trello = new Trello(token);
   const response = await trello.getBoard(id);
@@ -127,7 +132,7 @@ export async function getBoard(token: string, id: string, memberId: string, requ
 
   const subscriptions: TrelloBoardSubscriptions = {
     lists: subscribedLists,
-    cards: subscribedCards,
+    cards: subscribedCards
   };
 
   await client.set(key, JSON.stringify(response.data), 'EX', 3 * 60 * 60);

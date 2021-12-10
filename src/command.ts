@@ -1,12 +1,21 @@
-import { AxiosResponse } from "axios";
+import { AxiosResponse } from 'axios';
 import { User } from '@prisma/client';
-import { AutocompleteContext, CommandContext, SlashCommand } from "slash-create";
-import { getBoardTextLabel, getCardTextLabel, getLabelTextLabel, getListTextLabel, isElevated, noAuthResponse, sortBoards, sortLists } from "./util";
-import { getBoard, getMember, TrelloAPIError } from "./util/api";
-import { prisma } from "./util/prisma";
-import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from "./util/types";
+import { AutocompleteContext, CommandContext, SlashCommand } from 'slash-create';
+import {
+  getBoardTextLabel,
+  getCardTextLabel,
+  getLabelTextLabel,
+  getListTextLabel,
+  isElevated,
+  noAuthResponse,
+  sortBoards,
+  sortLists
+} from './util';
+import { getBoard, getMember, TrelloAPIError } from './util/api';
+import { prisma } from './util/prisma';
+import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './util/types';
 import fuzzy from 'fuzzy';
-import { createT } from "./util/locale";
+import { createT } from './util/locale';
 
 interface AutocompleteItemOptions<T = any> {
   userData?: User;
@@ -30,18 +39,14 @@ export default abstract class Command extends SlashCommand {
       const member = await getMember(userData.trelloToken, userData.trelloID);
       const boards = sortBoards(member.boards.filter(opts.filter || (() => true)));
 
-      if (!query) return boards
-        .map((b) => ({ name: getBoardTextLabel(b), value: b.id }))
-        .slice(0, 25);
+      if (!query) return boards.map((b) => ({ name: getBoardTextLabel(b), value: b.id })).slice(0, 25);
 
       const result = fuzzy.filter(query, boards, {
         extract: (board) => board.name
       });
-      return result
-        .map((res) => ({ name: getBoardTextLabel(res.original), value: res.original.id }))
-        .slice(0, 25);
+      return result.map((res) => ({ name: getBoardTextLabel(res.original), value: res.original.id })).slice(0, 25);
     } catch (e) {
-      this.onAutocompleteError(e, ctx)
+      this.onAutocompleteError(e, ctx);
       return [];
     }
   }
@@ -61,9 +66,7 @@ export default abstract class Command extends SlashCommand {
       const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
       const lists = sortLists(board.lists.filter(opts.filter || (() => true)));
 
-      if (!query) return lists
-        .map((l) => ({ name: getListTextLabel(l, subs.lists[l.id]), value: l.id }))
-        .slice(0, 25);
+      if (!query) return lists.map((l) => ({ name: getListTextLabel(l, subs.lists[l.id]), value: l.id })).slice(0, 25);
 
       const result = fuzzy.filter(query, lists, {
         extract: (list) => list.name
@@ -72,7 +75,7 @@ export default abstract class Command extends SlashCommand {
         .map((res) => ({ name: getListTextLabel(res.original, subs.lists[res.original.id]), value: res.original.id }))
         .slice(0, 25);
     } catch (e) {
-      this.onAutocompleteError(e, ctx)
+      this.onAutocompleteError(e, ctx);
       return [];
     }
   }
@@ -93,18 +96,22 @@ export default abstract class Command extends SlashCommand {
       // TODO sort cards
       const cards = board.cards.filter(opts.filter || (() => true));
 
-      if (!query) return cards
-        .map((c) => ({ name: getCardTextLabel(c, board.lists, subs.cards[c.id]), value: c.id }))
-        .slice(0, 25);
+      if (!query)
+        return cards
+          .map((c) => ({ name: getCardTextLabel(c, board.lists, subs.cards[c.id]), value: c.id }))
+          .slice(0, 25);
 
       const result = fuzzy.filter(query, cards, {
         extract: (card) => card.name
       });
       return result
-        .map((res) => ({ name: getCardTextLabel(res.original, board.lists, subs.lists[res.original.id]), value: res.original.id }))
+        .map((res) => ({
+          name: getCardTextLabel(res.original, board.lists, subs.lists[res.original.id]),
+          value: res.original.id
+        }))
         .slice(0, 25);
     } catch (e) {
-      this.onAutocompleteError(e, ctx)
+      this.onAutocompleteError(e, ctx);
       return [];
     }
   }
@@ -125,18 +132,14 @@ export default abstract class Command extends SlashCommand {
       const [board] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
       const labels = board.labels.filter(opts.filter || (() => true)).sort((a, b) => a.name.localeCompare(b.name));
 
-      if (!query) return labels
-        .map((l) => ({ name: getLabelTextLabel(l, t), value: l.id }))
-        .slice(0, 25);
+      if (!query) return labels.map((l) => ({ name: getLabelTextLabel(l, t), value: l.id })).slice(0, 25);
 
       const result = fuzzy.filter(query, labels, {
         extract: (label) => label.name
       });
-      return result
-        .map((res) => ({ name: getLabelTextLabel(res.original, t), value: res.original.id }))
-        .slice(0, 25);
+      return result.map((res) => ({ name: getLabelTextLabel(res.original, t), value: res.original.id })).slice(0, 25);
     } catch (e) {
-      this.onAutocompleteError(e, ctx)
+      this.onAutocompleteError(e, ctx);
       return [];
     }
   }
@@ -161,7 +164,7 @@ export default abstract class Command extends SlashCommand {
           data: { trelloID: null, trelloToken: null }
         });
         const t = createT(userData?.locale);
-        return ctx.send(t('auth.expired'), { components: noAuthResponse(t).components })
+        return ctx.send(t('auth.expired'), { components: noAuthResponse(t).components });
       }
     }
 
@@ -170,14 +173,13 @@ export default abstract class Command extends SlashCommand {
       console.log((err as any).request);
       console.log((err as any).response);
       return ctx.send({
-        content: '\`\`\`js\n' + err.stack + '\`\`\`',
+        content: '```js\n' + err.stack + '```',
         ephemeral: true
       });
     }
 
     // ? should i even localize this
-    if (err instanceof TrelloAPIError)
-      return ctx.send("An error occurred with Trello's API!\n" + err.toString());
+    if (err instanceof TrelloAPIError) return ctx.send("An error occurred with Trello's API!\n" + err.toString());
     else return ctx.send('An error occurred!\n' + err.toString());
   }
 }

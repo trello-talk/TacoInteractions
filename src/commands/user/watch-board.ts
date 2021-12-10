@@ -11,17 +11,19 @@ export default class WatchBoardCommand extends SlashCommand {
     super(creator, {
       name: 'watch-board',
       description: 'Subscribe to a board to get notifications on Trello.com.',
-      options: [{
-        type: CommandOptionType.STRING,
-        name: 'board',
-        description: 'The board to watch, defaults to the selected board.',
-        autocomplete: true
-      }]
+      options: [
+        {
+          type: CommandOptionType.STRING,
+          name: 'board',
+          description: 'The board to watch, defaults to the selected board.',
+          autocomplete: true
+        }
+      ]
     });
   }
 
   async autocomplete(ctx: AutocompleteContext) {
-    return this.autocompleteBoards(ctx, { filter: b => !b.closed });
+    return this.autocompleteBoards(ctx, { filter: (b) => !b.closed });
   }
 
   async run(ctx: CommandContext) {
@@ -33,8 +35,8 @@ export default class WatchBoardCommand extends SlashCommand {
 
     const member = await getMember(userData.trelloToken, userData.trelloID);
 
-    let board = member.boards.find(b => b.id === ctx.options.board || b.shortLink === ctx.options.board);
-    if (!board) board = member.boards.find(b => b.id === userData.currentBoard);
+    let board = member.boards.find((b) => b.id === ctx.options.board || b.shortLink === ctx.options.board);
+    if (!board) board = member.boards.find((b) => b.id === userData.currentBoard);
     if (!board) return t('query.not_found', { context: 'board' });
 
     const trello = new Trello(userData.trelloToken);

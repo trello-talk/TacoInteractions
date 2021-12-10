@@ -3,7 +3,7 @@ import { ComponentContext } from 'slash-create';
 import { iterateFolder } from '.';
 import { logger } from '../logger';
 import { client } from './redis';
-import { nanoid } from 'nanoid'
+import { nanoid } from 'nanoid';
 
 export enum ActionType {
   DEBUG = -1,

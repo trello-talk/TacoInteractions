@@ -13,13 +13,15 @@ export default class LabelCommand extends SlashCommand {
     super(creator, {
       name: 'label',
       description: 'View cards that are assigned a given label on your selected board.',
-      options: [{
-        type: CommandOptionType.STRING,
-        name: 'label',
-        description: 'The label to view.',
-        autocomplete: true,
-        required: true
-      }]
+      options: [
+        {
+          type: CommandOptionType.STRING,
+          name: 'label',
+          description: 'The label to view.',
+          autocomplete: true,
+          required: true
+        }
+      ]
     });
   }
 
@@ -37,17 +39,20 @@ export default class LabelCommand extends SlashCommand {
 
     const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
 
-    const label = board.labels.find(l => l.id === ctx.options.label);
+    const label = board.labels.find((l) => l.id === ctx.options.label);
     if (label) {
-      const cards = sortCards(board.cards.filter(c => c.idLabels.includes(label.id)));
+      const cards = sortCards(board.cards.filter((c) => c.idLabels.includes(label.id)));
 
-      if (!cards.length) return {
-        embeds: [{
-          title: t('label.title', { label: truncate(label.name, 100), cards: 0 }),
-          color: label.color ? LABEL_COLORS[label.color] : undefined,
-          description: `*${t('label.none')}*`
-        }]
-      }
+      if (!cards.length)
+        return {
+          embeds: [
+            {
+              title: t('label.title', { label: truncate(label.name, 100), cards: 0 }),
+              color: label.color ? LABEL_COLORS[label.color] : undefined,
+              description: `*${t('label.none')}*`
+            }
+          ]
+        };
 
       await ctx.defer();
       await ctx.fetch();
@@ -55,10 +60,17 @@ export default class LabelCommand extends SlashCommand {
         {
           title: t('label.title', { label: truncate(label.name, 100), cards: cards.length }),
           color: label.color ? LABEL_COLORS[label.color] : undefined,
-          pages: splitMessage(cards.map(
-            (card) =>
-              `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} ${truncate(card.name, 100)}`
-          ).join('\n'))
+          pages: splitMessage(
+            cards
+              .map(
+                (card) =>
+                  `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} ${truncate(
+                    card.name,
+                    100
+                  )}`
+              )
+              .join('\n')
+          )
         },
         ctx.messageID!,
         t

@@ -22,41 +22,43 @@ export default class CardsCommand extends SlashCommand {
     super(creator, {
       name: 'cards',
       description: 'List Trello cards on your selected board.',
-      options: [{
-        type: CommandOptionType.STRING,
-        name: 'filter',
-        description: 'Filter cards to list.',
-        choices: [
-          {
-            name: 'All',
-            value: TrelloCardsFilter.ALL
-          },
-          {
-            name: 'Open',
-            value: TrelloCardsFilter.OPEN
-          },
-          {
-            name: 'Archived',
-            value: TrelloCardsFilter.ARCHIVED
-          },
-          {
-            name: 'Watched',
-            value: TrelloCardsFilter.WATCHED
-          },
-          {
-            name: 'Overdue',
-            value: TrelloCardsFilter.OVERDUE
-          },
-          {
-            name: 'With Labels',
-            value: TrelloCardsFilter.LABELS
-          },
-          {
-            name: 'Without Labels',
-            value: TrelloCardsFilter.NO_LABELS
-          }
-        ]
-      }]
+      options: [
+        {
+          type: CommandOptionType.STRING,
+          name: 'filter',
+          description: 'Filter cards to list.',
+          choices: [
+            {
+              name: 'All',
+              value: TrelloCardsFilter.ALL
+            },
+            {
+              name: 'Open',
+              value: TrelloCardsFilter.OPEN
+            },
+            {
+              name: 'Archived',
+              value: TrelloCardsFilter.ARCHIVED
+            },
+            {
+              name: 'Watched',
+              value: TrelloCardsFilter.WATCHED
+            },
+            {
+              name: 'Overdue',
+              value: TrelloCardsFilter.OVERDUE
+            },
+            {
+              name: 'With Labels',
+              value: TrelloCardsFilter.LABELS
+            },
+            {
+              name: 'Without Labels',
+              value: TrelloCardsFilter.NO_LABELS
+            }
+          ]
+        }
+      ]
     });
   }
 
@@ -76,22 +78,22 @@ export default class CardsCommand extends SlashCommand {
       case TrelloCardsFilter.ALL:
         break;
       case TrelloCardsFilter.OPEN:
-        cards = cards.filter(c => !c.closed);
+        cards = cards.filter((c) => !c.closed);
         break;
       case TrelloCardsFilter.ARCHIVED:
-        cards = cards.filter(c => c.closed);
+        cards = cards.filter((c) => c.closed);
         break;
       case TrelloCardsFilter.WATCHED:
-        cards = cards.filter(c => subs.cards[c.id] || c.subscribed);
+        cards = cards.filter((c) => subs.cards[c.id] || c.subscribed);
         break;
       case TrelloCardsFilter.OVERDUE:
-        cards = cards.filter(c => c.due && Date.now() > new Date(c.due).valueOf() && !c.closed && !c.dueComplete);
+        cards = cards.filter((c) => c.due && Date.now() > new Date(c.due).valueOf() && !c.closed && !c.dueComplete);
         break;
       case TrelloCardsFilter.LABELS:
-        cards = cards.filter(c => c.idLabels.length);
+        cards = cards.filter((c) => c.idLabels.length);
         break;
       case TrelloCardsFilter.NO_LABELS:
-        cards = cards.filter(c => !c.idLabels.length);
+        cards = cards.filter((c) => !c.idLabels.length);
         break;
     }
     if (!cards.length) return t('query.no_list', { context: 'card' });
@@ -101,10 +103,21 @@ export default class CardsCommand extends SlashCommand {
     return await createListPrompt(
       {
         title: `${t('cards.list', { context: filter.toLowerCase() })} (${formatNumber(cards.length, userData.locale)})`,
-        pages: splitMessage(cards.map(
-          (card) =>
-            `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} [${truncate(card.name, 25)}](https://trello.com/c/${card.shortLink} "${truncate(card.name, 50)}") (${truncate(board.lists.find(l => l.id === card.idList).name, 25)})`
-        ).join('\n'), { maxLength: 1000 }),
+        pages: splitMessage(
+          cards
+            .map(
+              (card) =>
+                `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} [${truncate(
+                  card.name,
+                  25
+                )}](https://trello.com/c/${card.shortLink} "${truncate(card.name, 50)}") (${truncate(
+                  board.lists.find((l) => l.id === card.idList).name,
+                  25
+                )})`
+            )
+            .join('\n'),
+          { maxLength: 1000 }
+        )
       },
       ctx.messageID!,
       t

@@ -15,8 +15,8 @@ export const init = async () => {
       escapeValue: false
     },
     backend: {
-      loadPath: `${isInDist ? '../' : ''}locale/{{ns}}/{{lng}}.json`,
-    },
+      loadPath: `${isInDist ? '../' : ''}locale/{{ns}}/{{lng}}.json`
+    }
   });
 };
 

@@ -13,7 +13,6 @@ export function truncateList(texts: string[], t: TFunction, limit = 256, sep = '
   const result = [];
   const maxItemLen = t('common.more', { count: texts.length }).length;
   for (const text of texts) {
-
     if (result.join(sep).length + sep.length + (maxItemLen > text.length ? maxItemLen : text.length) > limit) {
       result.push(`*${t('common.more', { count: texts.length - result.length })}*`);
       break;
@@ -28,10 +27,13 @@ export function toColorInt(hex: string) {
 }
 
 /** Strip indents, extra newlines and trim the result. */
-export const stripIndentsAndNewlines = new TemplateTag(
-  stripIndentTransformer('all'),
-  { onEndResult: endResult => endResult.replace(/[^\S\n]+$/gm, '').replace(/^\n/, '').replace(/\n(\n+)/g, '\n') }
-);
+export const stripIndentsAndNewlines = new TemplateTag(stripIndentTransformer('all'), {
+  onEndResult: (endResult) =>
+    endResult
+      .replace(/[^\S\n]+$/gm, '')
+      .replace(/^\n/, '')
+      .replace(/\n(\n+)/g, '\n')
+});
 
 export async function iterateFolder(
   folderPath: string,
@@ -113,15 +115,14 @@ export function noAuthResponse(t: TFunction): MessageOptions {
         ]
       }
     ]
-  }
+  };
 }
 
 export function noBoardSelectedResponse(t: TFunction): MessageOptions {
   return {
     content: t('switch.no_board_command'),
     ephemeral: true
-  }
-  
+  };
 }
 export function isElevated(user: string) {
   if (!process.env.COMMANDS_ELEVATED) return false;
@@ -129,7 +130,8 @@ export function isElevated(user: string) {
 }
 
 export async function deleteInteraction(ctx: ComponentContext, t: TFunction) {
-  if (ctx.message.flags === InteractionResponseFlags.EPHEMERAL) await ctx.editParent(t('interactions.dismiss'), { components: [] })
+  if (ctx.message.flags === InteractionResponseFlags.EPHEMERAL)
+    await ctx.editParent(t('interactions.dismiss'), { components: [] });
   else {
     await ctx.acknowledge();
     await ctx.delete();
@@ -137,26 +139,22 @@ export async function deleteInteraction(ctx: ComponentContext, t: TFunction) {
 }
 
 export function getBoardTextLabel(board: TrelloBoard) {
-  return `${[
-    board.starred ? '⭐' : '',
-    board.subscribed ? '🔔' : '',
-    board.closed ? '🗃️' : '',
-  ].filter(v => !!v).join('')} ${truncate(board.name, 85)} (${board.shortLink})`.trim();
+  return `${[board.starred ? '⭐' : '', board.subscribed ? '🔔' : '', board.closed ? '🗃️' : '']
+    .filter((v) => !!v)
+    .join('')} ${truncate(board.name, 85)} (${board.shortLink})`.trim();
 }
 
 export function getListTextLabel(list: TrelloList, subscribed?: boolean) {
-  return `${[
-    subscribed || list.subscribed ? '🔔' : '',
-    list.closed ? '🗃️' : '',
-  ].filter(v => !!v).join('')} ${truncate(list.name, 90)}`.trim();
+  return `${[subscribed || list.subscribed ? '🔔' : '', list.closed ? '🗃️' : '']
+    .filter((v) => !!v)
+    .join('')} ${truncate(list.name, 90)}`.trim();
 }
 
 export function getCardTextLabel(card: TrelloCard, lists: TrelloList[], subscribed?: boolean) {
-  const listName = lists.find(list => list.id === card.idList).name;
-  return `${[
-    subscribed || card.subscribed ? '🔔' : '',
-    card.closed ? '🗃️' : '',
-  ].filter(v => !!v).join('')} ${truncate(card.name, 65)} (${truncate(listName, 20)})`.trim();
+  const listName = lists.find((list) => list.id === card.idList).name;
+  return `${[subscribed || card.subscribed ? '🔔' : '', card.closed ? '🗃️' : '']
+    .filter((v) => !!v)
+    .join('')} ${truncate(card.name, 65)} (${truncate(listName, 20)})`.trim();
 }
 
 export function getLabelTextLabel(label: TrelloLabel, t: TFunction) {

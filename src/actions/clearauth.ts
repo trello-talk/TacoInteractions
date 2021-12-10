@@ -12,8 +12,7 @@ export const action: ActionFunction = {
 
     const t = createT(userData?.locale);
 
-    if (!userData || !userData.trelloToken)
-      return void ctx.editParent(t('clearauth.no_auth'), { components: [] });
+    if (!userData || !userData.trelloToken) return void ctx.editParent(t('clearauth.no_auth'), { components: [] });
 
     await new Trello(userData.trelloToken).invalidate();
     await prisma.user.update({

@@ -34,7 +34,9 @@ export default class Trello {
     }
 
     // User Agent
-    options.headers['User-Agent'] = `TacoSlashCommands (https://github.com/trello-talk/Taco-Slash-Commands, ${VERSION}) Node.js/${process.version}`;
+    options.headers[
+      'User-Agent'
+    ] = `TacoSlashCommands (https://github.com/trello-talk/Taco-Slash-Commands, ${VERSION}) Node.js/${process.version}`;
 
     const response = await axios(options);
     return response;

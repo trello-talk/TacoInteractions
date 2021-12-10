@@ -206,7 +206,13 @@ export async function createListPrompt(
   };
 }
 
-async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, action: PromptAction, t: TFunction, lang?: string) {
+async function handleListPrompt(
+  ctx: ComponentContext,
+  prompt: ListPrompt,
+  action: PromptAction,
+  t: TFunction,
+  lang?: string
+) {
   // Filter out actions that shouldn't be possible
   if (
     (prompt.page <= 1 && action === PromptAction.PREVIOUS) ||
@@ -302,19 +308,24 @@ export async function createQueryPrompt(
   const offset = (prompt.page - 1) * 25;
   return {
     content: prompt.content || t('interactions.prompt_select_item'),
-    ...(prompt.title || prompt.footer || prompt.color ? {
-      embeds: [{
-        title: prompt.title,
-        color: prompt.color,
-      ...(prompt.footer ? { footer: { text: prompt.footer } } : {})
-    }] } : {}),
+    ...(prompt.title || prompt.footer || prompt.color
+      ? {
+          embeds: [
+            {
+              title: prompt.title,
+              color: prompt.color,
+              ...(prompt.footer ? { footer: { text: prompt.footer } } : {})
+            }
+          ]
+        }
+      : {}),
     components: [
       {
         type: ComponentType.ACTION_ROW,
         components: [
           {
             type: ComponentType.SELECT,
-            ...(prompt.placeholder ? { placeholder: prompt.placeholder, } : {}),
+            ...(prompt.placeholder ? { placeholder: prompt.placeholder } : {}),
             options: prompt.display.map((opt, i) => ({ ...opt, value: String(i) })).slice(offset, prompt.page * 25),
             custom_id: `prompt:${PromptType.QUERY}:${PromptAction.SELECT}`,
             min_values: 1,
@@ -361,7 +372,13 @@ export async function createQueryPrompt(
   };
 }
 
-async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, action: PromptAction, t: TFunction, lang?: string) {
+async function handleQueryPrompt(
+  ctx: ComponentContext,
+  prompt: QueryPrompt,
+  action: PromptAction,
+  t: TFunction,
+  lang?: string
+) {
   const max = Math.ceil(prompt.display.length / 25);
 
   // Filter out actions that shouldn't be possible
@@ -544,7 +561,13 @@ export async function createSelectPrompt(
   };
 }
 
-async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, action: PromptAction, t: TFunction, lang?: string) {
+async function handleSelectPrompt(
+  ctx: ComponentContext,
+  prompt: SelectPrompt,
+  action: PromptAction,
+  t: TFunction,
+  lang?: string
+) {
   const max = Math.ceil(prompt.display.length / 25);
 
   // Filter out actions that shouldn't be possible
