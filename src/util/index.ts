@@ -118,12 +118,6 @@ export function noAuthResponse(t: TFunction): MessageOptions {
   };
 }
 
-export function noBoardSelectedResponse(t: TFunction): MessageOptions {
-  return {
-    content: t('switch.no_board_command'),
-    ephemeral: true
-  };
-}
 export function isElevated(user: string) {
   if (!process.env.COMMANDS_ELEVATED) return false;
   return process.env.COMMANDS_ELEVATED.split(',').includes(user);

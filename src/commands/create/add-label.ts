@@ -1,7 +1,7 @@
 import { SlashCreator, CommandContext, CommandOptionType } from 'slash-create';
 import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
-import { noAuthResponse, noBoardSelectedResponse, truncate } from '../../util';
+import { noAuthResponse, truncate } from '../../util';
 import { uncacheBoard } from '../../util/api';
 import Trello from '../../util/trello';
 import { createT } from '../../util/locale';
@@ -76,7 +76,7 @@ export default class AddLabelCommand extends SlashCommand {
     });
     const t = createT(userData?.locale);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
-    if (!userData.currentBoard) return noBoardSelectedResponse(t);
+    if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
     const trello = new Trello(userData.trelloToken);
     const name = ctx.options.name.trim();

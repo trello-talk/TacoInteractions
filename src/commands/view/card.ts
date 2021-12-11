@@ -6,14 +6,7 @@ import {
   MessageEmbedOptions
 } from 'slash-create';
 import SlashCommand from '../../command';
-import {
-  formatTime,
-  noAuthResponse,
-  noBoardSelectedResponse,
-  stripIndentsAndNewlines,
-  toColorInt,
-  truncateList
-} from '../../util';
+import { formatTime, noAuthResponse, stripIndentsAndNewlines, toColorInt, truncateList } from '../../util';
 import { truncate } from '../../util';
 import { getBoard, getCard } from '../../util/api';
 import { LABEL_COLORS, LABEL_EMOJIS, STICKER_EMOJIS, EMOJIS } from '../../util/constants';
@@ -47,7 +40,7 @@ export default class CardCommand extends SlashCommand {
     });
     const t = createT(userData?.locale);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
-    if (!userData.currentBoard) return noBoardSelectedResponse(t);
+    if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
     const [board] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
     if (!board.cards.find((c) => c.id === ctx.options.card || c.shortLink === ctx.options.card))
