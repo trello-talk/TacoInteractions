@@ -144,6 +144,10 @@ export async function uncacheBoard(id: string): Promise<number> {
   return await client.del(`trello.board:${id}`);
 }
 
+export async function uncacheCard(id: string): Promise<number> {
+  return await client.del(`trello.card:${id}`);
+}
+
 export async function updateBoardSub(
   memberId: string,
   boardId: string,

@@ -59,7 +59,7 @@ creator.on('componentInteraction', async (ctx) => {
         ephemeral: true
       });
 
-    const [, actionID, actionType] = ctx.customID.split(':');
+    const [, actionID, actionType, actionExtra] = ctx.customID.split(':');
     if (!actionID && !actionType)
       return ctx.send({
         content: t('interactions.prompt_no_action_id_or_type'),
@@ -71,7 +71,8 @@ creator.on('componentInteraction', async (ctx) => {
     if (!actionID) {
       action = {
         type: parseInt(actionType, 10),
-        user: ctx.user.id
+        user: ctx.user.id,
+        extra: actionExtra || ''
       };
     } else {
       const actionCache = await client.get(`action:${actionID}`);
@@ -91,7 +92,7 @@ creator.on('componentInteraction', async (ctx) => {
         ephemeral: true
       });
 
-    if (actions.get(action.type).requiresData)
+    if (actions.get(action.type).requiresData && !actionExtra)
       return ctx.send({
         content: t('interactions.prompt_action_requires_data'),
         ephemeral: true

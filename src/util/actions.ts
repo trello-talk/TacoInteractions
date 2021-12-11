@@ -40,6 +40,7 @@ export type Action = RegularAction | BooleanAction | InputAction | CardCreateAct
 export interface RegularAction {
   type: ActionType;
   user: string;
+  extra: string;
 }
 
 export interface BooleanAction extends RegularAction {
