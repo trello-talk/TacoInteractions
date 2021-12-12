@@ -3,7 +3,9 @@ import {
   CommandContext,
   AutocompleteContext,
   CommandOptionType,
-  MessageEmbedOptions
+  MessageEmbedOptions,
+  ComponentType,
+  ButtonStyle
 } from 'slash-create';
 import SlashCommand from '../../command';
 import { formatTime, noAuthResponse, stripIndentsAndNewlines, toColorInt, truncateList } from '../../util';
@@ -173,6 +175,21 @@ export default class CardCommand extends SlashCommand {
         inline: true
       });
 
-    return { embeds: [embed] };
+    return {
+      embeds: [embed],
+      components: [
+        {
+          type: ComponentType.ACTION_ROW,
+          components: [
+            {
+              type: ComponentType.BUTTON,
+              style: ButtonStyle.LINK,
+              label: t('interactions.visit', { context: 'card' }),
+              url: `https://trello.com/c/${card.shortLink}?utm_source=tacobot.app`
+            }
+          ]
+        }
+      ]
+    };
   }
 }

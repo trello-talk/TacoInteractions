@@ -7,7 +7,7 @@ import {
   ButtonStyle
 } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse } from '../../util';
+import { noAuthResponse, truncate } from '../../util';
 import { ActionType } from '../../util/actions';
 import { getBoard } from '../../util/api';
 import { createT } from '../../util/locale';
@@ -45,10 +45,10 @@ export default class DeleteCardCommand extends SlashCommand {
     const [board] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
 
     const card = board.cards.find((c) => c.id === ctx.options.card || c.shortLink === ctx.options.card);
-    if (!card) return t('query.not_found', { context: 'label' });
+    if (!card) return t('query.not_found', { context: 'card' });
 
     return {
-      content: t('deletecard.confirm'),
+      content: t('deletecard.confirm', { card: truncate(card.name, 100) }),
       components: [
         {
           type: ComponentType.ACTION_ROW,

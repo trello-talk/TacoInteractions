@@ -94,7 +94,7 @@ export default class BoardsCommand extends SlashCommand {
                 `${board.closed ? '🗃️ ' : ''}${board.subscribed ? '🔔 ' : ''}${board.starred ? '⭐ ' : ''} [${truncate(
                   board.name,
                   50
-                )}](${board.shortUrl})`
+                )}](${board.shortUrl}?utm_source=tacobot.app)`
             )
             .join('\n')
         )

@@ -1,14 +1,18 @@
 import { TFunction } from 'i18next';
 import { ButtonStyle, ComponentContext, ComponentType, EditMessageOptions } from 'slash-create';
-import { deleteInteraction } from '.';
+import { oneLine } from 'common-tags';
+import { deleteInteraction, toColorInt } from '.';
 import { Action, actions } from './actions';
+import { LABEL_COLORS } from './constants';
 import { createAndGetUserT, formatNumber } from './locale';
 import { client } from './redis';
+import { TrelloAttachment } from './types';
 
 export enum PromptType {
   LIST,
   QUERY,
-  SELECT
+  SELECT,
+  ATTACHMENT
 }
 
 export enum PromptAction {
@@ -52,7 +56,7 @@ export interface PartialSelectMenuOption {
   };
 }
 
-/** Uses select menus, 25 items per page */
+/** Uses select menus to select one item, 25 items per page */
 export interface QueryPrompt extends PromptBase {
   type: PromptType.QUERY;
   /** The display options, also determining max pages */
@@ -63,7 +67,7 @@ export interface QueryPrompt extends PromptBase {
   placeholder?: string;
 }
 
-/** Uses select menus, 25 items per page */
+/** Uses select menus to select multiple items, 25 items per page */
 export interface SelectPrompt extends PromptBase {
   type: PromptType.SELECT;
   /** The display options, also determining max pages */
@@ -76,7 +80,14 @@ export interface SelectPrompt extends PromptBase {
   placeholder?: string;
 }
 
-export type Prompt = ListPrompt | QueryPrompt | SelectPrompt;
+/** A listing prompt for Trello attachments */
+export interface AttachmentPrompt extends PromptBase {
+  type: PromptType.ATTACHMENT;
+  /** The attachments to display */
+  attachments: TrelloAttachment[];
+}
+
+export type Prompt = ListPrompt | QueryPrompt | SelectPrompt | AttachmentPrompt;
 
 export async function handlePrompt(ctx: ComponentContext) {
   const [t, data] = await createAndGetUserT(ctx.user.id);
@@ -108,6 +119,8 @@ export async function handlePrompt(ctx: ComponentContext) {
       return handleQueryPrompt(ctx, prompt as QueryPrompt, action, t, data?.locale);
     case PromptType.SELECT:
       return handleSelectPrompt(ctx, prompt as SelectPrompt, action, t, data?.locale);
+    case PromptType.ATTACHMENT:
+      return handleAttachmentPrompt(ctx, prompt as AttachmentPrompt, action, t, data?.locale);
     default:
       return ctx.send({
         content: t('interactions.prompt_no_function'),
@@ -670,6 +683,166 @@ async function handleSelectPrompt(
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.NEXT}`,
             emoji: { id: '902219517965525042' },
             disabled: prompt.page >= max
+          }
+        ]
+      }
+    ]
+  });
+}
+
+export async function createAttachmentPrompt(
+  options: Omit<AttachmentPrompt, 'page' | 'type'>,
+  messageID: string,
+  t: TFunction,
+  lang?: string
+): Promise<EditMessageOptions> {
+  const prompt: AttachmentPrompt = {
+    ...options,
+    type: PromptType.ATTACHMENT,
+    page: 1
+  };
+
+  if (prompt.attachments.length > 1) await client.set(`prompt:${messageID}`, JSON.stringify(prompt), 'EX', 10 * 60);
+
+  const attachment = prompt.attachments[prompt.page - 1];
+  const isFile = attachment.bytes !== null;
+
+  return {
+    content: prompt.content || '',
+    embeds: [
+      {
+        title: attachment.name || t('common.attachment'),
+        url: attachment.url,
+        ...(isFile ? { image: { url: attachment.url } } : { description: attachment.url }),
+        ...(attachment.edgeColor
+          ? { color: LABEL_COLORS[attachment.edgeColor] || toColorInt(attachment.edgeColor) }
+          : {})
+      }
+    ],
+    components: [
+      {
+        type: ComponentType.ACTION_ROW,
+        components: [
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.PRIMARY,
+            label: '',
+            custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.PREVIOUS}`,
+            emoji: { id: '902219517969727488' },
+            disabled: prompt.page <= 1
+          },
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.SECONDARY,
+            label: oneLine`
+              ${t('common.attachment')}
+              ${formatNumber(prompt.page, lang)}/${formatNumber(prompt.attachments.length, lang)}`,
+            custom_id: 'none',
+            disabled: true
+          },
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.DESTRUCTIVE,
+            label: '',
+            custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.STOP}`,
+            emoji: { id: '887142796560060426' }
+          },
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.PRIMARY,
+            label: '',
+            custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.NEXT}`,
+            emoji: { id: '902219517965525042' },
+            disabled: prompt.page >= prompt.attachments.length
+          }
+        ]
+      }
+    ]
+  };
+}
+
+async function handleAttachmentPrompt(
+  ctx: ComponentContext,
+  prompt: AttachmentPrompt,
+  action: PromptAction,
+  t: TFunction,
+  lang?: string
+) {
+  // Filter out actions that shouldn't be possible
+  if (
+    (prompt.page <= 1 && action === PromptAction.PREVIOUS) ||
+    (prompt.page >= prompt.attachments.length && action === PromptAction.NEXT)
+  )
+    return ctx.acknowledge();
+
+  // Handle action
+  switch (action) {
+    case PromptAction.PREVIOUS:
+      prompt.page--;
+      break;
+    case PromptAction.NEXT:
+      prompt.page++;
+      break;
+    case PromptAction.STOP:
+      await deleteInteraction(ctx, t);
+      await client.del(`prompt:${ctx.message.id}`);
+      if (prompt.action) await client.del(`action:${prompt.action}`);
+      return;
+  }
+
+  // Set cache
+  await client.set(`prompt:${ctx.message.id}`, JSON.stringify(prompt), 'EX', 10 * 60);
+  if (prompt.action) await client.expire(`action:${prompt.action}`, 10 * 60);
+
+  const attachment = prompt.attachments[prompt.page - 1];
+  const isFile = attachment.bytes === null;
+
+  // Display page
+  await ctx.editParent({
+    content: prompt.content || '',
+    embeds: [
+      {
+        title: attachment.name || t('common.attachment'),
+        url: attachment.url,
+        description: isFile ? attachment.url : undefined,
+        color: attachment.edgeColor ? LABEL_COLORS[attachment.edgeColor] || toColorInt(attachment.edgeColor) : undefined
+      }
+    ],
+    components: [
+      {
+        type: ComponentType.ACTION_ROW,
+        components: [
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.PRIMARY,
+            label: '',
+            custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.PREVIOUS}`,
+            emoji: { id: '902219517969727488' },
+            disabled: prompt.page <= 1
+          },
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.SECONDARY,
+            label: oneLine`
+              ${t('common.attachment')}
+              ${formatNumber(prompt.page, lang)}/${formatNumber(prompt.attachments.length, lang)}`,
+            custom_id: 'none',
+            disabled: true
+          },
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.DESTRUCTIVE,
+            label: '',
+            custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.STOP}`,
+            emoji: { id: '887142796560060426' }
+          },
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.PRIMARY,
+            label: '',
+            custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.NEXT}`,
+            emoji: { id: '902219517965525042' },
+            disabled: prompt.page >= prompt.attachments.length
           }
         ]
       }

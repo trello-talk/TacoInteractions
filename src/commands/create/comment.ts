@@ -3,28 +3,33 @@ import {
   CommandContext,
   AutocompleteContext,
   CommandOptionType,
-  ComponentType,
-  ButtonStyle
+  ButtonStyle,
+  ComponentType
 } from 'slash-create';
+import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
 import { noAuthResponse, truncate } from '../../util';
-import { ActionType } from '../../util/actions';
 import { getBoard } from '../../util/api';
-import { LABEL_EMOJIS } from '../../util/constants';
+import Trello from '../../util/trello';
 import { createT } from '../../util/locale';
-import { prisma } from '../../util/prisma';
 
-export default class DeleteLabelCommand extends SlashCommand {
+export default class CommentCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
-      name: 'delete-label',
-      description: 'Delete a label from your selected board.',
+      name: 'comment',
+      description: 'Comment on a card.',
       options: [
         {
           type: CommandOptionType.STRING,
-          name: 'label',
-          description: 'The label to delete.',
+          name: 'card',
+          description: 'The card to comment on.',
           autocomplete: true,
+          required: true
+        },
+        {
+          type: CommandOptionType.STRING,
+          name: 'message',
+          description: 'The message to comment.',
           required: true
         }
       ]
@@ -32,7 +37,7 @@ export default class DeleteLabelCommand extends SlashCommand {
   }
 
   async autocomplete(ctx: AutocompleteContext) {
-    return this.autocompleteLabels(ctx);
+    return this.autocompleteCards(ctx, { filter: (c) => !c.closed });
   }
 
   async run(ctx: CommandContext) {
@@ -44,29 +49,22 @@ export default class DeleteLabelCommand extends SlashCommand {
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
     const [board] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
+    const card = board.cards.find((c) => c.id === ctx.options.card || c.shortLink === ctx.options.card);
+    if (!card) return t('query.not_found', { context: 'card' });
 
-    const label = board.labels.find((l) => l.id === ctx.options.label);
-    if (!label) return t('query.not_found', { context: 'label' });
+    await new Trello(userData.trelloToken).addComment(card.id, ctx.options.message);
 
     return {
-      content: t('deletelabel.confirm', {
-        label: `${ctx.options.color ? LABEL_EMOJIS[ctx.options.color] : LABEL_EMOJIS.none} ${truncate(label.name, 100)}`
-      }),
+      content: t('comment.commented', { card: truncate(card.name, 100) }),
       components: [
         {
           type: ComponentType.ACTION_ROW,
           components: [
             {
               type: ComponentType.BUTTON,
-              style: ButtonStyle.DESTRUCTIVE,
-              label: t('common.yes'),
-              custom_id: `action::${ActionType.LABEL_DELETE}:${label.id}`
-            },
-            {
-              type: ComponentType.BUTTON,
-              style: ButtonStyle.SECONDARY,
-              label: t('common.no'),
-              custom_id: 'delete'
+              style: ButtonStyle.LINK,
+              label: t('interactions.visit', { context: 'card' }),
+              url: `https://trello.com/c/${card.shortLink}?utm_source=tacobot.app`
             }
           ]
         }

@@ -1,4 +1,11 @@
-import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
+import {
+  SlashCreator,
+  CommandContext,
+  AutocompleteContext,
+  CommandOptionType,
+  ComponentType,
+  ButtonStyle
+} from 'slash-create';
 import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
 import { noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
@@ -71,7 +78,7 @@ export default class BoardCommand extends SlashCommand {
                 board.organization
                   ? `**${t('common.org')}:** [${(truncate(board.organization.displayName), 50)}](https://trello.com/${
                       board.organization.name
-                    })`
+                    }?utm_source=tacobot.app)`
                   : ''
               }
               ${backgroundImg ? `**${t('common.bg_img')}:** [${t('common.link')}](${backgroundImg})\n` : ''}
@@ -84,6 +91,19 @@ export default class BoardCommand extends SlashCommand {
               cards: board.cards.filter((c) => !c.closed).length
             })
           }
+        }
+      ],
+      components: [
+        {
+          type: ComponentType.ACTION_ROW,
+          components: [
+            {
+              type: ComponentType.BUTTON,
+              style: ButtonStyle.LINK,
+              label: t('interactions.visit', { context: 'board' }),
+              url: `https://trello.com/b/${board.shortLink}?utm_source=tacobot.app`
+            }
+          ]
         }
       ]
     };

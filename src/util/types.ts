@@ -90,6 +90,7 @@ export interface TrelloAttachment {
   id: string;
   url: string;
   name: string;
+  bytes: number | null;
   edgeColor: string | null;
 }
 

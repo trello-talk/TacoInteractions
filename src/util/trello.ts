@@ -177,7 +177,7 @@ export default class Trello {
         stickers: 'true',
         sticker_fields: ['image'],
         attachments: 'true',
-        attachment_fields: ['url', 'name', 'edgeColor'],
+        attachment_fields: ['url', 'name', 'bytes', 'edgeColor'],
         checklists: 'all',
         checklist_fields: ['name'],
         fields: [
