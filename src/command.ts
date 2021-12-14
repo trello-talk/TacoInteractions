@@ -15,7 +15,8 @@ import { getBoard, getMember, TrelloAPIError } from './util/api';
 import { prisma } from './util/prisma';
 import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './util/types';
 import fuzzy from 'fuzzy';
-import { createT } from './util/locale';
+import { createT, langs } from './util/locale';
+import i18next from 'i18next';
 
 interface AutocompleteItemOptions<T = any> {
   userData?: User;
@@ -138,6 +139,24 @@ export default abstract class Command extends SlashCommand {
         extract: (label) => label.name || '[unnamed]'
       });
       return result.map((res) => ({ name: getLabelTextLabel(res.original, t), value: res.original.id })).slice(0, 25);
+    } catch (e) {
+      this.onAutocompleteError(e, ctx);
+      return [];
+    }
+  }
+
+  async autocompleteLocales(ctx: AutocompleteContext, query: string) {
+    try {
+      const langChoices = langs.map((lng) => ({
+        name: `[${lng}] ${i18next.getResource(lng, 'commands', '_.name')}`,
+        value: lng
+      }));
+      if (!query) return langChoices.slice(0, 25);
+
+      const result = fuzzy.filter(query, langChoices, {
+        extract: (lang) => lang.name
+      });
+      return result.map((res) => res.original).slice(0, 25);
     } catch (e) {
       this.onAutocompleteError(e, ctx);
       return [];

@@ -3,12 +3,14 @@ import i18next, { TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
 import { isInDist } from './dev';
 import { prisma } from './prisma';
+import { promises as fs } from 'fs';
+
+export const langs: string[] = [];
 
 export const init = async () => {
   await i18next.use(Backend).init({
-    lng: 'en',
     fallbackLng: 'en',
-    ns: ['bot', 'commands'],
+    ns: ['commands'],
     defaultNS: 'commands',
     debug: process.env.COMMANDS_DEBUG === 'true',
     interpolation: {
@@ -18,6 +20,9 @@ export const init = async () => {
       loadPath: `${isInDist ? '../' : ''}locale/{{ns}}/{{lng}}.json`
     }
   });
+  const lngs = await fs.readdir(`${isInDist ? '../' : ''}locale/commands`);
+  await i18next.loadLanguages(lngs.map((lng) => lng.replace('.json', '')));
+  lngs.map((lng) => langs.push(lng.replace('.json', '')));
 };
 
 export function createT(lang: string) {
