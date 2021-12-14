@@ -6,30 +6,41 @@ import {
   ComponentType,
   ButtonStyle
 } from 'slash-create';
-import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
 import { noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
-import { getBoard, getMember } from '../../util/api';
+import { getBoard, getMember, uncacheBoard, uncacheMember } from '../../util/api';
 import { createT } from '../../util/locale';
+import { prisma } from '../../util/prisma';
+import Trello from '../../util/trello';
 
-export default class BoardCommand extends SlashCommand {
+export default class EditBoardCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
-      name: 'board',
-      description: 'View a Trello board.',
+      name: 'edit-board',
+      description: 'Edit a board.',
       options: [
         {
           type: CommandOptionType.STRING,
           name: 'board',
-          description: 'The board to view, defaults to the selected board.',
+          description: 'The board to edit. Defaults to the selected board.',
           autocomplete: true
+        },
+        {
+          type: CommandOptionType.STRING,
+          name: 'name',
+          description: 'The new name of your board.'
+        },
+        {
+          type: CommandOptionType.STRING,
+          name: 'description',
+          description: 'The new description of your board. Use "none" to remove the description.'
         }
       ]
     });
   }
 
   async autocomplete(ctx: AutocompleteContext) {
-    return this.autocompleteBoards(ctx, { filter: (b) => !b.closed });
+    return this.autocompleteBoards(ctx);
   }
 
   async run(ctx: CommandContext) {
@@ -54,45 +65,30 @@ export default class BoardCommand extends SlashCommand {
 
     const [board] = await getBoard(userData.trelloToken, boardID, userData.trelloID);
 
-    const boardColor =
-      board.prefs && board.prefs.backgroundTopColor ? parseInt(board.prefs.backgroundTopColor.slice(1), 16) : 0;
-    const backgroundImg =
-      board.prefs && board.prefs.backgroundImageScaled ? board.prefs.backgroundImageScaled.reverse()[1].url : null;
+    if (!ctx.options.description && !ctx.options.name) return t('edit.no_edit');
+
+    try {
+      await new Trello(userData.trelloToken).updateBoard(boardID, {
+        ...(ctx.options.name ? { name: ctx.options.name } : {}),
+        ...(ctx.options.description ? { desc: ctx.options.description === 'none' ? '' : ctx.options.description } : {})
+      });
+    } catch (e) {
+      if (e.message === 'unauthorized permission requested') return t('edit.need_admin');
+      throw e;
+    }
+    await uncacheBoard(boardID);
+    await uncacheMember(userData.trelloID);
 
     return {
-      embeds: [
-        {
-          title: truncate(board.name, 256),
-          url: board.shortUrl,
-          color: boardColor,
-          description: board.desc ? truncate(board.desc, 4096) : undefined,
-          thumbnail: backgroundImg ? { url: backgroundImg } : undefined,
-          fields: [
-            {
-              // Information
-              name: t('common.info'),
-              value: stripIndentsAndNewlines`
-              ${board.closed ? `🗃️ *${t('board.is_archived')}*` : ''}
-              **${t('common.visibility')}:** ${t(`common.perm_levels.${board.prefs.permissionLevel}`)}
-              ${
-                board.organization
-                  ? `**${t('common.org')}:** [${(truncate(board.organization.displayName), 50)}](https://trello.com/${
-                      board.organization.name
-                    }?utm_source=tacobot.app)`
-                  : ''
-              }
-              ${backgroundImg ? `**${t('common.bg_img')}:** [${t('common.link')}](${backgroundImg})\n` : ''}
-            `
-            }
-          ],
-          footer: {
-            text: t('board.footer', {
-              lists: board.lists.filter((c) => !c.closed).length,
-              cards: board.cards.filter((c) => !c.closed).length
-            })
-          }
+      content: stripIndentsAndNewlines`
+        ${t('edit.header', { context: 'board', name: truncate(board.name, 100) })}
+        ${ctx.options.name ? t('edit.rename', { name: ctx.options.name }) : ''}
+        ${
+          ctx.options.description
+            ? t(`edit.${ctx.options.description === 'none' ? 'remove_description' : 'description'}`)
+            : ''
         }
-      ],
+      `,
       components: [
         {
           type: ComponentType.ACTION_ROW,

@@ -12,27 +12,11 @@ export enum ActionType {
   USER_CLEAR_AUTH = 1,
   USER_SWITCH = 2, // @deprecated
 
-  BOARD_VIEW = 100,
-  BOARD_WATCH = 101, // @deprecated
-  BOARD_ARCHIVE = 102,
-  BOARD_STAR = 110, // @deprecated
+  DELETE_LABEL = 10,
+  DELETE_CARD = 11,
 
-  CARD_VIEW = 200, // @deprecated
-  CARD_WATCH = 201,
-  CARD_ARCHIVE = 202,
-  CARD_DELETE = 203,
-  CARD_CREATE = 204,
-  CARD_COMMENT = 210,
-
-  LIST_VIEW = 300, // @deprecated
-  LIST_WATCH = 301,
-  LIST_ARCHIVE = 302,
-
-  LABEL_VIEW = 400, // @deprecated
-  // 401
-  // 402
-  LABEL_DELETE = 403
-  // LABEL_CREATE = 404, // not nessesary
+  SET_CARD_LABELS = 20,
+  SET_CARD_MEMBERS = 21
 }
 
 export type Action = RegularAction | BooleanAction | InputAction | CardCreateAction;
@@ -44,32 +28,22 @@ export interface RegularAction {
 }
 
 export interface BooleanAction extends RegularAction {
-  type:
-    | ActionType.BOARD_WATCH
-    | ActionType.BOARD_STAR
-    | ActionType.BOARD_ARCHIVE
-    | ActionType.CARD_WATCH
-    | ActionType.CARD_ARCHIVE
-    | ActionType.LIST_WATCH
-    | ActionType.LIST_ARCHIVE;
   value: boolean;
 }
 
 export interface InputAction extends RegularAction {
-  type: ActionType.CARD_COMMENT;
   input: string;
 }
 
 export interface CardCreateAction extends RegularAction {
-  type: ActionType.CARD_CREATE;
   title: string;
   description?: string;
 }
 
-export interface ActionFunction {
+export interface ActionFunction<T = Action> {
   type: ActionType;
   requiresData?: boolean;
-  onAction(ctx: ComponentContext, action: Action, data?: any): void | Promise<void>;
+  onAction(ctx: ComponentContext, action: T, data?: any): void | Promise<void>;
 }
 
 export const actions = new Map<ActionType, ActionFunction>();

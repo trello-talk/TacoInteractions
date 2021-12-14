@@ -1,3 +1,4 @@
+import { oneLine } from 'common-tags';
 import { SlashCreator, CommandContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
 import { noAuthResponse, splitMessage } from '../../util';
@@ -70,7 +71,9 @@ export default class LabelsCommand extends SlashCommand {
         pages: splitMessage(
           labels
             .map(
-              (label) => `${label.color ? LABEL_EMOJIS[label.color] : LABEL_EMOJIS.none} ${truncate(label.name, 50)}`
+              (label) => oneLine`
+                ${label.color ? LABEL_EMOJIS[label.color] : LABEL_EMOJIS.none}
+                ${truncate(label.name, 50) || '*[unnamed]*'}`
             )
             .join('\n')
         )

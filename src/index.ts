@@ -39,66 +39,75 @@ creator.on('commandError', (command, error) => logger.error(`Command ${command.c
 creator.withServer(new FastifyServer()).registerCommandsIn(path.join(__dirname, 'commands'));
 
 creator.on('componentInteraction', async (ctx) => {
-  if (ctx.customID === 'none') return ctx.acknowledge();
-  else if (ctx.customID === 'delete') {
-    const t = await createUserT(ctx.user.id);
-    if (ctx.message.interaction!.user.id !== ctx.user.id)
-      return ctx.send({
-        content: t(['interactions.delete_wrong_user', 'interactions.wrong_user']),
-        ephemeral: true
-      });
-    try {
-      await deleteInteraction(ctx, t);
-    } catch (e) {}
-  } else if (ctx.customID.startsWith('prompt:')) return handlePrompt(ctx);
-  else if (ctx.customID.startsWith('action:')) {
-    const t = await createUserT(ctx.user.id);
-    if (ctx.message.interaction!.user.id !== ctx.user.id)
-      return ctx.send({
-        content: t('interactions.wrong_user'),
-        ephemeral: true
-      });
-
-    const [, actionID, actionType, actionExtra] = ctx.customID.split(':');
-    if (!actionID && !actionType)
-      return ctx.send({
-        content: t('interactions.prompt_no_action_id_or_type'),
-        ephemeral: true
-      });
-
-    let action: Action;
-
-    if (!actionID) {
-      action = {
-        type: parseInt(actionType, 10),
-        user: ctx.user.id,
-        extra: actionExtra || ''
-      };
-    } else {
-      const actionCache = await client.get(`action:${actionID}`);
-      if (!actionCache)
+  try {
+    if (ctx.customID === 'none') return ctx.acknowledge();
+    else if (ctx.customID === 'delete') {
+      const t = await createUserT(ctx.user.id);
+      if (ctx.message.interaction!.user.id !== ctx.user.id)
         return ctx.send({
-          content: t('interactions.prompt_action_expired'),
+          content: t(['interactions.delete_wrong_user', 'interactions.wrong_user']),
+          ephemeral: true
+        });
+      try {
+        await deleteInteraction(ctx, t);
+      } catch (e) {}
+    } else if (ctx.customID.startsWith('prompt:')) return handlePrompt(ctx);
+    else if (ctx.customID.startsWith('action:')) {
+      const t = await createUserT(ctx.user.id);
+      if (ctx.message.interaction!.user.id !== ctx.user.id)
+        return ctx.send({
+          content: t('interactions.wrong_user'),
           ephemeral: true
         });
 
-      await client.del(`action:${actionID}`);
-      action = JSON.parse(actionCache);
+      const [, actionID, actionType, actionExtra] = ctx.customID.split(':');
+      if (!actionID && !actionType)
+        return ctx.send({
+          content: t('interactions.prompt_no_action_id_or_type'),
+          ephemeral: true
+        });
+
+      let action: Action;
+
+      if (!actionID) {
+        action = {
+          type: parseInt(actionType, 10),
+          user: ctx.user.id,
+          extra: actionExtra || ''
+        };
+      } else {
+        const actionCache = await client.get(`action:${actionID}`);
+        if (!actionCache)
+          return ctx.send({
+            content: t('interactions.prompt_action_expired'),
+            ephemeral: true
+          });
+
+        await client.del(`action:${actionID}`);
+        action = JSON.parse(actionCache);
+      }
+
+      if (!actions.has(action.type))
+        return ctx.send({
+          content: t('interactions.prompt_action_invalid_type'),
+          ephemeral: true
+        });
+
+      if (actions.get(action.type).requiresData && !actionExtra)
+        return ctx.send({
+          content: t('interactions.prompt_action_requires_data'),
+          ephemeral: true
+        });
+
+      return actions.get(action.type).onAction(ctx, action);
     }
-
-    if (!actions.has(action.type))
-      return ctx.send({
-        content: t('interactions.prompt_action_invalid_type'),
-        ephemeral: true
-      });
-
-    if (actions.get(action.type).requiresData && !actionExtra)
-      return ctx.send({
-        content: t('interactions.prompt_action_requires_data'),
-        ephemeral: true
-      });
-
-    return actions.get(action.type).onAction(ctx, action);
+  } catch (e) {
+    logger.error(e);
+    const t = await createUserT(ctx.user.id);
+    return ctx.send({
+      content: t('interactions.error'),
+      ephemeral: true
+    });
   }
 });
 

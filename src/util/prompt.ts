@@ -436,6 +436,7 @@ async function handleQueryPrompt(
         components: [
           {
             type: ComponentType.SELECT,
+            ...(prompt.placeholder ? { placeholder: prompt.placeholder } : {}),
             options: prompt.display.map((opt, i) => ({ ...opt, value: String(i) })).slice(offset, prompt.page * 25),
             custom_id: `prompt:${PromptType.QUERY}:${PromptAction.SELECT}`,
             min_values: 1,
@@ -486,7 +487,7 @@ export async function createSelectPrompt(
   options: Omit<SelectPrompt, 'page' | 'type' | 'selected'>,
   messageID: string,
   t: TFunction,
-  selected?: number[],
+  selected: number[] = [],
   lang?: string
 ): Promise<EditMessageOptions> {
   const prompt: SelectPrompt = {
@@ -512,7 +513,7 @@ export async function createSelectPrompt(
     embeds: [
       {
         title: prompt.title,
-        description: `${selected} item(s) selected`,
+        description: t('interactions.items_selected', { count: selected.length || 0 }),
         ...(prompt.footer ? { footer: { text: prompt.footer } } : {})
       }
     ],
@@ -522,10 +523,13 @@ export async function createSelectPrompt(
         components: [
           {
             type: ComponentType.SELECT,
-            options: prompt.display.map((opt, i) => ({ ...opt, value: String(i) })).slice(offset, prompt.page * 25),
-            custom_id: `prompt:${PromptType.QUERY}:${PromptAction.SELECT}`,
-            min_values: 1,
-            max_values: 1
+            ...(prompt.placeholder ? { placeholder: prompt.placeholder } : {}),
+            options: prompt.display
+              .map((opt, i) => ({ ...opt, value: String(i), default: prompt.selected[prompt.page - 1].includes(i) }))
+              .slice(offset, prompt.page * 25),
+            custom_id: `prompt:${PromptType.SELECT}:${PromptAction.SELECT}`,
+            min_values: 0,
+            max_values: prompt.display.length > 25 ? 25 : prompt.display.length
           }
         ]
       },
@@ -557,7 +561,7 @@ export async function createSelectPrompt(
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SUCCESS,
-            label: 'Save',
+            label: t('common.done'),
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.DONE}`
           },
           {
@@ -601,10 +605,9 @@ async function handleSelectPrompt(
       if (prompt.action) await client.del(`action:${prompt.action}`);
       return;
     case PromptAction.SELECT:
-      prompt.selected[prompt.page - 1] = [...new Set(prompt.values.map((v) => parseInt(v, 10)))];
+      prompt.selected[prompt.page - 1] = [...new Set(ctx.values.map((v) => parseInt(v, 10)))];
       break;
     case PromptAction.DONE:
-      await deleteInteraction(ctx, t);
       await client.del(`prompt:${ctx.message.id}`);
       return handoffAction(
         ctx,
@@ -636,12 +639,13 @@ async function handleSelectPrompt(
         components: [
           {
             type: ComponentType.SELECT,
+            ...(prompt.placeholder ? { placeholder: prompt.placeholder } : {}),
             options: prompt.display
               .map((opt, i) => ({ ...opt, value: String(i), default: prompt.selected[prompt.page - 1].includes(i) }))
               .slice(offset, prompt.page * 25),
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.SELECT}`,
             min_values: 0,
-            max_values: 25
+            max_values: prompt.display.length > 25 ? 25 : prompt.display.length
           }
         ]
       },

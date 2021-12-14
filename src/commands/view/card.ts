@@ -1,3 +1,4 @@
+import { oneLine } from 'common-tags';
 import {
   SlashCreator,
   CommandContext,
@@ -103,7 +104,9 @@ export default class CardCommand extends SlashCommand {
         name: t('common.labels'),
         value: truncateList(
           card.labels.map(
-            (label) => `${label.color ? LABEL_EMOJIS[label.color] : LABEL_EMOJIS.none} ${truncate(label.name, 50)}`
+            (label) => oneLine`
+              ${label.color ? LABEL_EMOJIS[label.color] : LABEL_EMOJIS.none}
+              ${truncate(label.name, 50) || '*[unnamed]*'}`
           ),
           t
         ),

@@ -6,7 +6,7 @@ import { prisma } from '../util/prisma';
 import Trello from '../util/trello';
 
 export const action: ActionFunction = {
-  type: ActionType.LABEL_DELETE,
+  type: ActionType.DELETE_LABEL,
   async onAction(ctx, action) {
     const userData = await prisma.user.findUnique({
       where: { userID: action.user }

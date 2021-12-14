@@ -152,7 +152,9 @@ export function getCardTextLabel(card: TrelloCard, lists: TrelloList[], subscrib
 }
 
 export function getLabelTextLabel(label: TrelloLabel, t: TFunction) {
-  return `${truncate(label.name, 30)}${label.color ? ` (${t(`common.label_color.${label.color}`)})` : ''}`.trim();
+  return `${truncate(label.name, 30) || '[unnamed]'}${
+    label.color ? ` (${t(`common.label_color.${label.color}`)})` : ''
+  }`.trim();
 }
 
 export function sortBoards(boards: TrelloBoard[]) {

@@ -135,7 +135,7 @@ export default abstract class Command extends SlashCommand {
       if (!query) return labels.map((l) => ({ name: getLabelTextLabel(l, t), value: l.id })).slice(0, 25);
 
       const result = fuzzy.filter(query, labels, {
-        extract: (label) => label.name
+        extract: (label) => label.name || '[unnamed]'
       });
       return result.map((res) => ({ name: getLabelTextLabel(res.original, t), value: res.original.id })).slice(0, 25);
     } catch (e) {

@@ -57,7 +57,7 @@ export default class DeleteCardCommand extends SlashCommand {
               type: ComponentType.BUTTON,
               style: ButtonStyle.DESTRUCTIVE,
               label: t('common.yes'),
-              custom_id: `action::${ActionType.CARD_DELETE}:${card.id}`
+              custom_id: `action::${ActionType.DELETE_CARD}:${card.id}`
             },
             {
               type: ComponentType.BUTTON,

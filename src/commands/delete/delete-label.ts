@@ -60,7 +60,7 @@ export default class DeleteLabelCommand extends SlashCommand {
               type: ComponentType.BUTTON,
               style: ButtonStyle.DESTRUCTIVE,
               label: t('common.yes'),
-              custom_id: `action::${ActionType.LABEL_DELETE}:${label.id}`
+              custom_id: `action::${ActionType.DELETE_LABEL}:${label.id}`
             },
             {
               type: ComponentType.BUTTON,

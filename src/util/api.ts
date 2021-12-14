@@ -140,6 +140,10 @@ export async function getBoard(
   return [response.data, subscriptions];
 }
 
+export async function uncacheMember(id: string): Promise<number> {
+  return await client.del(`trello.member:${id}`);
+}
+
 export async function uncacheBoard(id: string): Promise<number> {
   return await client.del(`trello.board:${id}`);
 }

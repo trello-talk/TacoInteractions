@@ -36,6 +36,7 @@ export interface TrelloBoard {
   lists: TrelloList[];
   cards: TrelloCard[];
   labels: TrelloLabel[];
+  members: TrelloUser[];
 }
 
 export interface TrelloCard {

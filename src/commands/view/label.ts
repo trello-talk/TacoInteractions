@@ -47,7 +47,7 @@ export default class LabelCommand extends SlashCommand {
         return {
           embeds: [
             {
-              title: t('label.title', { label: truncate(label.name, 100), cards: 0 }),
+              title: t('label.title', { label: truncate(label.name, 100) || '*[unnamed]*', cards: 0 }),
               color: label.color ? LABEL_COLORS[label.color] : undefined,
               description: `*${t('label.none')}*`
             }
