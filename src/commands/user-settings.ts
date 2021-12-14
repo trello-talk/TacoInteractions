@@ -4,6 +4,7 @@ import { prisma } from '../util/prisma';
 import { createT, langs } from '../util/locale';
 import i18next from 'i18next';
 import { oneLine } from 'common-tags';
+import { getData } from '../util';
 
 export default class UserSettingsCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -34,10 +35,7 @@ export default class UserSettingsCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t } = await getData(ctx);
 
     switch (ctx.subcommands[0]) {
       case 'locale': {

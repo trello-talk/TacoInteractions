@@ -6,12 +6,9 @@ import {
   ComponentType,
   ButtonStyle
 } from 'slash-create';
-import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
-import { noAuthResponse, truncate } from '../../util';
+import { getData, noAuthResponse, truncate } from '../../util';
 import { getBoard, uncacheBoard } from '../../util/api';
-import Trello from '../../util/trello';
-import { createT } from '../../util/locale';
 import { TrelloCard } from '../../util/types';
 
 // TODO add position option (top, bottom)
@@ -48,10 +45,7 @@ export default class AddCardCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t, trello } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
@@ -61,7 +55,6 @@ export default class AddCardCommand extends SlashCommand {
     const list = board.lists.find((l) => l.id === ctx.options.list || l.name === ctx.options.list);
     if (!list) return t('query.not_found', { context: 'list' });
 
-    const trello = new Trello(userData.trelloToken);
     const name = ctx.options.name.trim();
     const response = await trello.addCard(list.id, { name, desc: ctx.options.description });
     const card = response.data as TrelloCard;

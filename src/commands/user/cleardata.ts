@@ -1,8 +1,7 @@
 import { SlashCreator, CommandContext, ComponentType, ButtonStyle } from 'slash-create';
 import { ActionType } from '../../util/actions';
-import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
-import { createT } from '../../util/locale';
+import { getData } from '../../util';
 
 export default class ClearDataCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -14,11 +13,7 @@ export default class ClearDataCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-
-    const t = createT(userData?.locale);
+    const { userData, t } = await getData(ctx);
 
     if (!userData)
       return {

@@ -1,10 +1,9 @@
 import { SlashCreator, CommandContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, splitMessage } from '../../util';
+import { getData, noAuthResponse, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getBoard } from '../../util/api';
-import { createT, formatNumber } from '../../util/locale';
-import { prisma } from '../../util/prisma';
+import { formatNumber } from '../../util/locale';
 import { createListPrompt } from '../../util/prompt';
 
 enum TrelloListsFilter {
@@ -48,10 +47,7 @@ export default class ListsCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t, locale } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
@@ -78,7 +74,7 @@ export default class ListsCommand extends SlashCommand {
     await ctx.fetch();
     return await createListPrompt(
       {
-        title: `${t('lists.list', { context: filter.toLowerCase() })} (${formatNumber(lists.length, userData.locale)})`,
+        title: `${t('lists.list', { context: filter.toLowerCase() })} (${formatNumber(lists.length, locale)})`,
         pages: splitMessage(
           lists
             .map(
@@ -86,14 +82,15 @@ export default class ListsCommand extends SlashCommand {
                 `${list.closed ? '🗃️ ' : ''}${subs.lists[list.id] || list.subscribed ? '🔔 ' : ''} ${truncate(
                   list.name,
                   50
-                )} (${formatNumber(board.cards.filter((c) => c.idList == list.id).length, userData?.locale)} card[s])`
+                )} (${formatNumber(board.cards.filter((c) => c.idList == list.id).length, locale)} card[s])`
             )
             .join('\n'),
           { maxLength: 1000 }
         )
       },
       ctx.messageID!,
-      t
+      t,
+      locale
     );
   }
 }

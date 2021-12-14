@@ -9,12 +9,11 @@ import {
   ButtonStyle
 } from 'slash-create';
 import SlashCommand from '../../command';
-import { formatTime, noAuthResponse, stripIndentsAndNewlines, toColorInt, truncateList } from '../../util';
+import { formatTime, getData, noAuthResponse, stripIndentsAndNewlines, toColorInt, truncateList } from '../../util';
 import { truncate } from '../../util';
 import { getBoard, getCard } from '../../util/api';
 import { LABEL_COLORS, LABEL_EMOJIS, STICKER_EMOJIS, EMOJIS } from '../../util/constants';
-import { createT, formatNumber } from '../../util/locale';
-import { prisma } from '../../util/prisma';
+import { formatNumber } from '../../util/locale';
 
 export default class CardCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -38,10 +37,7 @@ export default class CardCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t, locale } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
@@ -75,7 +71,7 @@ export default class CardCommand extends SlashCommand {
           }
           ${
             card.membersVoted.length
-              ? `**${t('common.votes')}:** ${formatNumber(card.membersVoted.length, userData.locale)}${
+              ? `**${t('common.votes')}:** ${formatNumber(card.membersVoted.length, locale)}${
                   hasVoted ? ` ${t('card.vote_include')}` : ''
                 }`
               : ''
@@ -137,7 +133,7 @@ export default class CardCommand extends SlashCommand {
           .map(
             (key) =>
               `${STICKER_EMOJIS[key] ? `<:_:${STICKER_EMOJIS[key]}>` : key}${
-                stickers[key] > 1 ? ` ${formatNumber(stickers[key], userData?.locale)}` : ''
+                stickers[key] > 1 ? ` ${formatNumber(stickers[key], locale)}` : ''
               }`
           )
           .join(' '),
@@ -155,8 +151,8 @@ export default class CardCommand extends SlashCommand {
             const checkedCount = checklist.checkItems.filter((item) => item.state === 'complete').length;
             return `${completed ? EMOJIS.check : EMOJIS.uncheck} ${truncate(checklist.name, 50)} (${formatNumber(
               checkedCount,
-              userData.locale
-            )}/${formatNumber(checklist.checkItems.length, userData.locale)})`;
+              locale
+            )}/${formatNumber(checklist.checkItems.length, locale)})`;
           }),
           t
         ),

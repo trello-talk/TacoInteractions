@@ -1,9 +1,7 @@
 import { SlashCreator, CommandContext, MessageEmbedOptions } from 'slash-create';
 import SlashCommand from '../command';
-import { noAuthResponse, truncate } from '../util';
+import { getData, noAuthResponse, truncate } from '../util';
 import { getMember } from '../util/api';
-import { prisma } from '../util/prisma';
-import { createT } from '../util/locale';
 
 export default class MeCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -15,11 +13,7 @@ export default class MeCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
-
+    const { userData, t } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
     const member = await getMember(userData.trelloToken, userData.trelloID);

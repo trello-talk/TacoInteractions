@@ -7,11 +7,8 @@ import {
   ButtonStyle
 } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
+import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { getBoard, getMember, uncacheBoard, uncacheMember } from '../../util/api';
-import { createT } from '../../util/locale';
-import { prisma } from '../../util/prisma';
-import Trello from '../../util/trello';
 
 export default class EditBoardCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -44,10 +41,7 @@ export default class EditBoardCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t, trello } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
     let boardID = ctx.options.board || userData.currentBoard;
@@ -68,7 +62,7 @@ export default class EditBoardCommand extends SlashCommand {
     if (!ctx.options.description && !ctx.options.name) return t('edit.no_edit');
 
     try {
-      await new Trello(userData.trelloToken).updateBoard(boardID, {
+      await trello.updateBoard(boardID, {
         ...(ctx.options.name ? { name: ctx.options.name } : {}),
         ...(ctx.options.description ? { desc: ctx.options.description === 'none' ? '' : ctx.options.description } : {})
       });

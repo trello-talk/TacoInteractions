@@ -1,10 +1,7 @@
 import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
+import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { getBoard, uncacheBoard } from '../../util/api';
-import { createT } from '../../util/locale';
-import { prisma } from '../../util/prisma';
-import Trello from '../../util/trello';
 
 export default class EditListCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -38,10 +35,7 @@ export default class EditListCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t, trello } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
@@ -52,7 +46,7 @@ export default class EditListCommand extends SlashCommand {
 
     if (ctx.options.archive === undefined && !ctx.options.name) return t('edit.no_edit');
 
-    await new Trello(userData.trelloToken).updateList(list.id, {
+    await trello.updateList(list.id, {
       ...(ctx.options.name ? { name: ctx.options.name } : {}),
       ...(ctx.options.archive !== undefined ? { closed: ctx.options.archive } : {})
     });

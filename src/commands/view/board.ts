@@ -6,11 +6,9 @@ import {
   ComponentType,
   ButtonStyle
 } from 'slash-create';
-import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
-import { noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
+import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { getBoard, getMember } from '../../util/api';
-import { createT } from '../../util/locale';
 
 export default class BoardCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -33,10 +31,7 @@ export default class BoardCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
     let boardID = ctx.options.board || userData.currentBoard;

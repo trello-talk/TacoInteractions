@@ -6,12 +6,9 @@ import {
   ButtonStyle,
   ComponentType
 } from 'slash-create';
-import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
-import { noAuthResponse, truncate } from '../../util';
+import { getData, noAuthResponse, truncate } from '../../util';
 import { getBoard } from '../../util/api';
-import Trello from '../../util/trello';
-import { createT } from '../../util/locale';
 
 export default class CommentCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -41,10 +38,7 @@ export default class CommentCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t, trello } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
@@ -52,7 +46,7 @@ export default class CommentCommand extends SlashCommand {
     const card = board.cards.find((c) => c.id === ctx.options.card || c.shortLink === ctx.options.card);
     if (!card) return t('query.not_found', { context: 'card' });
 
-    await new Trello(userData.trelloToken).addComment(card.id, ctx.options.message);
+    await trello.addComment(card.id, ctx.options.message);
 
     return {
       content: t('comment.commented', { card: truncate(card.name, 100) }),

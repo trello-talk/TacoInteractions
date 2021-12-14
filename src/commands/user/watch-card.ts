@@ -1,10 +1,7 @@
 import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
-import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
-import { noAuthResponse, truncate } from '../../util';
+import { getData, noAuthResponse, truncate } from '../../util';
 import { getBoard, updateBoardSub } from '../../util/api';
-import Trello from '../../util/trello';
-import { createT } from '../../util/locale';
 
 export default class WatchCardCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -28,10 +25,7 @@ export default class WatchCardCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t, trello } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
@@ -40,7 +34,6 @@ export default class WatchCardCommand extends SlashCommand {
     if (!card) return t('query.not_found', { context: 'card' });
 
     const subbed = !subs.cards[card.id];
-    const trello = new Trello(userData.trelloToken);
     await trello.updateCard(card.id, { subscribed: subbed });
     await updateBoardSub(userData.trelloID, board.id, card.id, 'card', subbed);
 

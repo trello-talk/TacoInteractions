@@ -24,6 +24,7 @@ interface AutocompleteItemOptions<T = any> {
   filter?(value: T, index: number, array: T[]): boolean;
 }
 
+// TODO fix server locale for autocomplete
 export default abstract class Command extends SlashCommand {
   async autocompleteBoards(ctx: AutocompleteContext, opts: AutocompleteItemOptions<TrelloBoard> = {}) {
     const query = opts.query || ctx.options.board;

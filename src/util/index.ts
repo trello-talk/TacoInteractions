@@ -2,7 +2,17 @@ import { stripIndentTransformer, TemplateTag } from 'common-tags';
 import { promises as fs } from 'fs';
 import { TFunction } from 'i18next';
 import path from 'path';
-import { ButtonStyle, ComponentContext, ComponentType, InteractionResponseFlags, MessageOptions } from 'slash-create';
+import {
+  ButtonStyle,
+  ComponentContext,
+  ComponentType,
+  InteractionResponseFlags,
+  MessageInteractionContext,
+  MessageOptions
+} from 'slash-create';
+import { createT } from './locale';
+import { prisma } from './prisma';
+import Trello from './trello';
 import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './types';
 
 export function truncate(text: string, limit = 2000) {
@@ -24,6 +34,20 @@ export function truncateList(texts: string[], t: TFunction, limit = 256, sep = '
 
 export function toColorInt(hex: string) {
   return parseInt(hex.slice(1), 16);
+}
+
+export async function getData(ctx: MessageInteractionContext) {
+  const userData = await prisma.user.findUnique({
+    where: { userID: ctx.user.id }
+  });
+  const serverData = ctx.guildID
+    ? await prisma.server.findUnique({
+        where: { serverID: ctx.guildID }
+      })
+    : null;
+  const t = createT(userData?.locale || serverData?.locale);
+  const trello = new Trello(userData?.trelloToken);
+  return { userData, serverData, t, trello, locale: userData?.locale || serverData?.locale || 'en' };
 }
 
 /** Strip indents, extra newlines and trim the result. */

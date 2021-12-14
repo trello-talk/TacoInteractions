@@ -1,11 +1,9 @@
 import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, sortCards, splitMessage } from '../../util';
+import { getData, noAuthResponse, sortCards, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getBoard } from '../../util/api';
 import { LABEL_COLORS } from '../../util/constants';
-import { createT } from '../../util/locale';
-import { prisma } from '../../util/prisma';
 import { createListPrompt } from '../../util/prompt';
 
 export default class LabelCommand extends SlashCommand {
@@ -30,10 +28,7 @@ export default class LabelCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 

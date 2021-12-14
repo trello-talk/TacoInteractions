@@ -1,5 +1,5 @@
 import { SlashCommand, SlashCreator, ComponentType, ButtonStyle, CommandContext } from 'slash-create';
-import { createUserT } from '../../util/locale';
+import { getData } from '../../util';
 
 export default class AuthCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -11,7 +11,7 @@ export default class AuthCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const t = await createUserT(ctx.user.id);
+    const { t } = await getData(ctx);
     return {
       content: t('auth.content'),
       ephemeral: true,

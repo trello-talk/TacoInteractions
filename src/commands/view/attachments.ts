@@ -1,9 +1,7 @@
 import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse } from '../../util';
+import { getData, noAuthResponse } from '../../util';
 import { getBoard, getCard } from '../../util/api';
-import { createT } from '../../util/locale';
-import { prisma } from '../../util/prisma';
 import { createAttachmentPrompt } from '../../util/prompt';
 
 export default class AttachmentsCommand extends SlashCommand {
@@ -28,10 +26,7 @@ export default class AttachmentsCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 

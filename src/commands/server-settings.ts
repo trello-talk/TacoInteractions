@@ -4,6 +4,7 @@ import { prisma } from '../util/prisma';
 import { createT, langs } from '../util/locale';
 import i18next from 'i18next';
 import { oneLine } from 'common-tags';
+import { getData } from '../util';
 
 export default class ServerSettingsCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -45,15 +46,7 @@ export default class ServerSettingsCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const serverData = ctx.guildID
-      ? await prisma.server.findUnique({
-          where: { serverID: ctx.guildID }
-        })
-      : null;
-    const t = createT(userData?.locale || serverData?.locale);
+    const { userData, serverData, t } = await getData(ctx);
     if (!ctx.guildID) return { content: t('interactions.no_server'), ephemeral: true };
     if (!ctx.member!.permissions.has('MANAGE_GUILD'))
       return { content: t('interactions.no_admin_perms'), ephemeral: true };

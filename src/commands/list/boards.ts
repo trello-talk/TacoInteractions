@@ -1,10 +1,9 @@
 import { SlashCreator, CommandContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, splitMessage } from '../../util';
+import { getData, noAuthResponse, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getMember } from '../../util/api';
-import { createT, formatNumber } from '../../util/locale';
-import { prisma } from '../../util/prisma';
+import { formatNumber } from '../../util/locale';
 import { createListPrompt } from '../../util/prompt';
 
 enum TrelloBoardsFilter {
@@ -53,10 +52,7 @@ export default class BoardsCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t, locale } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
     const member = await getMember(userData.trelloToken, userData.trelloID);
@@ -83,10 +79,7 @@ export default class BoardsCommand extends SlashCommand {
     await ctx.fetch();
     return await createListPrompt(
       {
-        title: `${t('boards.list', { context: filter.toLowerCase() })} (${formatNumber(
-          boards.length,
-          userData.locale
-        )})`,
+        title: `${t('boards.list', { context: filter.toLowerCase() })} (${formatNumber(boards.length, locale)})`,
         pages: splitMessage(
           boards
             .map(
@@ -100,7 +93,8 @@ export default class BoardsCommand extends SlashCommand {
         )
       },
       ctx.messageID!,
-      t
+      t,
+      locale
     );
   }
 }

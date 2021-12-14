@@ -7,12 +7,10 @@ import {
   ButtonStyle
 } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, truncate } from '../../util';
+import { getData, noAuthResponse, truncate } from '../../util';
 import { ActionType } from '../../util/actions';
 import { getBoard } from '../../util/api';
 import { LABEL_EMOJIS } from '../../util/constants';
-import { createT } from '../../util/locale';
-import { prisma } from '../../util/prisma';
 
 export default class DeleteLabelCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -36,10 +34,7 @@ export default class DeleteLabelCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 

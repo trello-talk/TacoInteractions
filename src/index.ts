@@ -11,8 +11,8 @@ import { client, connect } from './util/redis';
 import { handlePrompt } from './util/prompt';
 import { Action, actions, load as loadActions } from './util/actions';
 import { logger } from './logger';
-import { deleteInteraction } from './util';
-import { createUserT, init as initLocale } from './util/locale';
+import { deleteInteraction, getData } from './util';
+import { init as initLocale } from './util/locale';
 
 export const creator = new SlashCreator({
   applicationID: process.env.DISCORD_APP_ID,
@@ -42,7 +42,7 @@ creator.on('componentInteraction', async (ctx) => {
   try {
     if (ctx.customID === 'none') return ctx.acknowledge();
     else if (ctx.customID === 'delete') {
-      const t = await createUserT(ctx.user.id);
+      const { t } = await getData(ctx);
       if (ctx.message.interaction!.user.id !== ctx.user.id)
         return ctx.send({
           content: t(['interactions.delete_wrong_user', 'interactions.wrong_user']),
@@ -53,7 +53,7 @@ creator.on('componentInteraction', async (ctx) => {
       } catch (e) {}
     } else if (ctx.customID.startsWith('prompt:')) return handlePrompt(ctx);
     else if (ctx.customID.startsWith('action:')) {
-      const t = await createUserT(ctx.user.id);
+      const { t } = await getData(ctx);
       if (ctx.message.interaction!.user.id !== ctx.user.id)
         return ctx.send({
           content: t('interactions.wrong_user'),
@@ -103,7 +103,7 @@ creator.on('componentInteraction', async (ctx) => {
     }
   } catch (e) {
     logger.error(e);
-    const t = await createUserT(ctx.user.id);
+    const { t } = await getData(ctx);
     return ctx.send({
       content: t('interactions.error'),
       ephemeral: true

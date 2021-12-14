@@ -1,10 +1,7 @@
 import { SlashCreator, CommandContext, CommandOptionType } from 'slash-create';
-import { prisma } from '../../util/prisma';
 import SlashCommand from '../../command';
-import { noAuthResponse, truncate } from '../../util';
+import { getData, noAuthResponse, truncate } from '../../util';
 import { getBoard, uncacheBoard } from '../../util/api';
-import Trello from '../../util/trello';
-import { createT } from '../../util/locale';
 import { LABEL_EMOJIS } from '../../util/constants';
 
 export default class AddLabelCommand extends SlashCommand {
@@ -71,17 +68,13 @@ export default class AddLabelCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t, trello } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
     const [board] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
     if (board.labels.length >= 800) return { content: t('addlabel.limited'), ephemeral: true };
 
-    const trello = new Trello(userData.trelloToken);
     const name = ctx.options.name.trim();
     await trello.addLabel(userData.currentBoard, { name, color: ctx.options.color });
     await uncacheBoard(userData.currentBoard);

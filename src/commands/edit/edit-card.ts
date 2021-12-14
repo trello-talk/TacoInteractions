@@ -1,13 +1,10 @@
 import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
+import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { ActionType, createAction } from '../../util/actions';
 import { getBoard, getCard, uncacheBoard, uncacheCard } from '../../util/api';
 import { LABEL_EMOJIS } from '../../util/constants';
-import { createT } from '../../util/locale';
-import { prisma } from '../../util/prisma';
 import { createSelectPrompt } from '../../util/prompt';
-import Trello from '../../util/trello';
 
 export default class EditCardCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -107,10 +104,7 @@ export default class EditCardCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t, trello, locale } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
@@ -123,7 +117,7 @@ export default class EditCardCommand extends SlashCommand {
     switch (ctx.subcommands[0]) {
       case 'attributes': {
         const opts = ctx.options.attributes;
-        await new Trello(userData.trelloToken).updateCard(card.id, {
+        await trello.updateCard(card.id, {
           ...(opts.name ? { name: opts.name } : {}),
           ...(opts.description ? { desc: opts.description === 'none' ? '' : opts.description } : {}),
           ...(opts.archive !== undefined ? { closed: opts.archive } : {})
@@ -143,7 +137,7 @@ export default class EditCardCommand extends SlashCommand {
         const list = board.lists.find((l) => l.id === opts.list || l.name === opts.list);
         if (!list) return t('query.not_found', { context: 'list' });
 
-        await new Trello(userData.trelloToken).updateCard(card.id, { idList: list.id });
+        await trello.updateCard(card.id, { idList: list.id });
         await uncacheBoard(userData.currentBoard);
         await uncacheCard(card.id);
 
@@ -169,7 +163,7 @@ export default class EditCardCommand extends SlashCommand {
           ctx.messageID!,
           t,
           card.labels.map((l) => board.labels.findIndex((lb) => lb.id === l.id)),
-          userData.locale
+          locale
         );
       }
       case 'members': {
@@ -189,7 +183,7 @@ export default class EditCardCommand extends SlashCommand {
           ctx.messageID!,
           t,
           card.members.map((m) => board.members.findIndex((mb) => mb.id === m.id)),
-          userData.locale
+          locale
         );
       }
     }

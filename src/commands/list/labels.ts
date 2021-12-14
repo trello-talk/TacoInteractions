@@ -1,12 +1,11 @@
 import { oneLine } from 'common-tags';
 import { SlashCreator, CommandContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, splitMessage } from '../../util';
+import { getData, noAuthResponse, splitMessage } from '../../util';
 import { truncate } from '../../util';
 import { getBoard } from '../../util/api';
 import { LABEL_EMOJIS } from '../../util/constants';
-import { createT, formatNumber } from '../../util/locale';
-import { prisma } from '../../util/prisma';
+import { formatNumber } from '../../util/locale';
 import { createListPrompt } from '../../util/prompt';
 
 enum TrelloLabelsFilter {
@@ -40,10 +39,7 @@ export default class LabelsCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t, locale } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
@@ -64,10 +60,7 @@ export default class LabelsCommand extends SlashCommand {
     await ctx.fetch();
     return await createListPrompt(
       {
-        title: `${t('labels.list', { context: filter.toLowerCase() })} (${formatNumber(
-          labels.length,
-          userData.locale
-        )})`,
+        title: `${t('labels.list', { context: filter.toLowerCase() })} (${formatNumber(labels.length, locale)})`,
         pages: splitMessage(
           labels
             .map(
@@ -79,7 +72,8 @@ export default class LabelsCommand extends SlashCommand {
         )
       },
       ctx.messageID!,
-      t
+      t,
+      locale
     );
   }
 }

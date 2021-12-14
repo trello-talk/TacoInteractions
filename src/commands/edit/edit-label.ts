@@ -1,11 +1,8 @@
 import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
 import SlashCommand from '../../command';
-import { noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
+import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { getBoard, uncacheBoard } from '../../util/api';
 import { LABEL_EMOJIS } from '../../util/constants';
-import { createT } from '../../util/locale';
-import { prisma } from '../../util/prisma';
-import Trello from '../../util/trello';
 
 export default class EditLabelCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -85,10 +82,7 @@ export default class EditLabelCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: ctx.user.id }
-    });
-    const t = createT(userData?.locale);
+    const { userData, t, trello } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
@@ -100,7 +94,7 @@ export default class EditLabelCommand extends SlashCommand {
     const color = ctx.options.color === 'none' ? null : ctx.options.color;
     if (color === undefined && !ctx.options.name) return t('edit.no_edit');
 
-    await new Trello(userData.trelloToken).updateLabel(label.id, {
+    await trello.updateLabel(label.id, {
       ...(ctx.options.name ? { name: ctx.options.name } : {}),
       ...(color !== undefined ? { color } : {})
     });
