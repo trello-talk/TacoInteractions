@@ -4,22 +4,31 @@ import { iterateFolder } from '.';
 import { logger } from '../logger';
 import { client } from './redis';
 import { nanoid } from 'nanoid';
+import { DiscordWebhook, TrelloBoard } from './types';
 
 export enum ActionType {
   DEBUG = -1,
-
   USER_CLEAR_DATA = 0,
   USER_CLEAR_AUTH = 1,
-  USER_SWITCH = 2, // @deprecated
-
-  DELETE_LABEL = 10,
-  DELETE_CARD = 11,
-
-  SET_CARD_LABELS = 20,
-  SET_CARD_MEMBERS = 21
+  USER_SWITCH = 2,
+  DELETE_LABEL = 3,
+  DELETE_CARD = 4,
+  DELETE_WEBHOOK = 5,
+  SET_CARD_LABELS = 6,
+  SET_CARD_MEMBERS = 7,
+  CREATE_WEBHOOK = 8,
+  SET_WEBHOOK_FILTERS = 9,
+  SET_WEBHOOK_CARDS = 10,
+  SET_WEBHOOK_LISTS = 11
 }
 
-export type Action = RegularAction | BooleanAction | InputAction | CardCreateAction;
+export type Action =
+  | RegularAction
+  | BooleanAction
+  | InputAction
+  | CardCreateAction
+  | WebhookCreateAction
+  | WebhookEditAction;
 
 export interface RegularAction {
   type: ActionType;
@@ -40,6 +49,18 @@ export interface CardCreateAction extends RegularAction {
   description?: string;
 }
 
+export interface WebhookCreateAction extends RegularAction {
+  type: ActionType.CREATE_WEBHOOK;
+  board: TrelloBoard;
+  channelID: string;
+  name?: string;
+  webhooks: DiscordWebhook[];
+}
+
+export interface WebhookEditAction extends RegularAction {
+  type: ActionType.SET_WEBHOOK_FILTERS | ActionType.SET_WEBHOOK_CARDS | ActionType.SET_WEBHOOK_LISTS;
+  webhookID: number;
+}
 export interface ActionFunction<T = Action> {
   type: ActionType;
   requiresData?: boolean;

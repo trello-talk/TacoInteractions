@@ -10,7 +10,7 @@ export const langs: string[] = [];
 export const init = async () => {
   await i18next.use(Backend).init({
     fallbackLng: 'en',
-    ns: ['commands'],
+    ns: ['commands', 'webhook'],
     defaultNS: 'commands',
     debug: process.env.COMMANDS_DEBUG === 'true',
     interpolation: {

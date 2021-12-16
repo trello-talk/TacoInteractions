@@ -498,8 +498,12 @@ export async function createSelectPrompt(
   };
 
   // Place selected values
+  selected = selected.filter((v) => v != -1);
   const max = Math.ceil(prompt.display.length / 25);
-  prompt.selected = new Array(max).fill([]);
+  prompt.selected = ' '
+    .repeat(max)
+    .split('')
+    .map(() => []);
   for (const i of selected) {
     const pageIndex = Math.floor(i / 25);
     prompt.selected[pageIndex].push(i);
@@ -508,6 +512,7 @@ export async function createSelectPrompt(
   await client.set(`prompt:${messageID}`, JSON.stringify(prompt), 'EX', 10 * 60);
 
   const offset = (prompt.page - 1) * 25;
+  const displayLen = Math.min(25, prompt.display.length - offset);
   return {
     content: prompt.content || '',
     embeds: [
@@ -529,7 +534,7 @@ export async function createSelectPrompt(
               .slice(offset, prompt.page * 25),
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.SELECT}`,
             min_values: 0,
-            max_values: prompt.display.length > 25 ? 25 : prompt.display.length
+            max_values: displayLen
           }
         ]
       },
@@ -623,6 +628,7 @@ async function handleSelectPrompt(
 
   // Display page
   const offset = (prompt.page - 1) * 25;
+  const displayLen = Math.min(25, prompt.display.length - offset);
   const selected = prompt.selected.reduce((p, n) => p + n.length, 0);
   await ctx.editParent({
     content: prompt.content || '',
@@ -645,7 +651,7 @@ async function handleSelectPrompt(
               .slice(offset, prompt.page * 25),
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.SELECT}`,
             min_values: 0,
-            max_values: prompt.display.length > 25 ? 25 : prompt.display.length
+            max_values: displayLen
           }
         ]
       },

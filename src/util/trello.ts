@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { VERSION } from './constants';
 
 export const BASE_URL = 'https://api.trello.com/1';
-const VERSION: string = require('../../package.json').version;
 
 type RequestConfig = AxiosRequestConfig<any> & { isForm?: true };
 
@@ -298,7 +298,7 @@ export default class Trello {
       isForm: true,
       data: {
         idModel: id,
-        description: `[${new Date()}] TrelloBot (https://github.com/trello-talk/Taco)`,
+        description: `[${new Date()}] tacobot.app (https://github.com/trello-talk/TacoInteractions)`,
         ...payload
       }
     });

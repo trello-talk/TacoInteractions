@@ -1,7 +1,8 @@
 import { client } from './redis';
 import Trello from './trello';
 import { AxiosResponse } from 'axios';
-import { TrelloBoard, TrelloBoardStar, TrelloCard, TrelloMember } from './types';
+import { DiscordWebhook, TrelloBoard, TrelloBoardStar, TrelloCard, TrelloMember } from './types';
+import { SlashCreator } from 'slash-create';
 
 export interface TrelloBoardSubscriptions {
   cards: Record<string, boolean>;
@@ -152,6 +153,10 @@ export async function uncacheCard(id: string): Promise<number> {
   return await client.del(`trello.card:${id}`);
 }
 
+export async function uncacheWebhooks(id: string): Promise<number> {
+  return await client.del(`discord.webhooks:${id}`);
+}
+
 export async function updateBoardSub(
   memberId: string,
   boardId: string,
@@ -182,4 +187,15 @@ export async function getCard(token: string, id: string): Promise<TrelloCard> {
 
   await client.set(key, JSON.stringify(response.data), 'EX', 30 * 60);
   return response.data;
+}
+
+export async function getWebhooks(id: string, creator: SlashCreator): Promise<DiscordWebhook[]> {
+  const key = `discord.webhooks:${id}`;
+  const cached = await client.get(key);
+  if (cached) return JSON.parse(cached);
+
+  const webhooks = await creator.requestHandler.request('GET', `/guilds/${id}/webhooks`);
+
+  await client.set(key, JSON.stringify(webhooks), 'EX', 6 * 60 * 60);
+  return webhooks;
 }

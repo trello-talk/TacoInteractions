@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { SlashCreator, FastifyServer } from 'slash-create';
+import { SlashCreator, FastifyServer, InteractionResponseFlags } from 'slash-create';
 import { isInDist } from './util/dev';
 import path from 'path';
 
@@ -77,11 +77,18 @@ creator.on('componentInteraction', async (ctx) => {
         };
       } else {
         const actionCache = await client.get(`action:${actionID}`);
-        if (!actionCache)
-          return ctx.send({
+        if (!actionCache) {
+          if (ctx.message.flags === InteractionResponseFlags.EPHEMERAL)
+            return ctx.send({
+              content: t('interactions.prompt_action_expired'),
+              ephemeral: true
+            });
+          return ctx.editParent({
             content: t('interactions.prompt_action_expired'),
-            ephemeral: true
+            embeds: [],
+            components: []
           });
+        }
 
         await client.del(`action:${actionID}`);
         action = JSON.parse(actionCache);

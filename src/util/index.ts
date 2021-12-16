@@ -1,8 +1,10 @@
+import axios from 'axios';
 import { stripIndentTransformer, TemplateTag } from 'common-tags';
 import { promises as fs } from 'fs';
 import { TFunction } from 'i18next';
 import path from 'path';
 import {
+  AutocompleteContext,
   ButtonStyle,
   ComponentContext,
   ComponentType,
@@ -12,8 +14,10 @@ import {
 } from 'slash-create';
 import { createT } from './locale';
 import { prisma } from './prisma';
+import { client } from './redis';
 import Trello from './trello';
-import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './types';
+import { DiscordWebhook, TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './types';
+import { VERSION } from './constants';
 
 export function truncate(text: string, limit = 2000) {
   return text.length > limit ? text.slice(0, limit - 1) + '…' : text;
@@ -36,7 +40,7 @@ export function toColorInt(hex: string) {
   return parseInt(hex.slice(1), 16);
 }
 
-export async function getData(ctx: MessageInteractionContext) {
+export async function getData(ctx: MessageInteractionContext | AutocompleteContext) {
   const userData = await prisma.user.findUnique({
     where: { userID: ctx.user.id }
   });
@@ -211,4 +215,45 @@ export function sortCards(card: TrelloCard[]) {
     if (a.pos > b.pos) return 1;
     return 0;
   });
+}
+
+export async function createDiscordWebhook(
+  guildID: string,
+  channelID: string,
+  body: any,
+  reason?: string
+): Promise<DiscordWebhook> {
+  await client.del(`discord.webhooks:${guildID}`);
+  const response = await axios.post(`https://discord.com/api/v9/channels/${channelID}/webhooks`, body, {
+    headers: {
+      Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+      'Content-Type': 'application/json',
+      'User-Agent': `TacoInteractions (https://github.com/trello-talk/TacoInteractions, ${VERSION}) Node.js/${process.version}`,
+      ...(reason ? { 'X-Audit-Log-Reason': reason } : {})
+    }
+  });
+
+  return response.data;
+}
+
+export async function postToWebhook(webhook: DiscordWebhook, body: any): Promise<any> {
+  const response = await axios.post(`https://discord.com/api/v9/webhooks/${webhook.id}/${webhook.token}`, body, {
+    headers: {
+      'Content-Type': 'application/json',
+      'User-Agent': `TacoInteractions (https://github.com/trello-talk/TacoInteractions, ${VERSION}) Node.js/${process.version}`
+    }
+  });
+
+  return response.data;
+}
+
+export function parseBigInt(value: string, radix: number) {
+  var size = 10,
+    factor = BigInt(radix ** size),
+    i = value.length % size || size,
+    parts = [value.slice(0, i)];
+
+  while (i < value.length) parts.push(value.slice(i, (i += size)));
+
+  return parts.reduce((r, v) => r * factor + BigInt(parseInt(v, radix)), 0n);
 }

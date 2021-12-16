@@ -24,7 +24,6 @@ interface AutocompleteItemOptions<T = any> {
   filter?(value: T, index: number, array: T[]): boolean;
 }
 
-// TODO fix server locale for autocomplete
 export default abstract class Command extends SlashCommand {
   async autocompleteBoards(ctx: AutocompleteContext, opts: AutocompleteItemOptions<TrelloBoard> = {}) {
     const query = opts.query || ctx.options.board;
@@ -95,8 +94,7 @@ export default abstract class Command extends SlashCommand {
 
     try {
       const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
-      // TODO sort cards
-      const cards = board.cards.filter(opts.filter || (() => true));
+      const cards = board.cards.filter(opts.filter || (() => true)).sort((a, b) => b.name.localeCompare(a.name));
 
       if (!query)
         return cards
@@ -126,7 +124,12 @@ export default abstract class Command extends SlashCommand {
       });
     }
     const userData = opts.userData;
-    const t = createT(userData?.locale);
+    const serverData = ctx.guildID
+      ? await prisma.server.findUnique({
+          where: { serverID: ctx.guildID }
+        })
+      : null;
+    const t = createT(userData?.locale || serverData?.locale);
 
     if (!userData || !userData.trelloToken || !userData.currentBoard) return [];
 
@@ -164,9 +167,38 @@ export default abstract class Command extends SlashCommand {
     }
   }
 
-  async onAutocompleteError(err: Error, ctx: AutocompleteContext) {
+  async autocompleteWebhooks(ctx: AutocompleteContext, query: string) {
+    if (!ctx.guildID) return [];
+
+    try {
+      const webhooks = await prisma.webhook.findMany({
+        where: { guildID: ctx.guildID }
+      });
+
+      if (!query)
+        return webhooks
+          .sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf())
+          .map((w) => ({ name: `[${w.id}] ${w.name || 'Unnamed Webhook'}`, value: String(w.id) }))
+          .slice(0, 25);
+
+      const result = fuzzy.filter(query, webhooks, {
+        extract: (w) => w.name || 'Unnamed Webhook'
+      });
+      return result
+        .map((res) => ({
+          name: `[${res.original.id}] ${res.original.name || 'Unnamed Webhook'}`,
+          value: String(res.original.id)
+        }))
+        .slice(0, 25);
+    } catch (e) {
+      this.onAutocompleteError(e, ctx);
+      return [];
+    }
+  }
+
+  async onAutocompleteError(err: any, ctx: AutocompleteContext) {
     if ('response' in err) {
-      const response = (err as any).response as AxiosResponse;
+      const response = err.response as AxiosResponse;
       if (response.status === 401 && response.data === 'invalid token')
         return await prisma.user.update({
           where: { userID: ctx.user.id },

@@ -73,9 +73,10 @@ export const LABEL_EMOJIS: Record<string, string> = {
   black: '<:labelBlack:917659217958141962>'
 };
 
-export const IMAGE_ATTACHMENT_HOST = 'https://trello-attachments.s3.amazonaws.com/';
-
 export const EMOJIS: Record<string, string> = {
   check: '<:check:632444546684551183>',
   uncheck: '<:uncheck:632444550115491910>'
 };
+
+export const VERSION: string = require('../../package.json').version;
+export const REPOSITORY: string = require('../../package.json').repository;

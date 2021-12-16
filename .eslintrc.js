@@ -1,14 +1,11 @@
 module.exports = {
   env: {
+    es2020: true,
     commonjs: true,
     es6: true,
     node: true
   },
   extends: ['eslint:recommended', 'plugin:prettier/recommended'],
-  globals: {
-    NodeJS: true,
-    BigInt: true
-  },
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 6,
