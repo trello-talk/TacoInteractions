@@ -9,14 +9,16 @@ import {
   isElevated,
   noAuthResponse,
   sortBoards,
-  sortLists
+  sortLists,
+  stripIndentsAndNewlines,
+  truncate
 } from './util';
 import { getBoard, getMember, TrelloAPIError } from './util/api';
 import { prisma } from './util/prisma';
 import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './util/types';
 import fuzzy from 'fuzzy';
 import { createT, langs } from './util/locale';
-import { logger } from './logger';
+import { reportError } from './util/airbrake';
 
 interface AutocompleteItemOptions<T = any> {
   userData?: User;
@@ -208,7 +210,7 @@ export default abstract class Command extends SlashCommand {
         });
     }
 
-    logger.error('Error in autocomplete', err);
+    reportError(err, `Error in autocomplete (${this.commandName})`, 'autocomplete', ctx, this.commandName);
   }
 
   async onError(err: Error, ctx: CommandContext) {
@@ -225,16 +227,20 @@ export default abstract class Command extends SlashCommand {
     }
 
     if (isElevated(ctx.user.id)) {
-      console.log((err as any).toJSON());
-      console.log((err as any).request);
-      console.log((err as any).response);
+      const e = err as any;
+      reportError(err, `Error in command (${ctx.commandName})`, 'command', ctx);
       return ctx.send({
-        content: '```js\n' + err.stack + '```',
+        content: stripIndentsAndNewlines`
+          __Error in command (${ctx.commandName})__
+          ${e.response && e.response.status ? `Status: ${e.response.status}` : ''}
+          ${e.response && e.response.status ? `Response: ${truncate(e.response.data, 1000)}` : ''}
+        `,
+        embeds: [{ description: '```js\n' + err.stack + '```' }],
         ephemeral: true
       });
     }
 
-    // ? should i even localize this
+    reportError(err, `Error in command (${ctx.commandName})`, 'command', ctx);
     if (err instanceof TrelloAPIError) return ctx.send("An error occurred with Trello's API!\n" + err.toString());
     else return ctx.send('An error occurred!\n' + err.toString());
   }
