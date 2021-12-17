@@ -16,7 +16,6 @@ import { prisma } from './util/prisma';
 import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './util/types';
 import fuzzy from 'fuzzy';
 import { createT, langs } from './util/locale';
-import i18next from 'i18next';
 import { logger } from './logger';
 
 interface AutocompleteItemOptions<T = any> {
@@ -152,10 +151,12 @@ export default abstract class Command extends SlashCommand {
 
   async autocompleteLocales(ctx: AutocompleteContext, query: string) {
     try {
-      const langChoices = langs.map((lng) => ({
-        name: `[${lng}] ${i18next.getResource(lng, 'commands', '_.name')}`,
-        value: lng
-      }));
+      const langChoices = langs
+        .filter((lang) => lang.available)
+        .map((lang) => ({
+          name: `[${lang.code}, ${lang.percent}%] ${lang.name}`,
+          value: lang.code
+        }));
       if (!query) return langChoices.slice(0, 25);
 
       const result = fuzzy.filter(query, langChoices, {

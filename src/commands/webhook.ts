@@ -414,12 +414,11 @@ export default class WebhookCommand extends SlashCommand {
             })
           : null;
 
+        const webhookLang = langs.find((lang) => lang.code === webhook.locale);
         const webhookLocale = !webhook.locale
           ? t('webhook.not_set')
-          : langs.includes(webhook.locale)
-          ? oneLine`
-            :flag_${i18next.getResource(webhook.locale, 'commands', '_.emoji')}:
-            ${i18next.getResource(webhook.locale, 'commands', '_.name')}`
+          : webhookLang
+          ? `:${webhookLang.emoji}: ${webhookLang.name}`
           : webhook.locale;
 
         return {
@@ -760,6 +759,7 @@ export default class WebhookCommand extends SlashCommand {
             await ctx.fetch();
             return await createSelectPrompt(
               {
+                content: t('webhook.choose_cards'),
                 title: t('webhook.cards_title', { webhook: truncate(webhook.name, 100) || t('webhook.unnamed') }),
                 action,
                 values: board.cards,
@@ -783,6 +783,7 @@ export default class WebhookCommand extends SlashCommand {
             await ctx.fetch();
             return await createSelectPrompt(
               {
+                content: t('webhook.choose_lists'),
                 title: t('webhook.lists_title', { webhook: truncate(webhook.name, 100) || t('webhook.unnamed') }),
                 action,
                 values: board.lists,

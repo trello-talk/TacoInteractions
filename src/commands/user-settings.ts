@@ -2,8 +2,6 @@ import { SlashCreator, CommandContext, CommandOptionType, AutocompleteContext } 
 import SlashCommand from '../command';
 import { prisma } from '../util/prisma';
 import { createT, langs } from '../util/locale';
-import i18next from 'i18next';
-import { oneLine } from 'common-tags';
 import { getData } from '../util';
 
 export default class UserSettingsCommand extends SlashCommand {
@@ -41,7 +39,7 @@ export default class UserSettingsCommand extends SlashCommand {
       case 'locale': {
         const setLocale = ctx.options.locale?.set;
         if (setLocale) {
-          if (!langs.includes(setLocale))
+          if (!langs.some((lang) => lang === setLocale))
             return {
               content: t('user_settings.invalid_locale'),
               ephemeral: true
@@ -60,13 +58,10 @@ export default class UserSettingsCommand extends SlashCommand {
         }
 
         const lng = userData?.locale || 'en';
+        const lang = langs.find((lang) => lang.code === lng);
         return {
           content: t('user_settings.locale', {
-            name: langs.includes(lng)
-              ? oneLine`
-                :flag_${i18next.getResource(lng, 'commands', '_.emoji')}:
-                ${i18next.getResource(lng, 'commands', '_.name')}`
-              : lng
+            name: lang ? `:${lang.emoji}: ${lang.name}` : lng
           }),
           ephemeral: true
         };

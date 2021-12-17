@@ -2,8 +2,6 @@ import { SlashCreator, CommandContext, CommandOptionType, AutocompleteContext } 
 import SlashCommand from '../command';
 import { prisma } from '../util/prisma';
 import { createT, langs } from '../util/locale';
-import i18next from 'i18next';
-import { oneLine } from 'common-tags';
 import { getData } from '../util';
 
 export default class ServerSettingsCommand extends SlashCommand {
@@ -55,7 +53,7 @@ export default class ServerSettingsCommand extends SlashCommand {
       case 'locale': {
         const setLocale = ctx.options.locale?.set;
         if (setLocale) {
-          if (!langs.includes(setLocale)) return t('server_settings.invalid_locale');
+          if (!langs.some((lang) => lang === setLocale)) return t('server_settings.invalid_locale');
 
           await prisma.server.upsert({
             where: { serverID: ctx.guildID },
@@ -67,14 +65,11 @@ export default class ServerSettingsCommand extends SlashCommand {
         }
 
         const lng = serverData?.locale;
+        const lang = langs.find((lang) => lang.code === lng);
         return !lng
           ? t('server_settings.no_locale_set')
           : t('server_settings.locale', {
-              name: langs.includes(lng)
-                ? oneLine`
-                :flag_${i18next.getResource(lng, 'commands', '_.emoji')}:
-                ${i18next.getResource(lng, 'commands', '_.name')}`
-                : lng
+              name: lang ? `:${lang.emoji}: ${lang.name}` : lng
             });
       }
       case 'role': {
