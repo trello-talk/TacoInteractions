@@ -118,14 +118,6 @@ creator.on('componentInteraction', async (ctx) => {
   }
 });
 
-if (process.env.COMMANDS_DEV_GUILD) {
-  creator.commands.forEach((command) => {
-    // @ts-ignore idk why i made this readonly
-    if (!command.guildIDs || command.guildIDs.length === 0) command.guildIDs = [process.env.COMMANDS_DEV_GUILD];
-  });
-  creator.syncCommands();
-}
-
 (async () => {
   await initLocale();
   await connect();

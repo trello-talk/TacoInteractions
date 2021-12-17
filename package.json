@@ -13,11 +13,11 @@
   "private": true,
   "scripts": {
     "start": "cd dist && node index.js",
-    "build": "npx rimraf dist && npx tsc",
-    "sync": "npx tsc && cd dist && node sync.js",
+    "build": "npx rimraf dist && tsc",
+    "sync": "tsc && ts-node scripts/sync",
     "dev": "devScript",
-    "lint": "npx eslint --ext .ts ./src",
-    "lint:fix": "npx eslint --ext .ts ./src --fix"
+    "lint": "eslint --ext .ts ./src",
+    "lint:fix": "eslint --ext .ts ./src --fix"
   },
   "devScript": {
     "depCheck": false

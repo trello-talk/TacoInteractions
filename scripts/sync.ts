@@ -2,14 +2,10 @@
 
 import dotenv from 'dotenv';
 import { SlashCreator } from 'slash-create';
-import { isInDist } from './util/dev';
 import path from 'path';
 
-let dotenvPath = path.join(process.cwd(), '.env');
-if (isInDist) dotenvPath = path.join(process.cwd(), '..', '.env');
-dotenv.config({ path: dotenvPath });
-
-import { logger } from './logger';
+dotenv.config();
+import { logger } from '../src/logger';
 
 const creator = new SlashCreator({
   applicationID: process.env.DISCORD_APP_ID,
@@ -29,7 +25,7 @@ creator.on('synced', () => {
 });
 creator.on('commandRegister', (command) => logger.info(`Registered command ${command.commandName}`));
 
-creator.registerCommandsIn(path.join(__dirname, 'commands'));
+creator.registerCommandsIn(path.join(__dirname, '..', 'dist', 'commands'));
 
 if (process.env.COMMANDS_DEV_GUILD) {
   creator.commands.forEach((command) => {
