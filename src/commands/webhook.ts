@@ -408,9 +408,11 @@ export default class WebhookCommand extends SlashCommand {
 
         const filters = new WebhookFilters(BigInt(webhook.filters)).toArray();
 
-        const trelloMember = await prisma.user.findFirst({
-          where: { trelloID: webhook.memberID }
-        });
+        const trelloMember = webhook.memberID
+          ? await prisma.user.findFirst({
+              where: { trelloID: webhook.memberID }
+            })
+          : null;
 
         const webhookLocale = !webhook.locale
           ? t('webhook.not_set')
@@ -809,9 +811,11 @@ export default class WebhookCommand extends SlashCommand {
         if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
         // Repair trello webhook
-        const trelloMember = await prisma.user.findFirst({
-          where: { trelloID: webhook.memberID }
-        });
+        const trelloMember = webhook.memberID
+          ? await prisma.user.findFirst({
+              where: { trelloID: webhook.memberID }
+            })
+          : null;
         if (!trelloMember || !trelloMember.trelloToken) {
           try {
             await this.repairTrelloWebhook(webhook, webhook.modelID, userData);

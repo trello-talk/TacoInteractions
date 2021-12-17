@@ -1,23 +1,24 @@
+import { getData } from '../util';
 import { ActionFunction, ActionType } from '../util/actions';
-import { createT } from '../util/locale';
 import { prisma } from '../util/prisma';
-import Trello from '../util/trello';
 
 export const action: ActionFunction = {
   type: ActionType.USER_CLEAR_DATA,
-  async onAction(ctx, action) {
-    const userData = await prisma.user.findUnique({
-      where: { userID: action.user }
-    });
-
-    const t = createT(userData?.locale);
-
+  async onAction(ctx) {
+    const { userData, t, trello } = await getData(ctx);
     if (!userData) return void ctx.editParent(t('cleardata.no_data'), { components: [] });
 
     try {
-      if (userData.trelloToken) await new Trello(userData.trelloToken).invalidate();
+      if (userData.trelloToken) await trello.invalidate();
     } catch (e) {}
-    await prisma.user.delete({ where: { userID: action.user } });
+
+    await prisma.user.delete({ where: { userID: userData.userID } });
+
+    if (userData.trelloID)
+      await prisma.webhook.updateMany({
+        where: { memberID: userData.trelloID },
+        data: { active: false, memberID: null }
+      });
 
     return void ctx.editParent(t('cleardata.done'), { components: [] });
   }
