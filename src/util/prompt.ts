@@ -1,18 +1,63 @@
 import { TFunction } from 'i18next';
 import { ButtonStyle, ComponentContext, ComponentType, EditMessageOptions } from 'slash-create';
 import { oneLine } from 'common-tags';
-import { deleteInteraction, toColorInt } from '.';
+import { deleteInteraction, getData, toColorInt } from '.';
 import { Action, actions } from './actions';
 import { LABEL_COLORS } from './constants';
-import { createAndGetUserT, formatNumber } from './locale';
+import { formatNumber } from './locale';
 import { client } from './redis';
 import { TrelloAttachment } from './types';
+
+const filterGroups: Record<string, string[]> = {
+  board: ['ADD_MEMBER_TO_BOARD', 'REMOVE_MEMBER_FROM_BOARD', 'MAKE_ADMIN_OF_BOARD', 'MAKE_NORMAL_MEMBER_OF_BOARD'],
+  boardUpdate: ['UPDATE_BOARD_NAME', 'UPDATE_BOARD_DESC', 'UPDATE_BOARD_PREFS', 'UPDATE_BOARD_CLOSED'],
+  label: ['CREATE_LABEL', 'DELETE_LABEL'],
+  labelUpdate: ['UPDATE_LABEL_NAME', 'UPDATE_LABEL_COLOR'],
+  card: [
+    'DELETE_CARD',
+    'CREATE_CARD',
+    'VOTE_ON_CARD',
+    'ADD_ATTACHMENT_TO_CARD',
+    'DELETE_ATTACHMENT_FROM_CARD',
+    'ADD_LABEL_TO_CARD',
+    'REMOVE_LABEL_FROM_CARD',
+    'ADD_MEMBER_TO_CARD',
+    'REMOVE_MEMBER_FROM_CARD',
+    'MOVE_CARD_FROM_BOARD',
+    'MOVE_CARD_TO_BOARD',
+    'COPY_CARD',
+    'EMAIL_CARD'
+  ],
+  cardUpdate: [
+    'UPDATE_CARD_NAME',
+    'UPDATE_CARD_DESC',
+    'UPDATE_CARD_LIST',
+    'UPDATE_CARD_POS',
+    'UPDATE_CARD_CLOSED',
+    'UPDATE_CARD_DUE'
+  ],
+  comment: ['COMMENT_CARD', 'UPDATE_COMMENT', 'DELETE_COMMENT'],
+  checklist: ['ADD_CHECKLIST_TO_CARD', 'REMOVE_CHECKLIST_FROM_CARD', 'COPY_CHECKLIST'],
+  checklistUpdate: ['UPDATE_CHECKLIST_NAME', 'UPDATE_CHECKLIST_POS'],
+  checkItem: [
+    'UPDATE_CHECK_ITEM_STATE_ON_CARD',
+    'CREATE_CHECK_ITEM',
+    'DELETE_CHECK_ITEM',
+    'CONVERT_TO_CARD_FROM_CHECK_ITEM'
+  ],
+  checkItemUpdate: ['UPDATE_CHECK_ITEM_NAME', 'UPDATE_CHECK_ITEM_POS'],
+  list: ['CREATE_LIST', 'MOVE_LIST_FROM_BOARD', 'MOVE_LIST_TO_BOARD'],
+  listUpdate: ['UPDATE_LIST_NAME', 'UPDATE_LIST_POS', 'UPDATE_LIST_CLOSED'],
+  customField: ['CREATE_CUSTOM_FIELD', 'DELETE_CUSTOM_FIELD', 'UPDATE_CUSTOM_FIELD_ITEM'],
+  customFieldUpdate: ['UPDATE_CUSTOM_FIELD_NAME', 'UPDATE_CUSTOM_FIELD_DISPLAY']
+};
 
 export enum PromptType {
   LIST,
   QUERY,
   SELECT,
-  ATTACHMENT
+  ATTACHMENT,
+  FILTERS
 }
 
 export enum PromptAction {
@@ -20,7 +65,8 @@ export enum PromptAction {
   NEXT,
   STOP,
   SELECT,
-  DONE
+  DONE,
+  SET_PAGE
 }
 
 export interface PromptBase {
@@ -87,10 +133,17 @@ export interface AttachmentPrompt extends PromptBase {
   attachments: TrelloAttachment[];
 }
 
-export type Prompt = ListPrompt | QueryPrompt | SelectPrompt | AttachmentPrompt;
+/** A select prompt for webhook filters */
+export interface FiltersPrompt extends PromptBase {
+  type: PromptType.FILTERS;
+  /** The filters selected */
+  selected: string[];
+}
+
+export type Prompt = ListPrompt | QueryPrompt | SelectPrompt | AttachmentPrompt | FiltersPrompt;
 
 export async function handlePrompt(ctx: ComponentContext) {
-  const [t, data] = await createAndGetUserT(ctx.user.id);
+  const { t, locale } = await getData(ctx);
 
   if (ctx.message.interaction!.user.id !== ctx.user.id)
     return ctx.send({
@@ -114,13 +167,15 @@ export async function handlePrompt(ctx: ComponentContext) {
 
   switch (type) {
     case PromptType.LIST:
-      return handleListPrompt(ctx, prompt as ListPrompt, action, t, data?.locale);
+      return handleListPrompt(ctx, prompt as ListPrompt, action, t, locale);
     case PromptType.QUERY:
-      return handleQueryPrompt(ctx, prompt as QueryPrompt, action, t, data?.locale);
+      return handleQueryPrompt(ctx, prompt as QueryPrompt, action, t, locale);
     case PromptType.SELECT:
-      return handleSelectPrompt(ctx, prompt as SelectPrompt, action, t, data?.locale);
+      return handleSelectPrompt(ctx, prompt as SelectPrompt, action, t, locale);
     case PromptType.ATTACHMENT:
-      return handleAttachmentPrompt(ctx, prompt as AttachmentPrompt, action, t, data?.locale);
+      return handleAttachmentPrompt(ctx, prompt as AttachmentPrompt, action, t, locale);
+    case PromptType.FILTERS:
+      return handleFiltersPrompt(ctx, prompt as FiltersPrompt, action, t);
     default:
       return ctx.send({
         content: t('interactions.prompt_no_function'),
@@ -853,6 +908,186 @@ async function handleAttachmentPrompt(
             custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.NEXT}`,
             emoji: { id: '902219517965525042' },
             disabled: prompt.page >= prompt.attachments.length
+          }
+        ]
+      }
+    ]
+  });
+}
+
+export async function createFiltersPrompt(
+  options: Omit<FiltersPrompt, 'page' | 'type'>,
+  messageID: string,
+  t: TFunction
+): Promise<EditMessageOptions> {
+  const prompt: FiltersPrompt = {
+    ...options,
+    type: PromptType.FILTERS,
+    page: 1
+  };
+
+  await client.set(`prompt:${messageID}`, JSON.stringify(prompt), 'EX', 10 * 60);
+
+  const pageGroup = Object.keys(filterGroups)[prompt.page - 1];
+  return {
+    content: prompt.content || '',
+    embeds: [
+      {
+        title: prompt.title,
+        description: t('interactions.items_selected', { count: prompt.selected.length }),
+        ...(prompt.footer ? { footer: { text: prompt.footer } } : {})
+      }
+    ],
+    components: [
+      {
+        type: ComponentType.ACTION_ROW,
+        components: [
+          {
+            type: ComponentType.SELECT,
+            placeholder: t('webhook.view_group_placeholder'),
+            options: Object.keys(filterGroups).map((group, i) => ({
+              label: t(`group.${group}`, { ns: 'webhook' }),
+              value: String(i + 1),
+              default: pageGroup === group,
+              emoji: { id: '624184549001396225' }
+            })),
+            custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.SET_PAGE}`,
+            min_values: 1,
+            max_values: 1
+          }
+        ]
+      },
+      {
+        type: ComponentType.ACTION_ROW,
+        components: [
+          {
+            type: ComponentType.SELECT,
+            placeholder: t('webhook.filters_placeholder'),
+            options: filterGroups[pageGroup].map((filter) => ({
+              label: t(`filters.${filter}`, { ns: 'webhook' }),
+              value: filter,
+              default: prompt.selected.includes(filter)
+            })),
+            custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.SELECT}`,
+            min_values: 0,
+            max_values: filterGroups[pageGroup].length
+          }
+        ]
+      },
+      {
+        type: ComponentType.ACTION_ROW,
+        components: [
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.SECONDARY,
+            label: t('common.cancel'),
+            custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.STOP}`
+          },
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.SUCCESS,
+            label: t('common.done'),
+            custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.DONE}`
+          }
+        ]
+      }
+    ]
+  };
+}
+
+async function handleFiltersPrompt(ctx: ComponentContext, prompt: FiltersPrompt, action: PromptAction, t: TFunction) {
+  // Handle action
+  switch (action) {
+    case PromptAction.SET_PAGE: {
+      const newPage = parseInt(ctx.values[0], 10);
+      if (newPage !== prompt.page && Object.keys(filterGroups)[newPage - 1]) prompt.page = newPage;
+      else return ctx.acknowledge();
+      break;
+    }
+    case PromptAction.STOP: {
+      await deleteInteraction(ctx, t);
+      await client.del(`prompt:${ctx.message.id}`);
+      if (prompt.action) await client.del(`action:${prompt.action}`);
+      return;
+    }
+    case PromptAction.SELECT: {
+      const pageGroup = Object.keys(filterGroups)[prompt.page - 1];
+      prompt.selected = prompt.selected
+        .filter((filter) => !filterGroups[pageGroup].includes(filter))
+        .concat([...new Set(ctx.values)]);
+      break;
+    }
+    case PromptAction.DONE: {
+      await client.del(`prompt:${ctx.message.id}`);
+      return handoffAction(ctx, prompt.action, prompt.selected, t);
+    }
+  }
+
+  // Set cache
+  await client.set(`prompt:${ctx.message.id}`, JSON.stringify(prompt), 'EX', 10 * 60);
+  if (prompt.action) await client.expire(`action:${prompt.action}`, 10 * 60);
+
+  // Display page
+  const pageGroup = Object.keys(filterGroups)[prompt.page - 1];
+  await ctx.editParent({
+    content: prompt.content || '',
+    embeds: [
+      {
+        title: prompt.title,
+        description: t('interactions.items_selected', { count: prompt.selected.length }),
+        ...(prompt.footer ? { footer: { text: prompt.footer } } : {})
+      }
+    ],
+    components: [
+      {
+        type: ComponentType.ACTION_ROW,
+        components: [
+          {
+            type: ComponentType.SELECT,
+            placeholder: t('webhook.view_group_placeholder'),
+            options: Object.keys(filterGroups).map((group, i) => ({
+              label: t(`group.${group}`, { ns: 'webhook' }),
+              value: String(i + 1),
+              default: pageGroup === group,
+              emoji: { id: '624184549001396225' }
+            })),
+            custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.SET_PAGE}`,
+            min_values: 1,
+            max_values: 1
+          }
+        ]
+      },
+      {
+        type: ComponentType.ACTION_ROW,
+        components: [
+          {
+            type: ComponentType.SELECT,
+            placeholder: t('webhook.filters_placeholder'),
+            options: filterGroups[pageGroup].map((filter) => ({
+              label: t(`filters.${filter}`, { ns: 'webhook' }),
+              value: filter,
+              default: prompt.selected.includes(filter)
+            })),
+            custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.SELECT}`,
+            min_values: 0,
+            max_values: filterGroups[pageGroup].length
+          }
+        ]
+      },
+      {
+        type: ComponentType.ACTION_ROW,
+        components: [
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.SECONDARY,
+            label: t('common.cancel'),
+            custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.STOP}`
+          },
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.SUCCESS,
+            label: t('common.done'),
+            custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.DONE}`
           }
         ]
       }

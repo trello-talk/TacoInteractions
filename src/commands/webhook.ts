@@ -20,7 +20,7 @@ import {
   stripIndentsAndNewlines,
   truncate
 } from '../util';
-import { createListPrompt, createSelectPrompt } from '../util/prompt';
+import { createFiltersPrompt, createListPrompt, createSelectPrompt } from '../util/prompt';
 import { EMOJIS } from '../util/constants';
 import WebhookFilters, { DEFAULT } from '../util/webhookFilters';
 import { getBoard, getWebhooks } from '../util/api';
@@ -37,50 +37,6 @@ enum WebhookFilter {
   INACTIVE = 'Inactive',
   UNNAMED = 'Unnamed'
 }
-
-const filterGroups: Record<string, string[]> = {
-  board: ['ADD_MEMBER_TO_BOARD', 'REMOVE_MEMBER_FROM_BOARD', 'MAKE_ADMIN_OF_BOARD', 'MAKE_NORMAL_MEMBER_OF_BOARD'],
-  boardUpdate: ['UPDATE_BOARD_NAME', 'UPDATE_BOARD_DESC', 'UPDATE_BOARD_PREFS', 'UPDATE_BOARD_CLOSED'],
-  label: ['CREATE_LABEL', 'DELETE_LABEL'],
-  labelUpdate: ['UPDATE_LABEL_NAME', 'UPDATE_LABEL_COLOR'],
-  card: [
-    'DELETE_CARD',
-    'CREATE_CARD',
-    'VOTE_ON_CARD',
-    'ADD_ATTACHMENT_TO_CARD',
-    'DELETE_ATTACHMENT_FROM_CARD',
-    'ADD_LABEL_TO_CARD',
-    'REMOVE_LABEL_FROM_CARD',
-    'ADD_MEMBER_TO_CARD',
-    'REMOVE_MEMBER_FROM_CARD',
-    'MOVE_CARD_FROM_BOARD',
-    'MOVE_CARD_TO_BOARD',
-    'COPY_CARD',
-    'EMAIL_CARD'
-  ],
-  cardUpdate: [
-    'UPDATE_CARD_NAME',
-    'UPDATE_CARD_DESC',
-    'UPDATE_CARD_LIST',
-    'UPDATE_CARD_POS',
-    'UPDATE_CARD_CLOSED',
-    'UPDATE_CARD_DUE'
-  ],
-  comment: ['COMMENT_CARD', 'UPDATE_COMMENT', 'DELETE_COMMENT'],
-  checklist: ['ADD_CHECKLIST_TO_CARD', 'REMOVE_CHECKLIST_FROM_CARD', 'COPY_CHECKLIST'],
-  checklistUpdate: ['UPDATE_CHECKLIST_NAME', 'UPDATE_CHECKLIST_POS'],
-  checkItem: [
-    'UPDATE_CHECK_ITEM_STATE_ON_CARD',
-    'CREATE_CHECK_ITEM',
-    'DELETE_CHECK_ITEM',
-    'CONVERT_TO_CARD_FROM_CHECK_ITEM'
-  ],
-  checkItemUpdate: ['UPDATE_CHECK_ITEM_NAME', 'UPDATE_CHECK_ITEM_POS'],
-  list: ['CREATE_LIST', 'MOVE_LIST_FROM_BOARD', 'MOVE_LIST_TO_BOARD'],
-  listUpdate: ['UPDATE_LIST_NAME', 'UPDATE_LIST_POS', 'UPDATE_LIST_CLOSED'],
-  customField: ['CREATE_CUSTOM_FIELD', 'DELETE_CUSTOM_FIELD', 'UPDATE_CUSTOM_FIELD_ITEM'],
-  customFieldUpdate: ['UPDATE_CUSTOM_FIELD_NAME', 'UPDATE_CUSTOM_FIELD_DISPLAY']
-};
 
 export default class WebhookCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -406,7 +362,7 @@ export default class WebhookCommand extends SlashCommand {
         return await createListPrompt(
           {
             title: oneLine`
-              ${t('webhooks.list', { context: filter.toLowerCase() })}
+              ${t('webhook.list', { context: filter.toLowerCase() })}
               (${formatNumber(displayedWebhooks.length, locale)})`,
             pages: splitMessage(
               displayedWebhooks
@@ -761,31 +717,18 @@ export default class WebhookCommand extends SlashCommand {
               style: t(`webhook.styles.${setStyle}.name`)
             });
           }
-          // TODO replace this with a special prompt, looks terrible atm
           case 'filters': {
-            const allFilters: { f: string; b: string; g: string }[] = Object.keys(filterGroups)
-              .map((key) => [filterGroups[key].map((f) => ({ f, b: WebhookFilters.FLAGS[f].toString(), g: key }))])
-              .reduce((a, b) => a.concat(b.flat()), []) as any;
             const action = await createAction(ActionType.SET_WEBHOOK_FILTERS, ctx.user.id, { webhookID: webhook.id });
             await ctx.defer();
             await ctx.fetch();
-            return await createSelectPrompt(
+            return await createFiltersPrompt(
               {
                 title: t('webhook.filters_title', { webhook: truncate(webhook.name, 100) || t('webhook.unnamed') }),
                 action,
-                values: allFilters.map((f) => f.f),
-                placeholder: t('webhook.filters_placeholder'),
-                display: allFilters.map((f) => ({
-                  label: t(`filters.${f.f}`, { ns: 'webhook' }),
-                  description: t(`group.${f.g}`, { ns: 'webhook' })
-                }))
+                selected: new WebhookFilters(BigInt(webhook.filters)).toArray()
               },
               ctx.messageID!,
-              t,
-              new WebhookFilters(BigInt(webhook.filters))
-                .toArray()
-                .map((filter) => allFilters.findIndex((f) => f.f === filter)),
-              locale
+              t
             );
           }
           case 'cards': {
