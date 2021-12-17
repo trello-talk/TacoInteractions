@@ -1,7 +1,7 @@
 import { client } from './redis';
 import Trello from './trello';
 import { AxiosResponse } from 'axios';
-import { DiscordWebhook, TrelloBoard, TrelloBoardStar, TrelloCard, TrelloMember } from './types';
+import { DiscordWebhook, DiscordChannel, TrelloBoard, TrelloBoardStar, TrelloCard, TrelloMember } from './types';
 import { SlashCreator } from 'slash-create';
 
 export interface TrelloBoardSubscriptions {
@@ -198,4 +198,15 @@ export async function getWebhooks(id: string, creator: SlashCreator): Promise<Di
 
   await client.set(key, JSON.stringify(webhooks), 'EX', 6 * 60 * 60);
   return webhooks;
+}
+
+export async function getChannels(id: string, creator: SlashCreator): Promise<DiscordChannel[]> {
+  const key = `discord.channels:${id}`;
+  const cached = await client.get(key);
+  if (cached) return JSON.parse(cached);
+
+  const channels = await creator.requestHandler.request('GET', `/guilds/${id}/channels`);
+
+  await client.set(key, JSON.stringify(channels), 'EX', 6 * 60 * 60);
+  return channels;
 }

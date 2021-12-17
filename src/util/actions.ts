@@ -19,7 +19,9 @@ export enum ActionType {
   CREATE_WEBHOOK = 8,
   SET_WEBHOOK_FILTERS = 9,
   SET_WEBHOOK_CARDS = 10,
-  SET_WEBHOOK_LISTS = 11
+  SET_WEBHOOK_LISTS = 11,
+  REPAIR_AFTER_CHANNEL = 12,
+  REPAIR_AFTER_WEBHOOK = 13
 }
 
 export type Action =
@@ -28,7 +30,8 @@ export type Action =
   | InputAction
   | CardCreateAction
   | WebhookCreateAction
-  | WebhookEditAction;
+  | WebhookEditAction
+  | RepairWebhookAction;
 
 export interface RegularAction {
   type: ActionType;
@@ -60,6 +63,14 @@ export interface WebhookCreateAction extends RegularAction {
 export interface WebhookEditAction extends RegularAction {
   type: ActionType.SET_WEBHOOK_FILTERS | ActionType.SET_WEBHOOK_CARDS | ActionType.SET_WEBHOOK_LISTS;
   webhookID: number;
+}
+
+export interface RepairWebhookAction extends RegularAction {
+  type: ActionType.REPAIR_AFTER_CHANNEL | ActionType.REPAIR_AFTER_WEBHOOK;
+  webhookID: number;
+  webhookName: string;
+  channelID: string;
+  webhooks: DiscordWebhook[];
 }
 export interface ActionFunction<T = Action> {
   type: ActionType;

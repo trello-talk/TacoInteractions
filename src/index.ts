@@ -13,6 +13,7 @@ import { Action, actions, load as loadActions } from './util/actions';
 import { logger } from './logger';
 import { deleteInteraction, getData } from './util';
 import { init as initLocale } from './util/locale';
+import { prisma } from './util/prisma';
 
 export const creator = new SlashCreator({
   applicationID: process.env.DISCORD_APP_ID,
@@ -121,8 +122,11 @@ creator.on('componentInteraction', async (ctx) => {
 (async () => {
   await initLocale();
   await connect();
+  await prisma.$connect();
   await loadActions();
   await creator.startServer();
-})();
+})().catch((e) => {
+  logger.error('Failed to start', e);
+});
 
 // This should serve in localhost:8020/interactions

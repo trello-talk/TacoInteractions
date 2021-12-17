@@ -298,7 +298,7 @@ export default class Trello {
       isForm: true,
       data: {
         idModel: id,
-        description: `[${new Date()}] tacobot.app (https://github.com/trello-talk/TacoInteractions)`,
+        description: `[${new Date().toISOString()}] tacobot.app (https://github.com/trello-talk/TacoInteractions)`,
         ...payload
       }
     });

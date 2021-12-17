@@ -58,7 +58,7 @@ export default class BoardCommand extends SlashCommand {
       embeds: [
         {
           title: truncate(board.name, 256),
-          url: board.shortUrl,
+          url: `${board.shortUrl}?utm_source=tacobot.app`,
           color: boardColor,
           description: board.desc ? truncate(board.desc, 4096) : undefined,
           thumbnail: backgroundImg ? { url: backgroundImg } : undefined,

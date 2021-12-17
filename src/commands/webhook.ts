@@ -20,16 +20,17 @@ import {
   stripIndentsAndNewlines,
   truncate
 } from '../util';
-import { createFiltersPrompt, createListPrompt, createSelectPrompt } from '../util/prompt';
+import { createFiltersPrompt, createListPrompt, createQueryPrompt, createSelectPrompt } from '../util/prompt';
 import { EMOJIS } from '../util/constants';
 import WebhookFilters, { DEFAULT } from '../util/webhookFilters';
-import { getBoard, getWebhooks } from '../util/api';
+import { getBoard, getChannels, getWebhooks } from '../util/api';
 import { DiscordWebhook, TrelloBoard } from '../util/types';
 import i18next from 'i18next';
 import { ActionType, createAction } from '../util/actions';
 import { AxiosResponse } from 'axios';
-import { Webhook } from '@prisma/client';
+import { User, Webhook } from '@prisma/client';
 import { logger } from '../logger';
+import Trello from '../util/trello';
 
 enum WebhookFilter {
   ALL = 'All',
@@ -301,6 +302,20 @@ export default class WebhookCommand extends SlashCommand {
               ]
             }
           ]
+        },
+        {
+          type: CommandOptionType.SUB_COMMAND,
+          name: 'repair',
+          description: 'Repair a webhook.',
+          options: [
+            {
+              type: CommandOptionType.STRING,
+              name: 'webhook',
+              description: 'The webhook to repair.',
+              autocomplete: true,
+              required: true
+            }
+          ]
         }
       ]
     });
@@ -409,6 +424,7 @@ export default class WebhookCommand extends SlashCommand {
           embeds: [
             {
               title: webhook.name || t('webhook.unnamed'),
+              url: `https://trello.com/b/${webhook.modelID}?utm_source=tacobot.app`,
               description: stripIndentsAndNewlines`
                 ${webhook.active ? EMOJIS.check : EMOJIS.uncheck} ${t('webhook.active')}
                 **${t('webhook.id')}:** \`${webhook.id}\`
@@ -417,6 +433,7 @@ export default class WebhookCommand extends SlashCommand {
                 ${trelloMember ? `**${t('webhook.wh_owner')}:** <@${trelloMember.userID}>` : ''}
                 ${discordWebhook ? `**${t('webhook.dwh')}:** ${discordWebhook.name}` : ''}
                 ${discordWebhook ? `**${t('webhook.dwh_creator')}:** <@${discordWebhook.user.id}>` : ''}
+                ${discordWebhook ? `**${t('webhook.dwh_channel')}:** <#${discordWebhook.channel_id}>` : ''}
 
                 ${
                   !trelloMember || !discordWebhook
@@ -529,13 +546,15 @@ export default class WebhookCommand extends SlashCommand {
               ctx.options.add.channel,
               {
                 name:
-                  board.name === 'clyde' ? t('webhook.new_wh_name') : truncate(ctx.options.add.name || board.name, 32)
+                  board.name.toLowerCase() === 'clyde'
+                    ? t('webhook.new_wh_name')
+                    : truncate(ctx.options.add.name || board.name, 32)
               },
               `Requested by ${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`
             );
           } catch (e) {
             logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${ctx.options.add.channel})`, e);
-            return t('interactions.dwh_fail_create');
+            return t('webhook.dwh_fail_create');
           }
 
           const callbackURL = process.env.WEBHOOK_BASE_URL + userData.trelloID;
@@ -577,7 +596,7 @@ export default class WebhookCommand extends SlashCommand {
             ]
           });
 
-          return t('interactions.add_done', { board: truncate(board.name, 32) });
+          return t('webhook.add_done', { board: truncate(board.name, 32) });
         }
 
         // If there are webhooks w/ tokens, we need to ask the user to choose one
@@ -784,11 +803,98 @@ export default class WebhookCommand extends SlashCommand {
           ephemeral: true
         };
       }
+      case 'repair': {
+        const webhook = webhooks.find((w) => String(w.id) === ctx.options.repair?.webhook);
+        if (!webhook) return t('query.not_found', { context: 'webhook' });
+        if (!userData || !userData.trelloToken) return noAuthResponse(t);
+
+        // Repair trello webhook
+        const trelloMember = await prisma.user.findFirst({
+          where: { trelloID: webhook.memberID }
+        });
+        if (!trelloMember || !trelloMember.trelloToken) {
+          try {
+            await this.repairTrelloWebhook(webhook, webhook.modelID, userData);
+          } catch (e) {
+            return t('webhook.twh_repair_failed');
+          }
+        } else {
+          try {
+            await this.repairTrelloWebhook(webhook, webhook.modelID, trelloMember);
+          } catch (e) {
+            logger.warn("Failed to repair other's Trello webhook", e);
+            try {
+              await this.repairTrelloWebhook(webhook, webhook.modelID, userData);
+            } catch (e) {
+              return t('webhook.twh_repair_failed');
+            }
+          }
+        }
+
+        // Repair discord webhook
+        let discordWebhooks: DiscordWebhook[];
+        try {
+          discordWebhooks = await getWebhooks(ctx.guildID, ctx.creator);
+        } catch (e) {
+          return t('webhook.dwh_fail');
+        }
+        if (discordWebhooks.find((dwh) => dwh.id === webhook.webhookID)) return t('webhook.repair_done');
+
+        const channels = await getChannels(ctx.guildID, ctx.creator);
+        const availableChannels = channels
+          .filter((c) => {
+            if (c.type !== ChannelType.GUILD_TEXT && c.type !== ChannelType.GUILD_NEWS) return false;
+            const channelWebhooks = discordWebhooks.filter((dwh) => dwh.channel_id === c.id);
+            if (channelWebhooks.every((dwh) => !dwh.token) && channelWebhooks.length >= 10) return false;
+            return true;
+          })
+          .sort((a, b) => a.position - b.position);
+
+        if (!availableChannels.length) return t('webhook.dwh_fail_no_channel');
+
+        const action = await createAction(ActionType.REPAIR_AFTER_CHANNEL, ctx.user.id, {
+          webhookID: webhook.id,
+          webhookName: webhook.name,
+          webhooks: discordWebhooks
+        });
+
+        await ctx.defer();
+        await ctx.fetch();
+        return await createQueryPrompt(
+          {
+            content: t('webhook.select_channel'),
+            action,
+            placeholder: t('webhook.select_channel_placeholder'),
+            values: availableChannels,
+            display: availableChannels.map((c) => ({
+              label: truncate(c.name, 100),
+              description: c.parent_id ? truncate(channels.find((ch) => ch.id === c.parent_id).name, 100) : '',
+              emoji: { id: c.type === ChannelType.GUILD_NEWS ? '658522693058166804' : '585783907841212418' }
+            }))
+          },
+          ctx.messageID!,
+          t,
+          locale
+        );
+      }
     }
 
     return {
       content: t('interactions.bad_subcommand'),
       ephemeral: true
     };
+  }
+
+  async repairTrelloWebhook(webhook: Webhook, boardID: string, user: User) {
+    const callbackURL = process.env.WEBHOOK_BASE_URL + user.trelloID;
+    const trello = new Trello(user.trelloToken);
+    const trelloWebhooks = await trello.getWebhooks();
+    let trelloWebhook = trelloWebhooks.data.find((twh) => twh.idModel === boardID && twh.callbackURL === callbackURL);
+    if (!trelloWebhook) trelloWebhook = await trello.addWebhook(boardID, { callbackURL });
+    if (webhook.trelloWebhookID === trelloWebhook.id) return;
+    await prisma.webhook.update({
+      where: { id: webhook.id },
+      data: { memberID: user.trelloID, trelloWebhookID: trelloWebhook.id }
+    });
   }
 }

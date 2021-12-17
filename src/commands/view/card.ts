@@ -50,7 +50,7 @@ export default class CardCommand extends SlashCommand {
 
     const embed: MessageEmbedOptions = {
       title: truncate(card.name, 256),
-      url: card.shortUrl,
+      url: `${card.shortUrl}?utm_source=tacobot.app`,
       description: card.desc ? truncate(card.desc, 4096) : undefined,
       fields: [
         {

@@ -479,12 +479,17 @@ async function handleQueryPrompt(
   const offset = (prompt.page - 1) * 25;
   await ctx.editParent({
     content: prompt.content || '',
-    embeds: [
-      {
-        title: prompt.title,
-        ...(prompt.footer ? { footer: { text: prompt.footer } } : {})
-      }
-    ],
+    ...(prompt.title || prompt.footer || prompt.color
+      ? {
+          embeds: [
+            {
+              title: prompt.title,
+              color: prompt.color,
+              ...(prompt.footer ? { footer: { text: prompt.footer } } : {})
+            }
+          ]
+        }
+      : {}),
     components: [
       {
         type: ComponentType.ACTION_ROW,

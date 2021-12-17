@@ -28,7 +28,12 @@ export const action: ActionFunction = {
       if (trelloMember?.trelloToken) {
         const trello = new Trello(trelloMember.trelloToken);
         const webhookCount = await prisma.webhook.count({
-          where: { trelloWebhookID: webhook.trelloWebhookID }
+          where: {
+            trelloWebhookID: webhook.trelloWebhookID,
+            id: {
+              not: webhook.id
+            }
+          }
         });
         if (webhookCount <= 0) await trello.deleteWebhook(webhook.trelloWebhookID);
       }

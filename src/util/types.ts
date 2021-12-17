@@ -1,3 +1,5 @@
+import { ChannelType } from 'slash-create';
+
 type TrelloPermissionLevel = 'public' | 'private' | 'org' | 'observers';
 type TrelloBackgroundBrightness = 'dark' | 'light';
 type TrelloBackgroundSize = 'normal' | 'full';
@@ -181,4 +183,12 @@ export interface DiscordWebhook {
     public_flags: number;
     bot: boolean;
   };
+}
+
+export interface DiscordChannel {
+  type: ChannelType;
+  id: string;
+  name: string;
+  parent_id: string;
+  position: number;
 }

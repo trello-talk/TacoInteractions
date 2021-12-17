@@ -19,13 +19,15 @@ export const action: ActionFunction = {
           action.channelID,
           {
             name:
-              action.board.name === 'clyde' ? t('webhook.new_wh_name') : truncate(action.name || action.board.name, 32)
+              action.board.name.toLowerCase() === 'clyde'
+                ? t('webhook.new_wh_name')
+                : truncate(action.name || action.board.name, 32)
           },
           `Requested by ${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`
         );
       } catch (e) {
         logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${action.channelID})`, e);
-        return void ctx.editParent(t('interactions.dwh_fail_create'), { components: [] });
+        return void ctx.editParent(t('webhook.dwh_fail_create'), { components: [] });
       }
 
     const callbackURL = process.env.WEBHOOK_BASE_URL + userData.trelloID;
@@ -66,7 +68,7 @@ export const action: ActionFunction = {
       ]
     });
 
-    return void ctx.editParent(t('interactions.add_done', { board: truncate(action.board.name, 32) }), {
+    return void ctx.editParent(t('webhook.add_done', { board: truncate(action.board.name, 32) }), {
       components: []
     });
   }

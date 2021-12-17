@@ -17,6 +17,7 @@ import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './util/types';
 import fuzzy from 'fuzzy';
 import { createT, langs } from './util/locale';
 import i18next from 'i18next';
+import { logger } from './logger';
 
 interface AutocompleteItemOptions<T = any> {
   userData?: User;
@@ -205,6 +206,8 @@ export default abstract class Command extends SlashCommand {
           data: { trelloID: null, trelloToken: null }
         });
     }
+
+    logger.error('Error in autocomplete', err);
   }
 
   async onError(err: Error, ctx: CommandContext) {
