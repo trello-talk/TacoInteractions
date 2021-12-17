@@ -95,72 +95,6 @@ export default class Trello {
   }
 
   /**
-   * Gets the information on a board, optimized for card search
-   * @param id The board's ID
-   * @deprecated
-   */
-  getSlimBoard(id: string) {
-    return this._request({
-      url: `/boards/${id}`,
-      params: {
-        fields: ['name'],
-        lists: 'all',
-        list_fields: ['name', 'closed'],
-        cards: 'all',
-        card_fields: ['name', 'idList', 'shortLink', 'subscribed', 'closed']
-      }
-    });
-  }
-
-  /**
-   * Gets the open lists on a board
-   * @param id The board's ID
-   * @deprecated
-   */
-  getLists(id: string) {
-    return this._request({
-      url: `/boards/${id}/lists`,
-      params: {
-        cards: 'open',
-        card_fields: [],
-        fields: ['id', 'name', 'subscribed', 'dateLastActivity']
-      }
-    });
-  }
-
-  /**
-   * Gets all cards on a board
-   * @param id The board's ID
-   * @deprecated
-   */
-  getAllLists(id: string) {
-    return this._request({
-      url: `/boards/${id}/lists/all`,
-      params: {
-        cards: 'open',
-        card_fields: ['name', 'subscribed', 'shortLink', 'closed'],
-        fields: ['id', 'name', 'subscribed', 'dateLastActivity', 'closed']
-      }
-    });
-  }
-
-  /**
-   * Gets the archived lists on a board
-   * @param id The board's ID
-   * @deprecated
-   */
-  getListsArchived(id: string) {
-    return this._request({
-      url: `/boards/${id}/lists`,
-      params: {
-        filter: 'closed',
-        cards: 'open',
-        card_fields: ['name', 'subscribed', 'shortLink', 'shortUrl', 'labels']
-      }
-    });
-  }
-
-  /**
    * Gets a card's info
    * @param id The card's ID
    */
@@ -195,59 +129,6 @@ export default class Trello {
           'idList',
           'idAttachmentCover'
         ]
-      }
-    });
-  }
-
-  /**
-   * Gets the open cards on a board
-   * @param id The board's ID
-   * @deprecated
-   */
-  getCards(id: string) {
-    return this._request({
-      url: `/boards/${id}/cards`,
-      params: {
-        fields: ['name', 'subscribed', 'shortLink', 'shortUrl', 'labels']
-      }
-    });
-  }
-
-  /**
-   * Gets the card ID to list ID pairs
-   * @param id The board's ID
-   */
-  getCardPairs(id: string) {
-    return this._request({
-      url: `/boards/${id}/cards`,
-      params: {
-        fields: ['idList']
-      }
-    });
-  }
-
-  /**
-   * Gets the archived cards on a board
-   * @param {string} id The board's ID
-   */
-  getCardsArchived(id: string) {
-    return this._request({
-      url: `/boards/${id}/cards/closed`,
-      params: {
-        fields: ['name', 'subscribed', 'shortLink', 'shortUrl']
-      }
-    });
-  }
-
-  /**
-   * Gets the labels on a board
-   * @param {string} id The board's ID
-   */
-  getLabels(id: string) {
-    return this._request({
-      url: `/boards/${id}/labels`,
-      params: {
-        fields: ['name', 'color', 'uses']
       }
     });
   }
