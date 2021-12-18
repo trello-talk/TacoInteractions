@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "Taco Slash Commands",
+      "name": "Taco Interactions",
 			"args": "dist/index.js",
       "instances": "max",
       "exec_mode": "cluster",
