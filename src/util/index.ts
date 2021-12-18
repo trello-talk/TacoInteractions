@@ -49,7 +49,7 @@ export async function getData(ctx: MessageInteractionContext | AutocompleteConte
         where: { serverID: ctx.guildID }
       })
     : null;
-  const t = createT(userData?.locale || serverData?.locale);
+  const t = createT(userData?.locale || serverData?.locale || 'en');
   const trello = new Trello(userData?.trelloToken);
   return { userData, serverData, t, trello, locale: userData?.locale || serverData?.locale || 'en' };
 }

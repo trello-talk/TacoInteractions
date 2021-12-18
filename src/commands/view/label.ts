@@ -28,7 +28,7 @@ export default class LabelCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const { userData, t } = await getData(ctx);
+    const { userData, t, locale } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
@@ -68,7 +68,8 @@ export default class LabelCommand extends SlashCommand {
           )
         },
         ctx.messageID!,
-        t
+        t,
+        locale
       );
     }
 
