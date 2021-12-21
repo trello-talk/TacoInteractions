@@ -14,7 +14,8 @@
   "scripts": {
     "start": "cd dist && node index.js",
     "build": "npx rimraf dist && tsc",
-    "sync": "tsc && ts-node scripts/sync",
+    "sync": "slash-up sync",
+    "sync:dev": "slash-up sync -e development",
     "dev": "devScript",
     "lint": "eslint --ext .ts ./src",
     "lint:fix": "eslint --ext .ts ./src --fix"
@@ -51,6 +52,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.4.1",
     "prisma": "^3.6.0",
+    "slash-up": "^1.0.3",
     "ts-devscript": "^3.0.6",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2"

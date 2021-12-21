@@ -6,7 +6,6 @@ package_lock.json
 # Log files
 logs/
 *.log
-tmp.sql
 
 # Miscellaneous
 .tmp/
