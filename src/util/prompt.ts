@@ -743,8 +743,9 @@ async function handleSelectPrompt(
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SUCCESS,
-            label: t('common.done'),
-            custom_id: `prompt:${PromptType.SELECT}:${PromptAction.DONE}`
+            label: '',
+            custom_id: `prompt:${PromptType.SELECT}:${PromptAction.DONE}`,
+            emoji: { id: '922944199450578995' }
           },
           {
             type: ComponentType.BUTTON,
