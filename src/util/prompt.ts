@@ -66,7 +66,8 @@ export enum PromptAction {
   STOP,
   SELECT,
   DONE,
-  SET_PAGE
+  SET_PAGE,
+  TOGGLE_ALL
 }
 
 export interface PromptBase {
@@ -935,6 +936,7 @@ export async function createFiltersPrompt(
   await client.set(`prompt:${messageID}`, JSON.stringify(prompt), 'EX', 10 * 60);
 
   const pageGroup = Object.keys(filterGroups)[prompt.page - 1];
+  const allSelected = filterGroups[pageGroup].every((filter) => prompt.selected.includes(filter));
   return {
     content: prompt.content || '',
     embeds: [
@@ -994,6 +996,12 @@ export async function createFiltersPrompt(
             style: ButtonStyle.SUCCESS,
             label: t('common.done'),
             custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.DONE}`
+          },
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.PRIMARY,
+            label: t(allSelected ? 'webhook.deselect_all' : 'webhook.select_all'),
+            custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.TOGGLE_ALL}`
           }
         ]
       }
@@ -1023,6 +1031,13 @@ async function handleFiltersPrompt(ctx: ComponentContext, prompt: FiltersPrompt,
         .concat([...new Set(ctx.values)]);
       break;
     }
+    case PromptAction.TOGGLE_ALL: {
+      const pageGroup = Object.keys(filterGroups)[prompt.page - 1];
+      const allSelected = filterGroups[pageGroup].every((filter) => prompt.selected.includes(filter));
+      prompt.selected = prompt.selected.filter((filter) => !filterGroups[pageGroup].includes(filter));
+      if (!allSelected) prompt.selected = prompt.selected.concat(filterGroups[pageGroup]);
+      break;
+    }
     case PromptAction.DONE: {
       await client.del(`prompt:${ctx.message.id}`);
       return handoffAction(ctx, prompt.action, prompt.selected, t);
@@ -1035,6 +1050,7 @@ async function handleFiltersPrompt(ctx: ComponentContext, prompt: FiltersPrompt,
 
   // Display page
   const pageGroup = Object.keys(filterGroups)[prompt.page - 1];
+  const allSelected = filterGroups[pageGroup].every((filter) => prompt.selected.includes(filter));
   await ctx.editParent({
     content: prompt.content || '',
     embeds: [
@@ -1094,6 +1110,12 @@ async function handleFiltersPrompt(ctx: ComponentContext, prompt: FiltersPrompt,
             style: ButtonStyle.SUCCESS,
             label: t('common.done'),
             custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.DONE}`
+          },
+          {
+            type: ComponentType.BUTTON,
+            style: ButtonStyle.PRIMARY,
+            label: t(allSelected ? 'webhook.deselect_all' : 'webhook.select_all'),
+            custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.TOGGLE_ALL}`
           }
         ]
       }
