@@ -37,7 +37,7 @@
     "i18next-fs-backend": "^1.1.4",
     "ioredis": "^4.28.1",
     "nanoid": "^3.1.30",
-    "slash-create": "^4.4.0"
+    "slash-create": "^5.0.1"
   },
   "devDependencies": {
     "@types/common-tags": "^1.8.1",
