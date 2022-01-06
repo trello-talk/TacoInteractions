@@ -2,7 +2,7 @@
   "apps": [
     {
       "name": "Taco Interactions",
-			"args": "dist/index.js",
+      "args": "dist/index.js",
       "instances": "max",
       "exec_mode": "cluster",
       "wait_ready": true,
