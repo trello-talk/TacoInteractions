@@ -125,6 +125,9 @@ creator.on('componentInteraction', async (ctx) => {
   await prisma.$connect();
   await loadActions();
   await creator.startServer();
+
+  // PM2 graceful start/shutdown
+  if (process.send) process.send('ready');
 })().catch((e) => {
   logger.error('Failed to start', e);
 });
