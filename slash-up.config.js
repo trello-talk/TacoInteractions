@@ -4,9 +4,9 @@
 
 module.exports = {
   // The Token of the Discord bot
-  token: process.env.DISCORD_APP_ID,
+  token: process.env.DISCORD_BOT_TOKEN,
   // The Application ID of the Discord bot
-  applicationId: process.env.DISCORD_BOT_TOKEN,
+  applicationId: process.env.DISCORD_BOT_ID,
   // This is where the path to command files are, .ts files are supported!
   commandPath: './src/commands',
   // You can use different environments with --env (-e)
