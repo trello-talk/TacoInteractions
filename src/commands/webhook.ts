@@ -322,7 +322,7 @@ export default class WebhookCommand extends SlashCommand {
   }
 
   webhookAvailable(webhookID: number, webhooks: Webhook[], maxWebhooks?: number) {
-    maxWebhooks = maxWebhooks || 5;
+    maxWebhooks = maxWebhooks || parseInt(process.env.WEBHOOK_LIMIT, 10) || 5;
 
     if (maxWebhooks < webhooks.length)
       return !!webhooks

@@ -58,7 +58,11 @@ export default class ServerSettingsCommand extends SlashCommand {
           await prisma.server.upsert({
             where: { serverID: ctx.guildID },
             update: { locale: setLocale },
-            create: { serverID: ctx.guildID, locale: setLocale }
+            create: {
+              serverID: ctx.guildID,
+              locale: setLocale,
+              maxWebhooks: parseInt(process.env.WEBHOOK_LIMIT, 10) || 5
+            }
           });
           const nt = createT(userData?.locale || setLocale);
           return nt('server_settings.set_locale', { name: `:flag_${nt('_.emoji')}: ${nt('_.name')}` });
@@ -78,7 +82,11 @@ export default class ServerSettingsCommand extends SlashCommand {
           await prisma.server.upsert({
             where: { serverID: ctx.guildID },
             update: { trelloRole: setRole },
-            create: { serverID: ctx.guildID, trelloRole: setRole }
+            create: {
+              serverID: ctx.guildID,
+              trelloRole: setRole,
+              maxWebhooks: parseInt(process.env.WEBHOOK_LIMIT, 10) || 5
+            }
           });
 
           return t('server_settings.set_role', { role: ctx.roles.get(setRole).name });
