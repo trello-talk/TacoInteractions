@@ -53,7 +53,7 @@ export default class ServerSettingsCommand extends SlashCommand {
       case 'locale': {
         const setLocale = ctx.options.locale?.set;
         if (setLocale) {
-          if (!langs.some((lang) => lang === setLocale)) return t('server_settings.invalid_locale');
+          if (!langs.some((lang) => lang.code === setLocale)) return t('server_settings.invalid_locale');
 
           await prisma.server.upsert({
             where: { serverID: ctx.guildID },

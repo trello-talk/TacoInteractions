@@ -711,7 +711,7 @@ export default class WebhookCommand extends SlashCommand {
           }
           case 'locale': {
             const setLocale = ctx.options.set.locale.locale;
-            if (!langs.includes(setLocale)) return t('webhook.invalid_locale');
+            if (!langs.some((lang) => lang.code === setLocale)) return t('webhook.invalid_locale');
 
             await prisma.webhook.update({
               where: { id: webhook.id },

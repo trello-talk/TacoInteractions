@@ -39,7 +39,7 @@ export default class UserSettingsCommand extends SlashCommand {
       case 'locale': {
         const setLocale = ctx.options.locale?.set;
         if (setLocale) {
-          if (!langs.some((lang) => lang === setLocale))
+          if (!langs.some((lang) => lang.code === setLocale))
             return {
               content: t('user_settings.invalid_locale'),
               ephemeral: true
