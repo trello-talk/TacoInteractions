@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node';
 import '@sentry/tracing';
 import { RewriteFrames } from '@sentry/integrations';
-import { AutocompleteContext, CommandContext } from 'slash-create';
+import { AutocompleteContext, CommandContext, ComponentContext } from 'slash-create';
 import { logger } from '../logger';
 
 Sentry.init({
@@ -39,6 +39,23 @@ export function reportErrorFromCommand(
     Sentry.captureException(error);
   });
   logger.error(type ? `Error in ${type} (${commandName})` : `Unknown error in ${commandName}`, error);
+}
+
+export function reportErrorFromComponent(ctx: ComponentContext, error: any) {
+  Sentry.withScope((scope) => {
+    scope.setTag('type', 'component');
+    scope.setTag('user', ctx ? ctx.user.id : undefined);
+    scope.setTag('guild', ctx ? ctx.guildID : undefined);
+    scope.setTag('channel', ctx ? ctx.channelID : undefined);
+    scope.setExtra('ctx', ctx);
+    scope.setUser({
+      id: ctx ? ctx.user.id : undefined,
+      username: ctx ? ctx.user.username : undefined,
+      discriminator: ctx ? ctx.user.discriminator : undefined
+    });
+    Sentry.captureException(error);
+  });
+  logger.error('Error in component', error);
 }
 
 export function close() {

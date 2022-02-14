@@ -15,7 +15,7 @@ import { logger } from './logger';
 import { deleteInteraction, getData } from './util';
 import { init as initLocale } from './util/locale';
 import { prisma } from './util/prisma';
-import { close as closeSentry } from './util/sentry';
+import { close as closeSentry, reportErrorFromComponent } from './util/sentry';
 import { cron as influxCron, onCommandRun } from './util/influx';
 
 export const server = fastify();
@@ -117,6 +117,7 @@ creator.on('componentInteraction', async (ctx) => {
     }
   } catch (e) {
     logger.error(e);
+    reportErrorFromComponent(ctx, e);
     const { t } = await getData(ctx);
     return ctx.send({
       content: t('interactions.error'),
