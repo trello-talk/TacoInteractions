@@ -1,3 +1,4 @@
+import { ComponentContext } from 'slash-create';
 import { getData } from '../util';
 import { ActionFunction, ActionType } from '../util/actions';
 import { prisma } from '../util/prisma';
@@ -5,7 +6,7 @@ import Trello from '../util/trello';
 
 export const action: ActionFunction = {
   type: ActionType.DELETE_WEBHOOK,
-  async onAction(ctx, action) {
+  async onAction(ctx: ComponentContext, action) {
     const { t } = await getData(ctx);
     if (!ctx.guildID) return void ctx.editParent(t('interactions.no_server'), { components: [] });
     if (isNaN(parseInt(action.extra, 10))) return void ctx.editParent(t('query.not_found_webhook'), { components: [] });

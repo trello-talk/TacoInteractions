@@ -1,3 +1,4 @@
+import { ComponentContext } from 'slash-create';
 import { logger } from '../logger';
 import { createDiscordWebhook, getData, postToWebhook, truncate } from '../util';
 import { ActionFunction, ActionType, RepairWebhookAction } from '../util/actions';
@@ -5,7 +6,7 @@ import { prisma } from '../util/prisma';
 
 export const action: ActionFunction = {
   type: ActionType.REPAIR_AFTER_WEBHOOK,
-  async onAction(ctx, action: RepairWebhookAction) {
+  async onAction(ctx: ComponentContext, action: RepairWebhookAction) {
     const { t } = await getData(ctx);
     if (!ctx.guildID) return void ctx.editParent(t('interactions.no_server'), { components: [] });
 

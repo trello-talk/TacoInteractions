@@ -1,3 +1,4 @@
+import { ComponentContext } from 'slash-create';
 import { logger } from '../logger';
 import { createDiscordWebhook, getData, noAuthResponse, postToWebhook, truncate } from '../util';
 import { ActionFunction, ActionType, WebhookCreateAction } from '../util/actions';
@@ -6,7 +7,7 @@ import { DEFAULT } from '../util/webhookFilters';
 
 export const action: ActionFunction = {
   type: ActionType.CREATE_WEBHOOK,
-  async onAction(ctx, action: WebhookCreateAction) {
+  async onAction(ctx: ComponentContext, action: WebhookCreateAction) {
     const { userData, t, trello, locale } = await getData(ctx);
     if (!ctx.guildID) return void ctx.editParent(t('interactions.no_server'), { components: [] });
     if (!userData || !userData.trelloToken) return void ctx.editParent(noAuthResponse(t));

@@ -1,10 +1,11 @@
+import { ComponentContext } from 'slash-create';
 import { getData } from '../util';
 import { ActionFunction, ActionType } from '../util/actions';
 import { prisma } from '../util/prisma';
 
 export const action: ActionFunction = {
   type: ActionType.USER_CLEAR_DATA,
-  async onAction(ctx) {
+  async onAction(ctx: ComponentContext) {
     const { userData, t, trello } = await getData(ctx);
     if (!userData) return void ctx.editParent(t('cleardata.no_data'), { components: [] });
 

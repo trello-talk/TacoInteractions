@@ -1,4 +1,4 @@
-import { ButtonStyle, ComponentType } from 'slash-create';
+import { ButtonStyle, ComponentContext, ComponentType } from 'slash-create';
 import { logger } from '../logger';
 import { createDiscordWebhook, getData, postToWebhook, truncate } from '../util';
 import { ActionFunction, ActionType, createAction, RepairWebhookAction } from '../util/actions';
@@ -8,7 +8,7 @@ import { DiscordChannel, DiscordWebhook } from '../util/types';
 export const action: ActionFunction = {
   type: ActionType.REPAIR_AFTER_CHANNEL,
   requiresData: true,
-  async onAction(ctx, action: RepairWebhookAction, data: DiscordChannel) {
+  async onAction(ctx: ComponentContext, action: RepairWebhookAction, data: DiscordChannel) {
     const { t } = await getData(ctx);
     if (!ctx.guildID) return void ctx.editParent(t('interactions.no_server'), { components: [], embeds: [] });
 
