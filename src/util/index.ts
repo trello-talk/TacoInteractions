@@ -1,10 +1,9 @@
 import axios from 'axios';
 import { stripIndentTransformer, TemplateTag } from 'common-tags';
 import { promises as fs } from 'fs';
-import { TFunction } from 'i18next';
+import i18next, { TFunction } from 'i18next';
 import path from 'path';
 import {
-  AutocompleteContext,
   ButtonStyle,
   ComponentContext,
   ComponentType,
@@ -40,7 +39,7 @@ export function toColorInt(hex: string) {
   return parseInt(hex.slice(1), 16);
 }
 
-export async function getData(ctx: MessageInteractionContext | AutocompleteContext) {
+export async function getData(ctx: MessageInteractionContext) {
   const userData = await prisma.user.findUnique({
     where: { userID: ctx.user.id }
   });
@@ -51,7 +50,13 @@ export async function getData(ctx: MessageInteractionContext | AutocompleteConte
     : null;
   const t = createT(userData?.locale || serverData?.locale || 'en');
   const trello = new Trello(userData?.trelloToken);
-  return { userData, serverData, t, trello, locale: userData?.locale || serverData?.locale || 'en' };
+  let discordLocale = null;
+  if (ctx.locale) {
+    if (i18next.hasResourceBundle(ctx.locale, 'commands')) discordLocale = ctx.locale;
+    else if (i18next.hasResourceBundle(ctx.locale.split('-')[0], 'commands')) discordLocale = ctx.locale.split('-')[0];
+  }
+
+  return { userData, serverData, t, trello, locale: userData?.locale || serverData?.locale || discordLocale || 'en' };
 }
 
 /** Strip indents, extra newlines and trim the result. */
