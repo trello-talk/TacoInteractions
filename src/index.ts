@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import { SlashCreator, FastifyServer, InteractionResponseFlags } from 'slash-create';
+import fastify from 'fastify';
 import { isInDist } from './util/dev';
 import path from 'path';
 
@@ -14,6 +15,9 @@ import { logger } from './logger';
 import { deleteInteraction, getData } from './util';
 import { init as initLocale } from './util/locale';
 import { prisma } from './util/prisma';
+import { close as closeSentry } from './util/sentry';
+
+export const server = fastify();
 
 export const creator = new SlashCreator({
   applicationID: process.env.DISCORD_APP_ID,
@@ -37,7 +41,7 @@ creator.on('commandRun', (command, _, ctx) =>
 creator.on('commandRegister', (command) => logger.info(`Registered command ${command.commandName}`));
 creator.on('commandError', (command, error) => logger.error(`Command ${command.commandName}:`, error));
 
-creator.withServer(new FastifyServer()).registerCommandsIn(path.join(__dirname, 'commands'));
+creator.withServer(new FastifyServer(server)).registerCommandsIn(path.join(__dirname, 'commands'));
 
 creator.on('componentInteraction', async (ctx) => {
   try {
@@ -132,4 +136,9 @@ creator.on('componentInteraction', async (ctx) => {
   logger.error('Failed to start', e);
 });
 
-// This should serve in localhost:8020/interactions
+process.on('SIGINT', async () => {
+  logger.info('Shutting down...');
+  await server.close();
+  closeSentry();
+  process.exit(0);
+});

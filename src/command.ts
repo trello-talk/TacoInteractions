@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { User } from '@prisma/client';
+import { User } from './util/prisma';
 import { AutocompleteContext, CommandContext, SlashCommand } from 'slash-create';
 import {
   getBoardTextLabel,
@@ -18,7 +18,7 @@ import { prisma } from './util/prisma';
 import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './util/types';
 import fuzzy from 'fuzzy';
 import { createT, langs } from './util/locale';
-import { reportError } from './util/airbrake';
+import { reportErrorFromCommand } from './util/sentry';
 
 interface AutocompleteItemOptions<T = any> {
   userData?: User;
@@ -210,7 +210,7 @@ export default abstract class Command extends SlashCommand {
         });
     }
 
-    reportError(err, `Error in autocomplete (${this.commandName})`, 'autocomplete', ctx, this.commandName);
+    reportErrorFromCommand(ctx, err, this.commandName, 'autocomplete');
   }
 
   async onError(err: Error, ctx: CommandContext) {
@@ -226,9 +226,9 @@ export default abstract class Command extends SlashCommand {
       }
     }
 
+    reportErrorFromCommand(ctx, err, ctx.commandName, 'command');
     if (isElevated(ctx.user.id)) {
       const e = err as any;
-      reportError(err, `Error in command (${ctx.commandName})`, 'command', ctx);
       return ctx.send({
         content: stripIndentsAndNewlines`
           __Error in command (${ctx.commandName})__
@@ -240,7 +240,6 @@ export default abstract class Command extends SlashCommand {
       });
     }
 
-    reportError(err, `Error in command (${ctx.commandName})`, 'command', ctx);
     if (err instanceof TrelloAPIError) return ctx.send("An error occurred with Trello's API!\n" + err.toString());
     else return ctx.send('An error occurred!\n' + err.toString());
   }
