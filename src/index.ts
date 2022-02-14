@@ -16,6 +16,7 @@ import { deleteInteraction, getData } from './util';
 import { init as initLocale } from './util/locale';
 import { prisma } from './util/prisma';
 import { close as closeSentry } from './util/sentry';
+import { cron as influxCron, onCommandRun } from './util/influx';
 
 export const server = fastify();
 
@@ -35,9 +36,10 @@ creator.on('debug', (message) => logger.log(message));
 creator.on('warn', (message) => logger.warn(message));
 creator.on('error', (error) => logger.error(error));
 creator.on('synced', () => logger.info('Commands synced!'));
-creator.on('commandRun', (command, _, ctx) =>
-  logger.info(`${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran command ${command.commandName}`)
-);
+creator.on('commandRun', (command, _, ctx) => {
+  logger.info(`${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran command ${command.commandName}`);
+  onCommandRun(ctx.user.id, command.commandName);
+});
 creator.on('commandRegister', (command) => logger.info(`Registered command ${command.commandName}`));
 creator.on('commandError', (command, error) => logger.error(`Command ${command.commandName}:`, error));
 
@@ -129,6 +131,7 @@ creator.on('componentInteraction', async (ctx) => {
   await prisma.$connect();
   await loadActions();
   await creator.startServer();
+  influxCron.start();
 
   // PM2 graceful start/shutdown
   if (process.send) process.send('ready');
@@ -138,6 +141,7 @@ creator.on('componentInteraction', async (ctx) => {
 
 process.on('SIGINT', async () => {
   logger.info('Shutting down...');
+  influxCron.stop();
   await server.close();
   closeSentry();
   process.exit(0);
