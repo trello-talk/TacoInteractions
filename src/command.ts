@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { User } from './util/prisma';
+import { User } from '@prisma/client';
 import { AutocompleteContext, CommandContext, SlashCommand } from 'slash-create';
 import {
   getBoardTextLabel,
