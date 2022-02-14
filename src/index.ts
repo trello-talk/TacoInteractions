@@ -15,7 +15,7 @@ import { logger } from './logger';
 import { deleteInteraction, getData } from './util';
 import { init as initLocale } from './util/locale';
 import { prisma } from './util/prisma';
-import { close as closeSentry, reportErrorFromComponent } from './util/sentry';
+import { close as closeSentry, reportErrorFromComponent, reportErrorFromModal } from './util/sentry';
 import { cron as influxCron, onCommandRun } from './util/influx';
 
 export const server = fastify();
@@ -118,6 +118,67 @@ creator.on('componentInteraction', async (ctx) => {
   } catch (e) {
     logger.error(e);
     reportErrorFromComponent(ctx, e);
+    const { t } = await getData(ctx);
+    return ctx.send({
+      content: t('interactions.error'),
+      ephemeral: true
+    });
+  }
+});
+
+creator.on('modalInteraction', async (ctx) => {
+  try {
+    const { t } = await getData(ctx);
+    if (ctx.customID.startsWith('action:')) {
+      const [, actionID, actionType, actionExtra] = ctx.customID.split(':');
+      if (!actionID && !actionType)
+        return ctx.send({
+          content: t('interactions.prompt_no_action_id_or_type'),
+          ephemeral: true
+        });
+
+      let action: Action;
+
+      if (!actionID) {
+        action = {
+          type: parseInt(actionType, 10),
+          user: ctx.user.id,
+          extra: actionExtra || ''
+        };
+      } else {
+        const actionCache = await client.get(`action:${actionID}`);
+        if (!actionCache)
+          return ctx.send({
+            content: t('interactions.prompt_action_expired'),
+            ephemeral: true
+          });
+
+        await client.del(`action:${actionID}`);
+        action = JSON.parse(actionCache);
+      }
+
+      if (!actions.has(action.type))
+        return ctx.send({
+          content: t('interactions.prompt_action_invalid_type'),
+          ephemeral: true
+        });
+
+      if (actions.get(action.type).requiresData && !actionExtra)
+        return ctx.send({
+          content: t('interactions.prompt_action_requires_data'),
+          ephemeral: true
+        });
+
+      return actions.get(action.type).onAction(ctx, action);
+    }
+
+    return ctx.send({
+      content: t('interactions.prompt_no_action_id_or_type'),
+      ephemeral: true
+    });
+  } catch (e) {
+    logger.error(e);
+    reportErrorFromModal(ctx, e);
     const { t } = await getData(ctx);
     return ctx.send({
       content: t('interactions.error'),

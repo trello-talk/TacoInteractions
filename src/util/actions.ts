@@ -1,5 +1,5 @@
 import path from 'path';
-import { ComponentContext } from 'slash-create';
+import { ComponentContext, ModalInteractionContext } from 'slash-create';
 import { iterateFolder } from '.';
 import { logger } from '../logger';
 import { client } from './redis';
@@ -75,7 +75,7 @@ export interface RepairWebhookAction extends RegularAction {
 export interface ActionFunction<T = Action> {
   type: ActionType;
   requiresData?: boolean;
-  onAction(ctx: ComponentContext, action: T, data?: any): void | Promise<void>;
+  onAction(ctx: ComponentContext | ModalInteractionContext, action: T, data?: any): void | Promise<void>;
 }
 
 export const actions = new Map<ActionType, ActionFunction>();

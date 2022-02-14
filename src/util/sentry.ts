@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/node';
 import '@sentry/tracing';
 import { RewriteFrames } from '@sentry/integrations';
-import { AutocompleteContext, CommandContext, ComponentContext } from 'slash-create';
+import { AutocompleteContext, CommandContext, ComponentContext, ModalInteractionContext } from 'slash-create';
 import { logger } from '../logger';
 
 Sentry.init({
@@ -56,6 +56,23 @@ export function reportErrorFromComponent(ctx: ComponentContext, error: any) {
     Sentry.captureException(error);
   });
   logger.error('Error in component', error);
+}
+
+export function reportErrorFromModal(ctx: ModalInteractionContext, error: any) {
+  Sentry.withScope((scope) => {
+    scope.setTag('type', 'modal');
+    scope.setTag('user', ctx ? ctx.user.id : undefined);
+    scope.setTag('guild', ctx ? ctx.guildID : undefined);
+    scope.setTag('channel', ctx ? ctx.channelID : undefined);
+    scope.setExtra('ctx', ctx);
+    scope.setUser({
+      id: ctx ? ctx.user.id : undefined,
+      username: ctx ? ctx.user.username : undefined,
+      discriminator: ctx ? ctx.user.discriminator : undefined
+    });
+    Sentry.captureException(error);
+  });
+  logger.error('Error in modal submission', error);
 }
 
 export function close() {
