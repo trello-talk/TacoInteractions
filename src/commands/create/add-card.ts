@@ -4,14 +4,13 @@ import {
   CommandOptionType,
   AutocompleteContext,
   ComponentType,
-  ButtonStyle
+  TextInputStyle
 } from 'slash-create';
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, truncate } from '../../util';
-import { getBoard, uncacheBoard } from '../../util/api';
-import { TrelloCard } from '../../util/types';
+import { getData, noAuthResponse } from '../../util';
+import { ActionType } from '../../util/actions';
+import { getBoard } from '../../util/api';
 
-// TODO add position option (top, bottom)
 export default class AddCardCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -24,17 +23,6 @@ export default class AddCardCommand extends SlashCommand {
           description: 'The list to create your card in.',
           autocomplete: true,
           required: true
-        },
-        {
-          type: CommandOptionType.STRING,
-          name: 'name',
-          description: 'The name of your new card.',
-          required: true
-        },
-        {
-          type: CommandOptionType.STRING,
-          name: 'description',
-          description: 'The description of your new card.'
         }
       ]
     });
@@ -45,7 +33,7 @@ export default class AddCardCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    const { userData, t, trello } = await getData(ctx);
+    const { userData, t } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
@@ -55,26 +43,37 @@ export default class AddCardCommand extends SlashCommand {
     const list = board.lists.find((l) => l.id === ctx.options.list || l.name === ctx.options.list);
     if (!list) return t('query.not_found', { context: 'list' });
 
-    const name = ctx.options.name.trim();
-    const response = await trello.addCard(list.id, { name, desc: ctx.options.description });
-    const card = response.data as TrelloCard;
-    await uncacheBoard(userData.currentBoard);
-
-    return {
-      content: t('addcard.done', { card: truncate(name, 100) }),
+    await ctx.sendModal({
+      title: t('addcard.modal_title'),
+      custom_id: `action::${ActionType.CREATE_CARD}:${list.id}`,
       components: [
         {
           type: ComponentType.ACTION_ROW,
           components: [
             {
-              type: ComponentType.BUTTON,
-              style: ButtonStyle.LINK,
-              label: t('interactions.visit', { context: 'card' }),
-              url: `${card.shortUrl}?utm_source=tacobot.app`
+              type: ComponentType.TEXT_INPUT,
+              label: t('common.name'),
+              style: TextInputStyle.SHORT,
+              custom_id: 'name',
+              placeholder: t('common.empty_input'),
+              required: true
+            }
+          ]
+        },
+        {
+          type: ComponentType.ACTION_ROW,
+          components: [
+            {
+              type: ComponentType.TEXT_INPUT,
+              label: t('common.description'),
+              style: TextInputStyle.PARAGRAPH,
+              custom_id: 'description',
+              placeholder: t('common.empty_input'),
+              required: false
             }
           ]
         }
       ]
-    };
+    });
   }
 }

@@ -173,7 +173,7 @@ creator.on('modalInteraction', async (ctx) => {
     }
 
     return ctx.send({
-      content: t('interactions.prompt_no_action_id_or_type'),
+      content: t('interactions.modal_unknown'),
       ephemeral: true
     });
   } catch (e) {

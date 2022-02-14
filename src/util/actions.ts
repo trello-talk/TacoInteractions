@@ -21,7 +21,8 @@ export enum ActionType {
   SET_WEBHOOK_CARDS = 10,
   SET_WEBHOOK_LISTS = 11,
   REPAIR_AFTER_CHANNEL = 12,
-  REPAIR_AFTER_WEBHOOK = 13
+  REPAIR_AFTER_WEBHOOK = 13,
+  CREATE_CARD = 14
 }
 
 export type Action =
