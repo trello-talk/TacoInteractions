@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
+import { onRequestSent } from './influx';
 import { VERSION } from './constants';
 
 export const BASE_URL = 'https://api.trello.com/1';
@@ -19,6 +20,8 @@ export default class Trello {
     if (!options.params) options.params = {};
     if (!options.headers) options.headers = {};
 
+    onRequestSent();
+
     // Query params
     options.params.key = process.env.TRELLO_KEY;
     if (!options.url.startsWith('/tokens')) options.params.token = this.token;
@@ -36,7 +39,7 @@ export default class Trello {
     // User Agent
     options.headers[
       'User-Agent'
-    ] = `TacoSlashCommands (https://github.com/trello-talk/Taco-Slash-Commands, ${VERSION}) Node.js/${process.version}`;
+    ] = `TacoInteractions (https://github.com/trello-talk/TacoInteractions, ${VERSION}) Node.js/${process.version}`;
 
     const response = await axios(options);
     return response;

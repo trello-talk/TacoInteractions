@@ -29,6 +29,10 @@ export function onCommandRun(userID: string, commandName: string) {
   commandCounts.set(commandName, commandCount);
 }
 
+export function onRequestSent() {
+  requestsSent++;
+}
+
 async function collect(timestamp = new Date()) {
   if (!process.env.INFLUX_URL || !process.env.INFLUX_TOKEN) return;
   if (!timestamp) timestamp = cron.lastDate();
@@ -51,7 +55,6 @@ async function collect(timestamp = new Date()) {
         .tag('command', name)
         .intField('used', counts.used)
         .intField('usedUnique', counts.users.length)
-        .intField('requestsSent', requestsSent)
         .timestamp(timestamp)
     )
   );
