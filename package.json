@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@influxdata/influxdb-client": "^1.22.0",
-    "@prisma/client": "^3.6.0",
+    "@prisma/client": "^4.0.0",
     "@sentry/integrations": "^7.0.0",
     "@sentry/node": "^7.0.0",
     "@sentry/tracing": "^7.0.0",
