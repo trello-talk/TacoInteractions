@@ -1,10 +1,5 @@
-import {
-  SlashCommand,
-  SlashCreator,
-  CommandContext,
-  CommandOptionType,
-  ApplicationCommandPermissionType
-} from 'slash-create';
+import { ApplicationCommandPermissionType, CommandContext, CommandOptionType, SlashCommand, SlashCreator } from 'slash-create';
+
 import { stripIndentsAndNewlines } from '../util';
 import { prisma } from '../util/prisma';
 
@@ -191,9 +186,7 @@ export default class BotCommand extends SlashCommand {
             });
             return {
               content: stripIndentsAndNewlines`
-                ${specialServers.length} servers with a raised webhook limit: ${specialServers
-                .map((s) => `\`${s.serverID}\``)
-                .join(', ')}
+                ${specialServers.length} servers with a raised webhook limit: ${specialServers.map((s) => `\`${s.serverID}\``).join(', ')}
               `,
               ephemeral: true
             };
@@ -216,8 +209,7 @@ export default class BotCommand extends SlashCommand {
         return { content: 'Invalid subcommand.', ephemeral: true };
       }
       case 'smw': {
-        if (ctx.options.smw.maxwebhooks < 1)
-          return { content: 'Max webhooks must be greater than 0.', ephemeral: true };
+        if (ctx.options.smw.maxwebhooks < 1) return { content: 'Max webhooks must be greater than 0.', ephemeral: true };
 
         await prisma.server.upsert({
           where: { serverID: ctx.options.smw.id },

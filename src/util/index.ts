@@ -3,20 +3,14 @@ import { stripIndentTransformer, TemplateTag } from 'common-tags';
 import { promises as fs } from 'fs';
 import i18next, { TFunction } from 'i18next';
 import path from 'path';
-import {
-  ButtonStyle,
-  ComponentContext,
-  ComponentType,
-  InteractionResponseFlags,
-  MessageInteractionContext,
-  MessageOptions
-} from 'slash-create';
+import { ButtonStyle, ComponentContext, ComponentType, InteractionResponseFlags, MessageInteractionContext, MessageOptions } from 'slash-create';
+
+import { VERSION } from './constants';
 import { createT } from './locale';
 import { prisma } from './prisma';
 import { client } from './redis';
 import Trello from './trello';
 import { DiscordWebhook, TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './types';
-import { VERSION } from './constants';
 
 export function truncate(text: string, limit = 2000) {
   return text.length > limit ? text.slice(0, limit - 1) + '…' : text;
@@ -91,11 +85,7 @@ export function flattenObject(data: any) {
   return result;
 }
 
-export async function iterateFolder(
-  folderPath: string,
-  callback: (filePath: string) => void | Promise<void>,
-  extension: string = '.js'
-) {
+export async function iterateFolder(folderPath: string, callback: (filePath: string) => void | Promise<void>, extension = '.js') {
   const files = await fs.readdir(folderPath);
   await Promise.all(
     files.map(async (file) => {
@@ -135,10 +125,7 @@ export interface SplitOptions {
  * @param string text Content to split
  * @param options Options controlling the behavior of the split
  */
-export function splitMessage(
-  text: string,
-  { maxLength = 2000, char = '\n', prepend = '', append = '' }: SplitOptions = {}
-) {
+export function splitMessage(text: string, { maxLength = 2000, char = '\n', prepend = '', append = '' }: SplitOptions = {}) {
   if (text.length <= maxLength) return [text];
   const splitText = text.split(char);
   if (splitText.some((chunk) => chunk.length > maxLength)) throw new RangeError('SPLIT_MAX_LEN');
@@ -180,8 +167,7 @@ export function isElevated(user: string) {
 }
 
 export async function deleteInteraction(ctx: ComponentContext, t: TFunction) {
-  if (ctx.message.flags === InteractionResponseFlags.EPHEMERAL)
-    await ctx.editParent(t('interactions.dismiss'), { components: [] });
+  if (ctx.message.flags === InteractionResponseFlags.EPHEMERAL) await ctx.editParent(t('interactions.dismiss'), { components: [] });
   else {
     await ctx.acknowledge();
     await ctx.delete();
@@ -189,28 +175,26 @@ export async function deleteInteraction(ctx: ComponentContext, t: TFunction) {
 }
 
 export function getBoardTextLabel(board: TrelloBoard) {
-  return `${[board.starred ? '⭐' : '', board.subscribed ? '🔔' : '', board.closed ? '🗃️' : '']
-    .filter((v) => !!v)
-    .join('')} ${truncate(board.name, 85)} (${board.shortLink})`.trim();
+  return `${[board.starred ? '⭐' : '', board.subscribed ? '🔔' : '', board.closed ? '🗃️' : ''].filter((v) => !!v).join('')} ${truncate(
+    board.name,
+    85
+  )} (${board.shortLink})`.trim();
 }
 
 export function getListTextLabel(list: TrelloList, subscribed?: boolean) {
-  return `${[subscribed || list.subscribed ? '🔔' : '', list.closed ? '🗃️' : '']
-    .filter((v) => !!v)
-    .join('')} ${truncate(list.name, 90)}`.trim();
+  return `${[subscribed || list.subscribed ? '🔔' : '', list.closed ? '🗃️' : ''].filter((v) => !!v).join('')} ${truncate(list.name, 90)}`.trim();
 }
 
 export function getCardTextLabel(card: TrelloCard, lists: TrelloList[], subscribed?: boolean) {
   const listName = lists.find((list) => list.id === card.idList).name;
-  return `${[subscribed || card.subscribed ? '🔔' : '', card.closed ? '🗃️' : '']
-    .filter((v) => !!v)
-    .join('')} ${truncate(card.name, 65)} (${truncate(listName, 20)})`.trim();
+  return `${[subscribed || card.subscribed ? '🔔' : '', card.closed ? '🗃️' : ''].filter((v) => !!v).join('')} ${truncate(card.name, 65)} (${truncate(
+    listName,
+    20
+  )})`.trim();
 }
 
 export function getLabelTextLabel(label: TrelloLabel, t: TFunction) {
-  return `${truncate(label.name, 30) || '[unnamed]'}${
-    label.color ? ` (${t(`common.label_color.${label.color}`)})` : ''
-  }`.trim();
+  return `${truncate(label.name, 30) || '[unnamed]'}${label.color ? ` (${t(`common.label_color.${label.color}`)})` : ''}`.trim();
 }
 
 export function sortBoards(boards: TrelloBoard[]) {
@@ -245,12 +229,7 @@ export function sortCards(card: TrelloCard[]) {
   });
 }
 
-export async function createDiscordWebhook(
-  guildID: string,
-  channelID: string,
-  body: any,
-  reason?: string
-): Promise<DiscordWebhook> {
+export async function createDiscordWebhook(guildID: string, channelID: string, body: any, reason?: string): Promise<DiscordWebhook> {
   await client.del(`discord.webhooks:${guildID}`);
   const response = await axios.post(`https://discord.com/api/v9/channels/${channelID}/webhooks`, body, {
     headers: {
@@ -276,10 +255,10 @@ export async function postToWebhook(webhook: DiscordWebhook, body: any): Promise
 }
 
 export function parseBigInt(value: string, radix: number) {
-  var size = 10,
-    factor = BigInt(radix ** size),
-    i = value.length % size || size,
-    parts = [value.slice(0, i)];
+  const size = 10,
+    factor = BigInt(radix ** size);
+  let i = value.length % size || size;
+  const parts = [value.slice(0, i)];
 
   while (i < value.length) parts.push(value.slice(i, (i += size)));
 

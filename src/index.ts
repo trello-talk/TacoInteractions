@@ -1,22 +1,22 @@
 import dotenv from 'dotenv';
-import { SlashCreator, FastifyServer, InteractionResponseFlags } from 'slash-create';
 import fastify from 'fastify';
-import { isInDist } from './util/dev';
 import path from 'path';
+import { FastifyServer, InteractionResponseFlags, SlashCreator } from 'slash-create';
+
+import { logger } from './logger';
+import { deleteInteraction, getData } from './util';
+import { Action, actions, load as loadActions } from './util/actions';
+import { isInDist } from './util/dev';
+import { cron as influxCron, onCommandRun } from './util/influx';
+import { init as initLocale } from './util/locale';
+import { prisma } from './util/prisma';
+import { handlePrompt } from './util/prompt';
+import { client, connect } from './util/redis';
+import { close as closeSentry, reportErrorFromComponent, reportErrorFromModal } from './util/sentry';
 
 let dotenvPath = path.join(process.cwd(), '.env');
 if (isInDist) dotenvPath = path.join(process.cwd(), '..', '.env');
 dotenv.config({ path: dotenvPath });
-
-import { client, connect } from './util/redis';
-import { handlePrompt } from './util/prompt';
-import { Action, actions, load as loadActions } from './util/actions';
-import { logger } from './logger';
-import { deleteInteraction, getData } from './util';
-import { init as initLocale } from './util/locale';
-import { prisma } from './util/prisma';
-import { close as closeSentry, reportErrorFromComponent, reportErrorFromModal } from './util/sentry';
-import { cron as influxCron, onCommandRun } from './util/influx';
 
 export const server = fastify();
 

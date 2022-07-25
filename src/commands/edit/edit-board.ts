@@ -1,11 +1,5 @@
-import {
-  SlashCreator,
-  CommandContext,
-  AutocompleteContext,
-  CommandOptionType,
-  ComponentType,
-  ButtonStyle
-} from 'slash-create';
+import { AutocompleteContext, ButtonStyle, CommandContext, CommandOptionType, ComponentType, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../../command';
 import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { getBoard, getMember, uncacheBoard, uncacheMember } from '../../util/api';
@@ -46,8 +40,7 @@ export default class EditBoardCommand extends SlashCommand {
 
     let boardID = ctx.options.board || userData.currentBoard;
 
-    if ((!ctx.options.board || /^[a-f0-9]{24}$/.test(ctx.options.board)) && !userData.currentBoard)
-      return t('query.not_found', { context: 'board' });
+    if ((!ctx.options.board || /^[a-f0-9]{24}$/.test(ctx.options.board)) && !userData.currentBoard) return t('query.not_found', { context: 'board' });
 
     if (ctx.options.board) {
       const member = await getMember(userData.trelloToken, userData.trelloID);
@@ -77,11 +70,7 @@ export default class EditBoardCommand extends SlashCommand {
       content: stripIndentsAndNewlines`
         ${t('edit.header', { context: 'board', name: truncate(board.name, 100) })}
         ${ctx.options.name ? t('edit.rename', { name: ctx.options.name }) : ''}
-        ${
-          ctx.options.description
-            ? t(`edit.${ctx.options.description === 'none' ? 'remove_description' : 'description'}`)
-            : ''
-        }
+        ${ctx.options.description ? t(`edit.${ctx.options.description === 'none' ? 'remove_description' : 'description'}`) : ''}
       `,
       components: [
         {

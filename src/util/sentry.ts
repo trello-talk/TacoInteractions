@@ -1,8 +1,11 @@
-import * as Sentry from '@sentry/node';
 import '@sentry/tracing';
+
 import { RewriteFrames } from '@sentry/integrations';
+import * as Sentry from '@sentry/node';
 import { AutocompleteContext, CommandContext, ComponentContext, ModalInteractionContext } from 'slash-create';
+
 import { logger } from '../logger';
+import { VERSION } from './constants';
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
@@ -14,16 +17,11 @@ Sentry.init({
   ],
 
   environment: process.env.SENTRY_ENV || process.env.NODE_ENV || 'development',
-  release: `taco-interactions@${require('../../package.json').version}`,
+  release: `taco-interactions@${VERSION}`,
   tracesSampleRate: process.env.SENTRY_SAMPLE_RATE ? parseFloat(process.env.SENTRY_SAMPLE_RATE) : 1.0
 });
 
-export function reportErrorFromCommand(
-  ctx: CommandContext | AutocompleteContext,
-  error: any,
-  commandName: string,
-  type?: string
-) {
+export function reportErrorFromCommand(ctx: CommandContext | AutocompleteContext, error: any, commandName: string, type?: string) {
   Sentry.withScope((scope) => {
     scope.setTag('type', type || 'generic');
     if (commandName) scope.setTag('command', commandName);

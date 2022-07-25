@@ -1,4 +1,5 @@
-import { SlashCommand, SlashCreator, ComponentType, ButtonStyle, CommandContext } from 'slash-create';
+import { ButtonStyle, CommandContext, ComponentType, SlashCommand, SlashCreator } from 'slash-create';
+
 import { getData } from '../../util';
 
 export default class AuthCommand extends SlashCommand {

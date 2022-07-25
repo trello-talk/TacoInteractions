@@ -1,36 +1,21 @@
-import {
-  SlashCreator,
-  CommandContext,
-  CommandOptionType,
-  AutocompleteContext,
-  ComponentType,
-  ButtonStyle,
-  ChannelType
-} from 'slash-create';
-import SlashCommand from '../command';
-import { prisma } from '../util/prisma';
-import { formatNumber, langs } from '../util/locale';
-import { oneLine } from 'common-tags';
-import {
-  createDiscordWebhook,
-  getData,
-  noAuthResponse,
-  postToWebhook,
-  splitMessage,
-  stripIndentsAndNewlines,
-  truncate
-} from '../util';
-import { createFiltersPrompt, createListPrompt, createQueryPrompt, createSelectPrompt } from '../util/prompt';
-import { EMOJIS } from '../util/constants';
-import WebhookFilters, { DEFAULT } from '../util/webhookFilters';
-import { getBoard, getChannels, getWebhooks } from '../util/api';
-import { DiscordWebhook, TrelloBoard } from '../util/types';
-import i18next from 'i18next';
-import { ActionType, createAction } from '../util/actions';
-import { AxiosResponse } from 'axios';
 import { User, Webhook } from '@prisma/client';
+import { AxiosResponse } from 'axios';
+import { oneLine } from 'common-tags';
+import i18next from 'i18next';
+import { AutocompleteContext, ButtonStyle, ChannelType, CommandContext, CommandOptionType, ComponentType, SlashCreator } from 'slash-create';
+
+import SlashCommand from '../command';
 import { logger } from '../logger';
+import { createDiscordWebhook, getData, noAuthResponse, postToWebhook, splitMessage, stripIndentsAndNewlines, truncate } from '../util';
+import { ActionType, createAction } from '../util/actions';
+import { getBoard, getChannels, getWebhooks } from '../util/api';
+import { EMOJIS } from '../util/constants';
+import { formatNumber, langs } from '../util/locale';
+import { prisma } from '../util/prisma';
+import { createFiltersPrompt, createListPrompt, createQueryPrompt, createSelectPrompt } from '../util/prompt';
 import Trello from '../util/trello';
+import { DiscordWebhook, TrelloBoard } from '../util/types';
+import WebhookFilters, { DEFAULT } from '../util/webhookFilters';
 
 enum WebhookFilter {
   ALL = 'All',
@@ -334,8 +319,7 @@ export default class WebhookCommand extends SlashCommand {
   }
 
   async autocomplete(ctx: AutocompleteContext) {
-    if (ctx.subcommands[0] === 'add')
-      return this.autocompleteBoards(ctx, { query: ctx.options[ctx.subcommands[0]].board });
+    if (ctx.subcommands[0] === 'add') return this.autocompleteBoards(ctx, { query: ctx.options[ctx.subcommands[0]].board });
     if (ctx.subcommands[0] === 'set') {
       if (ctx.focused === 'locale') return this.autocompleteLocales(ctx, ctx.options.set[ctx.subcommands[1]].locale);
       return this.autocompleteWebhooks(ctx, ctx.options.set[ctx.subcommands[1]].webhook);
@@ -415,11 +399,7 @@ export default class WebhookCommand extends SlashCommand {
           : null;
 
         const webhookLang = langs.find((lang) => lang.code === webhook.locale);
-        const webhookLocale = !webhook.locale
-          ? t('webhook.not_set')
-          : webhookLang
-          ? `:${webhookLang.emoji}: ${webhookLang.name}`
-          : webhook.locale;
+        const webhookLocale = !webhook.locale ? t('webhook.not_set') : webhookLang ? `:${webhookLang.emoji}: ${webhookLang.name}` : webhook.locale;
 
         return {
           embeds: [
@@ -527,16 +507,13 @@ export default class WebhookCommand extends SlashCommand {
 
         let discordWebhooks: DiscordWebhook[];
         try {
-          discordWebhooks = (await getWebhooks(ctx.guildID, ctx.creator)).filter(
-            (dwh) => dwh.channel_id === ctx.options.add.channel
-          );
+          discordWebhooks = (await getWebhooks(ctx.guildID, ctx.creator)).filter((dwh) => dwh.channel_id === ctx.options.add.channel);
         } catch (e) {
           return t('webhook.dwh_fail');
         }
 
         // Special case: if all the webhooks are made by other apps
-        if (discordWebhooks.length >= 10 && discordWebhooks.every((dwh) => !dwh.token))
-          return t('webhook.no_dwh_available');
+        if (discordWebhooks.length >= 10 && discordWebhooks.every((dwh) => !dwh.token)) return t('webhook.no_dwh_available');
 
         // If there are no webhooks w/ tokens, we can create a new one
         if (!discordWebhooks.some((dwh) => dwh.token)) {
@@ -546,10 +523,7 @@ export default class WebhookCommand extends SlashCommand {
               ctx.guildID,
               ctx.options.add.channel,
               {
-                name:
-                  board.name.toLowerCase() === 'clyde'
-                    ? t('webhook.new_wh_name')
-                    : truncate(ctx.options.add.name || board.name, 32)
+                name: board.name.toLowerCase() === 'clyde' ? t('webhook.new_wh_name') : truncate(ctx.options.add.name || board.name, 32)
               },
               `Requested by ${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`
             );
@@ -560,9 +534,7 @@ export default class WebhookCommand extends SlashCommand {
 
           const callbackURL = process.env.WEBHOOK_BASE_URL + userData.trelloID;
           const trelloWebhooks = await trello.getWebhooks();
-          let trelloWebhook = trelloWebhooks.data.find(
-            (twh) => twh.idModel === board.id && twh.callbackURL === callbackURL
-          );
+          let trelloWebhook = trelloWebhooks.data.find((twh) => twh.idModel === board.id && twh.callbackURL === callbackURL);
           if (!trelloWebhook) trelloWebhook = await trello.addWebhook(board.id, { callbackURL });
 
           await prisma.webhook.create({

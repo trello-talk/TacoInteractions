@@ -1,12 +1,11 @@
 import { InfluxDB, Point } from '@influxdata/influxdb-client';
-import { CronJob } from 'cron';
-import { logger } from '../logger';
-import { hostname } from 'os';
 import { captureException, withScope } from '@sentry/node';
+import { CronJob } from 'cron';
+import { hostname } from 'os';
 
-export const client = process.env.INFLUX_URL
-  ? new InfluxDB({ url: process.env.INFLUX_URL, token: process.env.INFLUX_TOKEN })
-  : null;
+import { logger } from '../logger';
+
+export const client = process.env.INFLUX_URL ? new InfluxDB({ url: process.env.INFLUX_URL, token: process.env.INFLUX_TOKEN }) : null;
 
 export const cron = new CronJob('*/5 * * * *', collect, null, false, 'America/New_York');
 

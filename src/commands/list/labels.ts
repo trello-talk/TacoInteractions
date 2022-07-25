@@ -1,8 +1,8 @@
 import { oneLine } from 'common-tags';
-import { SlashCreator, CommandContext, CommandOptionType } from 'slash-create';
+import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, splitMessage } from '../../util';
-import { truncate } from '../../util';
+import { getData, noAuthResponse, splitMessage, truncate } from '../../util';
 import { getBoard } from '../../util/api';
 import { LABEL_EMOJIS } from '../../util/constants';
 import { formatNumber } from '../../util/locale';

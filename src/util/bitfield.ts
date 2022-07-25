@@ -3,7 +3,7 @@ export type BitFieldResolvable = string | bigint | BitField | Array<BitFieldReso
 /** Data structure that makes it easy to interact with a bitfield. */
 export default class BitField {
   /** Bitfield of the packed bits. */
-  bitfield: bigint = 0n;
+  bitfield = 0n;
 
   /** The flags for this bitfield. */
   static FLAGS: { [perm: string]: bigint } = {};
@@ -66,8 +66,7 @@ export default class BitField {
   serialize(): { [key: string]: boolean } {
     const serialized: { [key: string]: boolean } = {};
     // @ts-ignore
-    for (const [flag, bit] of Object.entries(this.constructor.FLAGS))
-      serialized[flag] = this.has(bit as BitFieldResolvable);
+    for (const [flag, bit] of Object.entries(this.constructor.FLAGS)) serialized[flag] = this.has(bit as BitFieldResolvable);
     return serialized;
   }
 

@@ -1,11 +1,5 @@
-import {
-  SlashCreator,
-  CommandContext,
-  AutocompleteContext,
-  CommandOptionType,
-  ButtonStyle,
-  ComponentType
-} from 'slash-create';
+import { AutocompleteContext, ButtonStyle, CommandContext, CommandOptionType, ComponentType, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../../command';
 import { getData, noAuthResponse, truncate } from '../../util';
 import { getBoard } from '../../util/api';
@@ -52,10 +46,7 @@ export default class CommentCommand extends SlashCommand {
 
     if (!ctx.options.url && !ctx.options.attachment) return { content: t('addattachment.no_url'), ephemeral: true };
 
-    await trello.addAttachment(
-      card.id,
-      ctx.options.attachment ? ctx.attachments.get(ctx.options.attachment).url : ctx.options.url
-    );
+    await trello.addAttachment(card.id, ctx.options.attachment ? ctx.attachments.get(ctx.options.attachment).url : ctx.options.url);
 
     return {
       content: t('addattachment.done', { card: truncate(card.name, 100) }),

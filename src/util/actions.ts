@@ -1,9 +1,10 @@
+import { nanoid } from 'nanoid';
 import path from 'path';
 import { ComponentContext, ModalInteractionContext } from 'slash-create';
-import { iterateFolder } from '.';
+
 import { logger } from '../logger';
+import { iterateFolder } from '.';
 import { client } from './redis';
-import { nanoid } from 'nanoid';
 import { DiscordWebhook, TrelloBoard } from './types';
 
 export enum ActionType {
@@ -25,14 +26,7 @@ export enum ActionType {
   CREATE_CARD = 14
 }
 
-export type Action =
-  | RegularAction
-  | BooleanAction
-  | InputAction
-  | CardCreateAction
-  | WebhookCreateAction
-  | WebhookEditAction
-  | RepairWebhookAction;
+export type Action = RegularAction | BooleanAction | InputAction | CardCreateAction | WebhookCreateAction | WebhookEditAction | RepairWebhookAction;
 
 export interface RegularAction {
   type: ActionType;
@@ -85,6 +79,7 @@ export const load = () => iterateFolder(path.resolve(__dirname, '../actions'), l
 
 export function loadAction(filePath: string) {
   logger.debug('Loading action', filePath);
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const file = require(filePath);
   if (file.action) actions.set(file.action.type, file.action);
 }

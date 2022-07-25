@@ -1,4 +1,5 @@
-import { SlashCreator, CommandContext, MessageEmbedOptions } from 'slash-create';
+import { CommandContext, MessageEmbedOptions, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../command';
 import { getData, noAuthResponse, truncate } from '../util';
 import { getMember } from '../util/api';
@@ -20,9 +21,7 @@ export default class MeCommand extends SlashCommand {
 
     const embed: MessageEmbedOptions = {
       author: {
-        name: member.fullName
-          ? `${truncate(member.fullName, 253 - member.username.length)} (${member.username})`
-          : member.username,
+        name: member.fullName ? `${truncate(member.fullName, 253 - member.username.length)} (${member.username})` : member.username,
         icon_url: member.avatarUrl ? member.avatarUrl + '/170.png' : null,
         url: member.url
       },

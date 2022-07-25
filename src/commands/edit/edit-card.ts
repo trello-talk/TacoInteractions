@@ -1,4 +1,5 @@
-import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
+import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../../command';
 import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { ActionType, createAction } from '../../util/actions';
@@ -110,8 +111,7 @@ export default class EditCardCommand extends SlashCommand {
 
     const [board] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
     const cardID = ctx.options[ctx.subcommands[0]].card;
-    if (!board.cards.find((c) => c.id === cardID || c.shortLink === cardID))
-      return t('query.not_found', { context: 'card' });
+    if (!board.cards.find((c) => c.id === cardID || c.shortLink === cardID)) return t('query.not_found', { context: 'card' });
     const card = await getCard(userData.trelloToken, cardID);
 
     switch (ctx.subcommands[0]) {

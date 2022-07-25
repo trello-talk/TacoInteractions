@@ -1,10 +1,11 @@
 import { User } from '@prisma/client';
+import { promises as fs } from 'fs';
 import i18next, { TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
+
+import { flattenObject } from '.';
 import { isInDist } from './dev';
 import { prisma } from './prisma';
-import { promises as fs } from 'fs';
-import { flattenObject } from '.';
 
 export interface LanguageInfo {
   code: string;
@@ -45,11 +46,7 @@ export const init = async () => {
       available: !!available,
       name: available ? available.name : l,
       percent: getLangPercent(l),
-      emoji: available
-        ? available.emoji.startsWith('$')
-          ? available.emoji.slice(1)
-          : `flag_${available.emoji}`
-        : 'grey_question'
+      emoji: available ? (available.emoji.startsWith('$') ? available.emoji.slice(1) : `flag_${available.emoji}`) : 'grey_question'
     });
   });
 };

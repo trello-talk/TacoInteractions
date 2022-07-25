@@ -1,4 +1,5 @@
-import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
+import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../../command';
 import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { getBoard, uncacheBoard } from '../../util/api';
@@ -103,9 +104,7 @@ export default class EditLabelCommand extends SlashCommand {
     return stripIndentsAndNewlines`
       ${t('edit.header', {
         context: 'label',
-        name: `${label.color ? LABEL_EMOJIS[label.color] : LABEL_EMOJIS.none} ${
-          label.name ? truncate(label.name, 100) : '*[unnamed]*'
-        }`
+        name: `${label.color ? LABEL_EMOJIS[label.color] : LABEL_EMOJIS.none} ${label.name ? truncate(label.name, 100) : '*[unnamed]*'}`
       })}
       ${ctx.options.name ? t('edit.rename', { name: ctx.options.name }) : ''}
       ${

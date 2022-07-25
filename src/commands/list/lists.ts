@@ -1,7 +1,7 @@
-import { SlashCreator, CommandContext, CommandOptionType } from 'slash-create';
+import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, splitMessage } from '../../util';
-import { truncate } from '../../util';
+import { getData, noAuthResponse, splitMessage, truncate } from '../../util';
 import { getBoard } from '../../util/api';
 import { formatNumber } from '../../util/locale';
 import { createListPrompt } from '../../util/prompt';
@@ -79,10 +79,10 @@ export default class ListsCommand extends SlashCommand {
           lists
             .map(
               (list) =>
-                `${list.closed ? '🗃️ ' : ''}${subs.lists[list.id] || list.subscribed ? '🔔 ' : ''} ${truncate(
-                  list.name,
-                  50
-                )} (${formatNumber(board.cards.filter((c) => c.idList == list.id).length, locale)} card[s])`
+                `${list.closed ? '🗃️ ' : ''}${subs.lists[list.id] || list.subscribed ? '🔔 ' : ''} ${truncate(list.name, 50)} (${formatNumber(
+                  board.cards.filter((c) => c.idList == list.id).length,
+                  locale
+                )} card[s])`
             )
             .join('\n'),
           { maxLength: 1000 }

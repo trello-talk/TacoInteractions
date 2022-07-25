@@ -1,8 +1,9 @@
-import { SlashCreator, CommandContext, CommandOptionType, AutocompleteContext } from 'slash-create';
+import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../command';
-import { prisma } from '../util/prisma';
-import { createT, langs } from '../util/locale';
 import { getData } from '../util';
+import { createT, langs } from '../util/locale';
+import { prisma } from '../util/prisma';
 
 export default class UserSettingsCommand extends SlashCommand {
   constructor(creator: SlashCreator) {

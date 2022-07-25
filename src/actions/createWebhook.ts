@@ -1,4 +1,5 @@
 import { ComponentContext } from 'slash-create';
+
 import { logger } from '../logger';
 import { createDiscordWebhook, getData, noAuthResponse, postToWebhook, truncate } from '../util';
 import { ActionFunction, ActionType, WebhookCreateAction } from '../util/actions';
@@ -19,10 +20,7 @@ export const action: ActionFunction = {
           ctx.guildID,
           action.channelID,
           {
-            name:
-              action.board.name.toLowerCase() === 'clyde'
-                ? t('webhook.new_wh_name')
-                : truncate(action.name || action.board.name, 32)
+            name: action.board.name.toLowerCase() === 'clyde' ? t('webhook.new_wh_name') : truncate(action.name || action.board.name, 32)
           },
           `Requested by ${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`
         );
@@ -33,9 +31,7 @@ export const action: ActionFunction = {
 
     const callbackURL = process.env.WEBHOOK_BASE_URL + userData.trelloID;
     const trelloWebhooks = await trello.getWebhooks();
-    let trelloWebhook = trelloWebhooks.data.find(
-      (twh) => twh.idModel === action.board.id && twh.callbackURL === callbackURL
-    );
+    let trelloWebhook = trelloWebhooks.data.find((twh) => twh.idModel === action.board.id && twh.callbackURL === callbackURL);
     if (!trelloWebhook) trelloWebhook = await trello.addWebhook(action.board.id, { callbackURL });
 
     await prisma.webhook.create({

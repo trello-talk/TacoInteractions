@@ -1,7 +1,8 @@
-import { SlashCreator, CommandContext, ComponentType, ButtonStyle } from 'slash-create';
-import { ActionType } from '../../util/actions';
+import { ButtonStyle, CommandContext, ComponentType, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../../command';
 import { getData } from '../../util';
+import { ActionType } from '../../util/actions';
 
 export default class ClearAuthCommand extends SlashCommand {
   constructor(creator: SlashCreator) {

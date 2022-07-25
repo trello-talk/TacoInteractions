@@ -1,7 +1,7 @@
-import { SlashCreator, CommandContext, CommandOptionType } from 'slash-create';
+import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, splitMessage } from '../../util';
-import { truncate } from '../../util';
+import { getData, noAuthResponse, splitMessage, truncate } from '../../util';
 import { getMember } from '../../util/api';
 import { formatNumber } from '../../util/locale';
 import { createListPrompt } from '../../util/prompt';
@@ -84,10 +84,9 @@ export default class BoardsCommand extends SlashCommand {
           boards
             .map(
               (board) =>
-                `${board.closed ? '🗃️ ' : ''}${board.subscribed ? '🔔 ' : ''}${board.starred ? '⭐ ' : ''} [${truncate(
-                  board.name,
-                  50
-                )}](${board.shortUrl}?utm_source=tacobot.app)`
+                `${board.closed ? '🗃️ ' : ''}${board.subscribed ? '🔔 ' : ''}${board.starred ? '⭐ ' : ''} [${truncate(board.name, 50)}](${
+                  board.shortUrl
+                }?utm_source=tacobot.app)`
             )
             .join('\n')
         )

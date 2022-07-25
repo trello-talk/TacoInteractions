@@ -1,4 +1,5 @@
 import { ComponentContext } from 'slash-create';
+
 import { getData, noAuthResponse } from '../util';
 import { ActionFunction, ActionType, WebhookEditAction } from '../util/actions';
 import { prisma } from '../util/prisma';

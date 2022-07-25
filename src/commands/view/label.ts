@@ -1,7 +1,7 @@
-import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
+import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, sortCards, splitMessage } from '../../util';
-import { truncate } from '../../util';
+import { getData, noAuthResponse, sortCards, splitMessage, truncate } from '../../util';
 import { getBoard } from '../../util/api';
 import { LABEL_COLORS } from '../../util/constants';
 import { createListPrompt } from '../../util/prompt';
@@ -57,13 +57,7 @@ export default class LabelCommand extends SlashCommand {
           color: label.color ? LABEL_COLORS[label.color] : undefined,
           pages: splitMessage(
             cards
-              .map(
-                (card) =>
-                  `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} ${truncate(
-                    card.name,
-                    100
-                  )}`
-              )
+              .map((card) => `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} ${truncate(card.name, 100)}`)
               .join('\n')
           )
         },

@@ -1,4 +1,5 @@
 import { ComponentContext } from 'slash-create';
+
 import { logger } from '../logger';
 import { createDiscordWebhook, getData, postToWebhook, truncate } from '../util';
 import { ActionFunction, ActionType, RepairWebhookAction } from '../util/actions';
@@ -17,10 +18,7 @@ export const action: ActionFunction = {
           ctx.guildID,
           action.channelID,
           {
-            name:
-              !action.webhookName || action.webhookName.toLowerCase() === 'clyde'
-                ? t('webhook.new_wh_name')
-                : truncate(action.webhookName, 32)
+            name: !action.webhookName || action.webhookName.toLowerCase() === 'clyde' ? t('webhook.new_wh_name') : truncate(action.webhookName, 32)
           },
           `Requested by ${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`
         );

@@ -78,5 +78,8 @@ export const EMOJIS: Record<string, string> = {
   uncheck: '<:uncheck:632444550115491910>'
 };
 
-export const VERSION: string = require('../../package.json').version;
-export const REPOSITORY: string = require('../../package.json').repository;
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const pkg = require('../../package.json');
+
+export const VERSION: string = pkg.version;
+export const REPOSITORY: string = pkg.repository;

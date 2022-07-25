@@ -1,8 +1,10 @@
-import { SlashCreator, CommandContext, AutocompleteContext, CommandOptionType } from 'slash-create';
-import { prisma } from '../../util/prisma';
+import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../../command';
 import { getData, noAuthResponse, truncate } from '../../util';
 import { getMember } from '../../util/api';
+import { prisma } from '../../util/prisma';
+
 export default class SwitchCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {

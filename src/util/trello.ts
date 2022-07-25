@@ -1,6 +1,7 @@
 import axios, { AxiosRequestConfig } from 'axios';
-import { onRequestSent } from './influx';
+
 import { VERSION } from './constants';
+import { onRequestSent } from './influx';
 
 export const BASE_URL = 'https://api.trello.com/1';
 
@@ -37,9 +38,7 @@ export default class Trello {
     }
 
     // User Agent
-    options.headers[
-      'User-Agent'
-    ] = `TacoInteractions (https://github.com/trello-talk/TacoInteractions, ${VERSION}) Node.js/${process.version}`;
+    options.headers['User-Agent'] = `TacoInteractions (https://github.com/trello-talk/TacoInteractions, ${VERSION}) Node.js/${process.version}`;
 
     const response = await axios(options);
     return response;
@@ -51,7 +50,7 @@ export default class Trello {
    * @param id The member's ID
    * @param boardFilter What type of boards to show
    */
-  getMember(id: string, boardFilter: string = 'all') {
+  getMember(id: string, boardFilter = 'all') {
     return this._request({
       url: `/members/${id}`,
       params: {
@@ -250,7 +249,7 @@ export default class Trello {
    * @param {string} boardID The board's ID
    * @param {string} [pos='top'] The position of the star
    */
-  starBoard(id: string, boardID: string, pos: string = 'top') {
+  starBoard(id: string, boardID: string, pos = 'top') {
     return this._request({
       method: 'post',
       url: `/members/${id}/boardStars`,

@@ -1,4 +1,5 @@
 import { ComponentContext } from 'slash-create';
+
 import { getData } from '../util';
 import { ActionFunction, ActionType } from '../util/actions';
 import { prisma } from '../util/prisma';

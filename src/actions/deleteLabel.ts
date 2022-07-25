@@ -1,4 +1,5 @@
 import { ComponentContext } from 'slash-create';
+
 import { getData, noAuthResponse } from '../util';
 import { ActionFunction, ActionType } from '../util/actions';
 import { uncacheBoard } from '../util/api';

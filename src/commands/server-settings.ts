@@ -1,8 +1,9 @@
-import { SlashCreator, CommandContext, CommandOptionType, AutocompleteContext } from 'slash-create';
+import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
+
 import SlashCommand from '../command';
-import { prisma } from '../util/prisma';
-import { createT, langs } from '../util/locale';
 import { getData } from '../util';
+import { createT, langs } from '../util/locale';
+import { prisma } from '../util/prisma';
 
 export default class ServerSettingsCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -46,8 +47,7 @@ export default class ServerSettingsCommand extends SlashCommand {
   async run(ctx: CommandContext) {
     const { userData, serverData, t } = await getData(ctx);
     if (!ctx.guildID) return { content: t('interactions.no_server'), ephemeral: true };
-    if (!ctx.member!.permissions.has('MANAGE_GUILD'))
-      return { content: t('interactions.no_admin_perms'), ephemeral: true };
+    if (!ctx.member!.permissions.has('MANAGE_GUILD')) return { content: t('interactions.no_admin_perms'), ephemeral: true };
 
     switch (ctx.subcommands[0]) {
       case 'locale': {

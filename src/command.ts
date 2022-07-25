@@ -1,6 +1,8 @@
-import { AxiosResponse } from 'axios';
 import { User } from '@prisma/client';
+import { AxiosResponse } from 'axios';
+import fuzzy from 'fuzzy';
 import { AutocompleteContext, CommandContext, SlashCommand } from 'slash-create';
+
 import {
   getBoardTextLabel,
   getCardTextLabel,
@@ -14,11 +16,10 @@ import {
   truncate
 } from './util';
 import { getBoard, getMember, TrelloAPIError } from './util/api';
-import { prisma } from './util/prisma';
-import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './util/types';
-import fuzzy from 'fuzzy';
 import { createT, langs } from './util/locale';
+import { prisma } from './util/prisma';
 import { reportErrorFromCommand } from './util/sentry';
+import { TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './util/types';
 
 interface AutocompleteItemOptions<T = any> {
   userData?: User;
@@ -74,9 +75,7 @@ export default abstract class Command extends SlashCommand {
       const result = fuzzy.filter(query, lists, {
         extract: (list) => list.name
       });
-      return result
-        .map((res) => ({ name: getListTextLabel(res.original, subs.lists[res.original.id]), value: res.original.id }))
-        .slice(0, 25);
+      return result.map((res) => ({ name: getListTextLabel(res.original, subs.lists[res.original.id]), value: res.original.id })).slice(0, 25);
     } catch (e) {
       this.onAutocompleteError(e, ctx);
       return [];
@@ -98,10 +97,7 @@ export default abstract class Command extends SlashCommand {
       const [board, subs] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID, true);
       const cards = board.cards.filter(opts.filter || (() => true)).sort((a, b) => b.name.localeCompare(a.name));
 
-      if (!query)
-        return cards
-          .map((c) => ({ name: getCardTextLabel(c, board.lists, subs.cards[c.id]), value: c.id }))
-          .slice(0, 25);
+      if (!query) return cards.map((c) => ({ name: getCardTextLabel(c, board.lists, subs.cards[c.id]), value: c.id })).slice(0, 25);
 
       const result = fuzzy.filter(query, cards, {
         extract: (card) => card.name

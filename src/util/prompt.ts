@@ -1,6 +1,7 @@
+import { oneLine } from 'common-tags';
 import { TFunction } from 'i18next';
 import { ButtonStyle, ComponentContext, ComponentType, EditMessageOptions } from 'slash-create';
-import { oneLine } from 'common-tags';
+
 import { deleteInteraction, getData, toColorInt } from '.';
 import { Action, actions } from './actions';
 import { LABEL_COLORS } from './constants';
@@ -28,23 +29,11 @@ const filterGroups: Record<string, string[]> = {
     'COPY_CARD',
     'EMAIL_CARD'
   ],
-  cardUpdate: [
-    'UPDATE_CARD_NAME',
-    'UPDATE_CARD_DESC',
-    'UPDATE_CARD_LIST',
-    'UPDATE_CARD_POS',
-    'UPDATE_CARD_CLOSED',
-    'UPDATE_CARD_DUE'
-  ],
+  cardUpdate: ['UPDATE_CARD_NAME', 'UPDATE_CARD_DESC', 'UPDATE_CARD_LIST', 'UPDATE_CARD_POS', 'UPDATE_CARD_CLOSED', 'UPDATE_CARD_DUE'],
   comment: ['COMMENT_CARD', 'UPDATE_COMMENT', 'DELETE_COMMENT'],
   checklist: ['ADD_CHECKLIST_TO_CARD', 'REMOVE_CHECKLIST_FROM_CARD', 'COPY_CHECKLIST'],
   checklistUpdate: ['UPDATE_CHECKLIST_NAME', 'UPDATE_CHECKLIST_POS'],
-  checkItem: [
-    'UPDATE_CHECK_ITEM_STATE_ON_CARD',
-    'CREATE_CHECK_ITEM',
-    'DELETE_CHECK_ITEM',
-    'CONVERT_TO_CARD_FROM_CHECK_ITEM'
-  ],
+  checkItem: ['UPDATE_CHECK_ITEM_STATE_ON_CARD', 'CREATE_CHECK_ITEM', 'DELETE_CHECK_ITEM', 'CONVERT_TO_CARD_FROM_CHECK_ITEM'],
   checkItemUpdate: ['UPDATE_CHECK_ITEM_NAME', 'UPDATE_CHECK_ITEM_POS'],
   list: ['CREATE_LIST', 'MOVE_LIST_FROM_BOARD', 'MOVE_LIST_TO_BOARD'],
   listUpdate: ['UPDATE_LIST_NAME', 'UPDATE_LIST_POS', 'UPDATE_LIST_CLOSED'],
@@ -275,18 +264,9 @@ export async function createListPrompt(
   };
 }
 
-async function handleListPrompt(
-  ctx: ComponentContext,
-  prompt: ListPrompt,
-  action: PromptAction,
-  t: TFunction,
-  lang?: string
-) {
+async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, action: PromptAction, t: TFunction, lang?: string) {
   // Filter out actions that shouldn't be possible
-  if (
-    (prompt.page <= 1 && action === PromptAction.PREVIOUS) ||
-    (prompt.page >= prompt.pages.length && action === PromptAction.NEXT)
-  )
+  if ((prompt.page <= 1 && action === PromptAction.PREVIOUS) || (prompt.page >= prompt.pages.length && action === PromptAction.NEXT))
     return ctx.acknowledge();
 
   // Handle action
@@ -441,18 +421,11 @@ export async function createQueryPrompt(
   };
 }
 
-async function handleQueryPrompt(
-  ctx: ComponentContext,
-  prompt: QueryPrompt,
-  action: PromptAction,
-  t: TFunction,
-  lang?: string
-) {
+async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, action: PromptAction, t: TFunction, lang?: string) {
   const max = Math.ceil(prompt.display.length / 25);
 
   // Filter out actions that shouldn't be possible
-  if ((prompt.page <= 1 && action === PromptAction.PREVIOUS) || (prompt.page >= max && action === PromptAction.NEXT))
-    return ctx.acknowledge();
+  if ((prompt.page <= 1 && action === PromptAction.PREVIOUS) || (prompt.page >= max && action === PromptAction.NEXT)) return ctx.acknowledge();
 
   // Handle action
   switch (action) {
@@ -644,18 +617,11 @@ export async function createSelectPrompt(
   };
 }
 
-async function handleSelectPrompt(
-  ctx: ComponentContext,
-  prompt: SelectPrompt,
-  action: PromptAction,
-  t: TFunction,
-  lang?: string
-) {
+async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, action: PromptAction, t: TFunction, lang?: string) {
   const max = Math.ceil(prompt.display.length / 25);
 
   // Filter out actions that shouldn't be possible
-  if ((prompt.page <= 1 && action === PromptAction.PREVIOUS) || (prompt.page >= max && action === PromptAction.NEXT))
-    return ctx.acknowledge();
+  if ((prompt.page <= 1 && action === PromptAction.PREVIOUS) || (prompt.page >= max && action === PromptAction.NEXT)) return ctx.acknowledge();
 
   // Handle action
   switch (action) {
@@ -786,9 +752,7 @@ export async function createAttachmentPrompt(
         title: attachment.name || t('common.attachment'),
         url: attachment.url,
         ...(isFile ? { image: { url: attachment.url } } : { description: attachment.url }),
-        ...(attachment.edgeColor
-          ? { color: LABEL_COLORS[attachment.edgeColor] || toColorInt(attachment.edgeColor) }
-          : {})
+        ...(attachment.edgeColor ? { color: LABEL_COLORS[attachment.edgeColor] || toColorInt(attachment.edgeColor) } : {})
       }
     ],
     components: [
@@ -833,18 +797,9 @@ export async function createAttachmentPrompt(
   };
 }
 
-async function handleAttachmentPrompt(
-  ctx: ComponentContext,
-  prompt: AttachmentPrompt,
-  action: PromptAction,
-  t: TFunction,
-  lang?: string
-) {
+async function handleAttachmentPrompt(ctx: ComponentContext, prompt: AttachmentPrompt, action: PromptAction, t: TFunction, lang?: string) {
   // Filter out actions that shouldn't be possible
-  if (
-    (prompt.page <= 1 && action === PromptAction.PREVIOUS) ||
-    (prompt.page >= prompt.attachments.length && action === PromptAction.NEXT)
-  )
+  if ((prompt.page <= 1 && action === PromptAction.PREVIOUS) || (prompt.page >= prompt.attachments.length && action === PromptAction.NEXT))
     return ctx.acknowledge();
 
   // Handle action
@@ -1026,9 +981,7 @@ async function handleFiltersPrompt(ctx: ComponentContext, prompt: FiltersPrompt,
     }
     case PromptAction.SELECT: {
       const pageGroup = Object.keys(filterGroups)[prompt.page - 1];
-      prompt.selected = prompt.selected
-        .filter((filter) => !filterGroups[pageGroup].includes(filter))
-        .concat([...new Set(ctx.values)]);
+      prompt.selected = prompt.selected.filter((filter) => !filterGroups[pageGroup].includes(filter)).concat([...new Set(ctx.values)]);
       break;
     }
     case PromptAction.TOGGLE_ALL: {
