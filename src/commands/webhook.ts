@@ -29,6 +29,7 @@ export default class WebhookCommand extends SlashCommand {
     super(creator, {
       name: 'webhook',
       description: 'Manage server webhooks.',
+      dmPermission: false,
       options: [
         {
           type: CommandOptionType.SUB_COMMAND,

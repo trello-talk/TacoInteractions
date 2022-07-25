@@ -10,6 +10,7 @@ export default class ServerSettingsCommand extends SlashCommand {
     super(creator, {
       name: 'server-settings',
       description: 'Edit server settings.',
+      dmPermission: false,
       options: [
         {
           type: CommandOptionType.SUB_COMMAND,
