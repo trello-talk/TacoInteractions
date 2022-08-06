@@ -716,7 +716,7 @@ export default class WebhookCommand extends SlashCommand {
             await ctx.fetch();
             return await createFiltersPrompt(
               {
-                title: t('webhook.filters_title', { webhook: truncate(webhook.name, 100) || t('webhook.unnamed') }),
+                title: t('webhook.filters_title', { webhook: truncate(webhook.name || t('webhook.unnamed'), 100) }),
                 action,
                 selected: new WebhookFilters(BigInt(webhook.filters)).toArray()
               },
@@ -733,7 +733,7 @@ export default class WebhookCommand extends SlashCommand {
             return await createSelectPrompt(
               {
                 content: t('webhook.choose_cards'),
-                title: t('webhook.cards_title', { webhook: truncate(webhook.name, 100) || t('webhook.unnamed') }),
+                title: t('webhook.cards_title', { webhook: truncate(webhook.name || t('webhook.unnamed'), 100) }),
                 action,
                 values: board.cards,
                 placeholder: t('webhook.cards_placeholder'),
@@ -757,7 +757,7 @@ export default class WebhookCommand extends SlashCommand {
             return await createSelectPrompt(
               {
                 content: t('webhook.choose_lists'),
-                title: t('webhook.lists_title', { webhook: truncate(webhook.name, 100) || t('webhook.unnamed') }),
+                title: t('webhook.lists_title', { webhook: truncate(webhook.name || t('webhook.unnamed'), 100) }),
                 action,
                 values: board.lists,
                 placeholder: t('webhook.lists_placeholder'),
