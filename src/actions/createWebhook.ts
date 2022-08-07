@@ -52,7 +52,7 @@ export const action: ActionFunction = {
       embeds: [
         {
           type: 'rich',
-          title: t('webhook.new_wh_title'),
+          title: t('webhook.add_wh_title'),
           description: t('webhook.add_wh_content', {
             name: truncate(action.board.name, 1000)
           }),
