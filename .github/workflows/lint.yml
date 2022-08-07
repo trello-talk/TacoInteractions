@@ -12,6 +12,11 @@ on:
       - ".github/workflows/lint.yml"
       - "package.json"
       - "yarn.lock"
+  pull_request:
+    tags:
+      - '!*'
+    branches:
+      - '*'
   workflow_dispatch:
 
 jobs:
