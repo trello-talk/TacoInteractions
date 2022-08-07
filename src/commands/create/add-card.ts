@@ -32,7 +32,8 @@ export default class AddCardCommand extends SlashCommand {
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
     const [board] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
-    if (board.cards.length >= 400) return { content: t('addcard.limited'), ephemeral: true };
+    // NOTE: we can't check per list, so this might fail anyways.
+    if (board.cards.filter((c) => !c.closed).length >= 5000 || board.cards.length >= 2000000) return { content: t('addcard.limited'), ephemeral: true };
 
     const list = board.lists.find((l) => l.id === ctx.options.list || l.name === ctx.options.list);
     if (!list) return t('query.not_found', { context: 'list' });

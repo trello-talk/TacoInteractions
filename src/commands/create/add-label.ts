@@ -74,7 +74,7 @@ export default class AddLabelCommand extends SlashCommand {
     if (!userData.currentBoard) return { content: t('switch.no_board_command'), ephemeral: true };
 
     const [board] = await getBoard(userData.trelloToken, userData.currentBoard, userData.trelloID);
-    if (board.labels.length >= 800) return { content: t('addlabel.limited'), ephemeral: true };
+    if (board.labels.length >= 1000) return { content: t('addlabel.limited'), ephemeral: true };
 
     const name = ctx.options.name.trim();
     await trello.addLabel(userData.currentBoard, { name, color: ctx.options.color });
