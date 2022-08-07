@@ -629,7 +629,8 @@ export default class WebhookCommand extends SlashCommand {
         const webhook = webhooks.find((w) => String(w.id) === ctx.options.set[ctx.subcommands[1]].webhook);
         if (!webhook) return t('query.not_found', { context: 'webhook' });
 
-        const available = this.webhookAvailable(webhook.id, webhooks, serverData.maxWebhooks);
+        const maxWebhooks = serverData ? serverData.maxWebhooks : 5;
+        const available = this.webhookAvailable(webhook.id, webhooks, maxWebhooks);
         if (!available)
           return {
             content: t('webhook.wh_expire'),
