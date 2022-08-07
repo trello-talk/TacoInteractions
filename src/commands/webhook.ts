@@ -335,7 +335,8 @@ export default class WebhookCommand extends SlashCommand {
       return { content: t('interactions.no_trello_perms'), ephemeral: true };
 
     const webhooks = await prisma.webhook.findMany({
-      where: { guildID: ctx.guildID }
+      where: { guildID: ctx.guildID },
+      orderBy: { createdAt: 'asc' }
     });
 
     switch (ctx.subcommands[0]) {
