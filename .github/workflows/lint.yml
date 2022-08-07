@@ -11,6 +11,7 @@ on:
       - ".prettierrc"
       - ".github/workflows/lint.yml"
       - "package.json"
+      - "yarn.lock"
   workflow_dispatch:
 
 jobs:
