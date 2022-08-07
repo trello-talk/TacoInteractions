@@ -424,7 +424,7 @@ export default class WebhookCommand extends SlashCommand {
                       > :warning: **${t('webhook.repair_header')}**
                       ${!trelloMember ? t('webhook.trello_member_missing') : ''}
                       ${!discordWebhook ? t('webhook.discord_webhook_missing') : ''}
-                      >${t('webhook.repair_footer')}
+                      > ${t('webhook.repair_footer')}
                     `
                     : ''
                 }
