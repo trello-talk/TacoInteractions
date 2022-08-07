@@ -40,7 +40,7 @@ creator.on('commandRun', (command, _, ctx) => {
   logger.info(`${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran command ${command.commandName} ${ctx.subcommands.join(' ')}`);
   onCommandRun(ctx.user.id, command.commandName);
 });
-creator.on('commandRegister', (command) => logger.info(`Registered command ${command.commandName}`));
+creator.on('commandRegister', (command) => logger.log(`Registered command ${command.commandName}`));
 creator.on('commandError', (command, error) => logger.error(`Command ${command.commandName}:`, error));
 
 creator.withServer(new FastifyServer(server)).registerCommandsIn(path.join(__dirname, 'commands'));
