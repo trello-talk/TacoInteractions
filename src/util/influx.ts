@@ -32,9 +32,9 @@ export function onRequestSent() {
   requestsSent++;
 }
 
-async function collect(timestamp = new Date()) {
+async function collect() {
   if (!process.env.INFLUX_URL || !process.env.INFLUX_TOKEN) return;
-  if (!timestamp) timestamp = cron.lastDate();
+  const timestamp = new Date();
 
   const writeApi = client.getWriteApi(process.env.INFLUX_ORG, process.env.INFLUX_BUCKET, 's');
   const points: Point[] = [
@@ -66,7 +66,7 @@ async function collect(timestamp = new Date()) {
   } catch (e) {
     withScope((scope) => {
       scope.clear();
-      scope.setExtra('date', timestamp || cron.lastDate());
+      scope.setExtra('date', timestamp);
       captureException(e);
     });
     logger.error('Error sending stats to Influx.', e);
