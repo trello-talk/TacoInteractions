@@ -62,7 +62,7 @@ export default class BoardCommand extends SlashCommand {
               **${t('common.visibility')}:** ${t(`common.perm_levels.${board.prefs.permissionLevel}`)}
               ${
                 board.organization
-                  ? `**${t('common.org')}:** [${(truncate(board.organization.displayName), 50)}](https://trello.com/${
+                  ? `**${t('common.org')}:** [${truncate(board.organization.displayName, 50)}](https://trello.com/${
                       board.organization.name
                     }?utm_source=tacobot.app)`
                   : ''
