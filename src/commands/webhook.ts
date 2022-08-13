@@ -24,6 +24,8 @@ enum WebhookFilter {
   UNNAMED = 'Unnamed'
 }
 
+const MAX_WEBHOOKS = parseInt(process.env.WEBHOOK_LIMIT, 10) || 5;
+
 export default class WebhookCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -308,7 +310,7 @@ export default class WebhookCommand extends SlashCommand {
   }
 
   webhookAvailable(webhookID: number, webhooks: Webhook[], maxWebhooks?: number) {
-    maxWebhooks = maxWebhooks || parseInt(process.env.WEBHOOK_LIMIT, 10) || 5;
+    maxWebhooks = maxWebhooks || MAX_WEBHOOKS;
 
     if (maxWebhooks < webhooks.length)
       return !!webhooks
@@ -472,7 +474,7 @@ export default class WebhookCommand extends SlashCommand {
         };
       }
       case 'add': {
-        const maxWebhooks = serverData ? serverData.maxWebhooks : 5;
+        const maxWebhooks = serverData ? serverData.maxWebhooks : MAX_WEBHOOKS;
         if (maxWebhooks <= webhooks.length)
           return {
             content: t('webhook.max'),
@@ -630,7 +632,7 @@ export default class WebhookCommand extends SlashCommand {
         const webhook = webhooks.find((w) => String(w.id) === ctx.options.set[ctx.subcommands[1]].webhook);
         if (!webhook) return t('query.not_found', { context: 'webhook' });
 
-        const maxWebhooks = serverData ? serverData.maxWebhooks : 5;
+        const maxWebhooks = serverData ? serverData.maxWebhooks : MAX_WEBHOOKS;
         const available = this.webhookAvailable(webhook.id, webhooks, maxWebhooks);
         if (!available)
           return {
