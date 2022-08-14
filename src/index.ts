@@ -25,7 +25,7 @@ export const creator = new SlashCreator({
   publicKey: process.env.DISCORD_PUBLIC_KEY,
   token: process.env.DISCORD_BOT_TOKEN,
   serverPort: parseInt(process.env.SERVER_PORT, 10) || 8020,
-  serverHost: process.env.SERVER_PORT || '127.0.0.1',
+  serverHost: process.env.SERVER_HOST || '127.0.0.1',
   allowedMentions: {
     everyone: false,
     users: false,
