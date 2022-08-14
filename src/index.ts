@@ -33,6 +33,14 @@ export const creator = new SlashCreator({
   }
 });
 
+server.route({
+  method: 'GET',
+  url: '/health',
+  handler: async (req, reply) => {
+    return reply.status(200).send({ ok: true });
+  }
+});
+
 creator.on('debug', (message) => logger.log(message));
 creator.on('warn', (message) => logger.warn(message));
 creator.on('error', (error) => logger.error(error));

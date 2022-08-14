@@ -22,7 +22,9 @@
     "sync:dev": "slash-up sync -e development",
     "dev": "devScript",
     "lint": "eslint --ext .ts ./src",
-    "lint:fix": "eslint --ext .ts ./src --fix"
+    "lint:fix": "eslint --ext .ts ./src --fix",
+    "generate": "prisma generate",
+    "migrate": "prisma migrate deploy"
   },
   "devScript": {
     "depCheck": false
