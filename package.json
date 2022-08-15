@@ -49,6 +49,9 @@
     "nanoid": "3.3.4",
     "slash-create": "5.7.1"
   },
+  "peerDependencies": {
+    "slash-up": "1.2.0"
+  },
   "devDependencies": {
     "@types/common-tags": "1.8.1",
     "@types/cron": "2.0.0",
