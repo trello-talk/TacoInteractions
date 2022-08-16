@@ -32,9 +32,9 @@
   "dependencies": {
     "@influxdata/influxdb-client": "1.28.0",
     "@prisma/client": "4.2.1",
-    "@sentry/integrations": "7.9.0",
-    "@sentry/node": "7.9.0",
-    "@sentry/tracing": "7.9.0",
+    "@sentry/integrations": "7.10.0",
+    "@sentry/node": "7.10.0",
+    "@sentry/tracing": "7.10.0",
     "axios": "0.27.2",
     "cat-loggr": "1.2.2",
     "common-tags": "1.8.2",
