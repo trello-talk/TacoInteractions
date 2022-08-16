@@ -59,7 +59,7 @@
     "@types/i18next-fs-backend": "1.1.2",
     "@types/ioredis": "4.28.10",
     "@types/node": "18.6.4",
-    "eslint": "8.21.0",
+    "eslint": "8.22.0",
     "eslint-config-snazzah": "1.1.0",
     "prisma": "4.2.1",
     "slash-up": "1.2.0",
