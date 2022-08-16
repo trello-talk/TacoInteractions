@@ -88,9 +88,9 @@ export default class BotCommand extends SlashCommand {
           description: 'Set max webhooks.',
           options: [
             {
-              type: CommandOptionType.INTEGER,
+              type: CommandOptionType.STRING,
               name: 'id',
-              description: 'The webhook ID.',
+              description: 'The server ID.',
               required: true
             },
             {
