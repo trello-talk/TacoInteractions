@@ -5,6 +5,16 @@ import { getData, noAuthResponse, sortCards, splitMessage, truncate } from '../.
 import { getBoard } from '../../util/api';
 import { createListPrompt } from '../../util/prompt';
 
+enum TrelloCardsFilter {
+  ALL = 'All',
+  OPEN = 'Open',
+  ARCHIVED = 'Archived',
+  WATCHED = 'Watched',
+  OVERDUE = 'Overdue',
+  LABELS = 'Labels',
+  NO_LABELS = 'No_Labels'
+}
+
 export default class ListCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -17,6 +27,41 @@ export default class ListCommand extends SlashCommand {
           description: 'The list to view.',
           autocomplete: true,
           required: true
+        },
+        {
+          type: CommandOptionType.STRING,
+          name: 'card_filter',
+          description: 'Filter cards to list.',
+          choices: [
+            {
+              name: 'All',
+              value: TrelloCardsFilter.ALL
+            },
+            {
+              name: 'Open',
+              value: TrelloCardsFilter.OPEN
+            },
+            {
+              name: 'Archived',
+              value: TrelloCardsFilter.ARCHIVED
+            },
+            {
+              name: 'Watched',
+              value: TrelloCardsFilter.WATCHED
+            },
+            {
+              name: 'Overdue',
+              value: TrelloCardsFilter.OVERDUE
+            },
+            {
+              name: 'With Labels',
+              value: TrelloCardsFilter.LABELS
+            },
+            {
+              name: 'Without Labels',
+              value: TrelloCardsFilter.NO_LABELS
+            }
+          ]
         }
       ]
     });
@@ -35,7 +80,30 @@ export default class ListCommand extends SlashCommand {
 
     const list = board.lists.find((l) => l.id === ctx.options.list || l.name === ctx.options.list);
     if (list) {
-      const cards = sortCards(board.cards.filter((c) => c.idList === list.id));
+      let cards = sortCards(board.cards.filter((c) => c.idList === list.id));
+      const filter: TrelloCardsFilter = ctx.options.card_filter || TrelloCardsFilter.OPEN;
+      switch (filter) {
+        case TrelloCardsFilter.ALL:
+          break;
+        case TrelloCardsFilter.OPEN:
+          cards = cards.filter((c) => !c.closed);
+          break;
+        case TrelloCardsFilter.ARCHIVED:
+          cards = cards.filter((c) => c.closed);
+          break;
+        case TrelloCardsFilter.WATCHED:
+          cards = cards.filter((c) => subs.cards[c.id] || c.subscribed);
+          break;
+        case TrelloCardsFilter.OVERDUE:
+          cards = cards.filter((c) => c.due && Date.now() > new Date(c.due).valueOf() && !c.closed && !c.dueComplete);
+          break;
+        case TrelloCardsFilter.LABELS:
+          cards = cards.filter((c) => c.idLabels.length);
+          break;
+        case TrelloCardsFilter.NO_LABELS:
+          cards = cards.filter((c) => !c.idLabels.length);
+          break;
+      }
 
       if (!cards.length)
         return {
