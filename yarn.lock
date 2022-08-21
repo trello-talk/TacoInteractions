@@ -2783,7 +2783,16 @@ signal-exit@^3.0.2:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.7.tgz#a9a1767f8af84155114eaabd73f99273c8f59ad9"
   integrity sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==
 
-slash-create@5.7.1, slash-create@^5.6.1:
+slash-create@5.8.0:
+  version "5.8.0"
+  resolved "https://registry.yarnpkg.com/slash-create/-/slash-create-5.8.0.tgz#69008c3ab2fe1b9792d6ec0b141a24b602cd9136"
+  integrity sha512-VTnGMO+w/c/HBBn2V6wdBO3SFTC5svlWwfwz+kxDCezfmNZL06kGwPGKzCk+lkBobUK4c+yL12zfopKDCibmnQ==
+  dependencies:
+    eventemitter3 "^4.0.7"
+    lodash.isequal "^4.5.0"
+    tweetnacl "^1.0.3"
+
+slash-create@^5.6.1:
   version "5.7.1"
   resolved "https://registry.yarnpkg.com/slash-create/-/slash-create-5.7.1.tgz#125e5f69442b26a7bc0d0d3e135dec71d4a9694a"
   integrity sha512-UTuOMW3D4f2k2t5aheO0abnuPLvLgj8M5pYYhaEfgKmUTJsQraTdWeMrh4syD9ZQV0qNgQTU9MCEOnhd6N8mGQ==
