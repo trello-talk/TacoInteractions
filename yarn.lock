@@ -83,10 +83,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@influxdata/influxdb-client@1.28.0":
-  version "1.28.0"
-  resolved "https://registry.yarnpkg.com/@influxdata/influxdb-client/-/influxdb-client-1.28.0.tgz#b6762dcfe6fce3ff640b3c23f667afa9de6aaee8"
-  integrity sha512-mTNsyBpVW3qT1dn9SH/LaQDlcotpSH+64aR00E7hONXyVntVUSLEbH0ijHs+Hwk1dQS+WmvNduhdeFr/vHZ+Kw==
+"@influxdata/influxdb-client@1.29.0":
+  version "1.29.0"
+  resolved "https://registry.yarnpkg.com/@influxdata/influxdb-client/-/influxdb-client-1.29.0.tgz#b7c758fb99a677876f357fb20841a6a1c760319a"
+  integrity sha512-9cup31a0S5Px1q5Bj9oyI8d84IWfv6nhldNuL8UNsiFPDD5SPw1QesPL4Oo+rR3Lbzbilt269NJOK5JOkmPyYA==
 
 "@ioredis/commands@^1.1.1":
   version "1.1.1"
