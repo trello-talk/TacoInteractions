@@ -2803,10 +2803,10 @@ signal-exit@^3.0.2:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.7.tgz#a9a1767f8af84155114eaabd73f99273c8f59ad9"
   integrity sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==
 
-slash-create@5.8.0:
-  version "5.8.0"
-  resolved "https://registry.yarnpkg.com/slash-create/-/slash-create-5.8.0.tgz#69008c3ab2fe1b9792d6ec0b141a24b602cd9136"
-  integrity sha512-VTnGMO+w/c/HBBn2V6wdBO3SFTC5svlWwfwz+kxDCezfmNZL06kGwPGKzCk+lkBobUK4c+yL12zfopKDCibmnQ==
+slash-create@5.9.0:
+  version "5.9.0"
+  resolved "https://registry.yarnpkg.com/slash-create/-/slash-create-5.9.0.tgz#96348d89bfd46938dd739e8d8859933c70660d89"
+  integrity sha512-dvfrPW4i/sCEerVzBiYyl28zjHY6hoVBTmWeVlNRQrWb47Kfp5o9zSJOkjGfKmxiwyOjPdnFwWCogXmBtldNkA==
   dependencies:
     eventemitter3 "^4.0.7"
     lodash.isequal "^4.5.0"
