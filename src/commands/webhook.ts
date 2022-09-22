@@ -6,7 +6,7 @@ import { AutocompleteContext, ButtonStyle, ChannelType, CommandContext, CommandO
 
 import SlashCommand from '../command';
 import { logger } from '../logger';
-import { createDiscordWebhook, getData, noAuthResponse, postToWebhook, splitMessage, stripIndentsAndNewlines, truncate } from '../util';
+import { createDiscordWebhook, getBoardID, getData, noAuthResponse, postToWebhook, splitMessage, stripIndentsAndNewlines, truncate } from '../util';
 import { ActionType, createAction } from '../util/actions';
 import { getBoard, getChannels, getWebhooks } from '../util/api';
 import { EMOJIS } from '../util/constants';
@@ -496,7 +496,8 @@ export default class WebhookCommand extends SlashCommand {
         if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
         // Verify if the user can access this board
-        const boardID = ctx.options.add.board.slice(0, 25);
+        const boardID = getBoardID(ctx.options.add.board);
+        if (!boardID) return t('webhook.board_invalid');
         let board: TrelloBoard;
         try {
           const response = await trello.getBoard(boardID);

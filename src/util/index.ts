@@ -264,3 +264,11 @@ export function parseBigInt(value: string, radix: number) {
 
   return parts.reduce((r, v) => r * factor + BigInt(parseInt(v, radix)), 0n);
 }
+
+const BOARD_ID_REGEX = /^(?:https?:\/\/trello\.com\/b\/)?([0-9a-f]{24}|[a-zA-Z0-9]{7,10})/;
+
+export function getBoardID(value: string) {
+  const match = BOARD_ID_REGEX.exec(value);
+  if (!match) return null;
+  return match[1];
+}
