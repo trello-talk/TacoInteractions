@@ -236,7 +236,7 @@ export async function createDiscordWebhook(guildID: string, channelID: string, b
       Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
       'Content-Type': 'application/json',
       'User-Agent': `TacoInteractions (https://github.com/trello-talk/TacoInteractions, ${VERSION}) Node.js/${process.version}`,
-      ...(reason ? { 'X-Audit-Log-Reason': reason } : {})
+      ...(reason ? { 'X-Audit-Log-Reason': reason.replace(/[^\t\x20-\x7e\x80-\xff]/g, '') } : {})
     }
   });
 
