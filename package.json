@@ -41,7 +41,7 @@
     "cron": "2.1.0",
     "dayjs": "1.11.5",
     "dotenv": "16.0.3",
-    "fastify": "3.29.2",
+    "fastify": "3.29.3",
     "fuzzy": "0.1.3",
     "i18next": "21.9.2",
     "i18next-fs-backend": "1.1.5",
