@@ -2826,10 +2826,10 @@ slash-create@^5.6.1:
     lodash.isequal "^4.5.0"
     tweetnacl "^1.0.3"
 
-slash-up@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/slash-up/-/slash-up-1.2.0.tgz#10bc04e61a846031df75dc89921e099afbcc2dff"
-  integrity sha512-ce2p5yCGVdLsehMeQzbM4PvuM8ru+Pt4bgpTptUjxt3bDc9SyPHW2msVtXFsdyJBMNt3a5LRAsln05OVpHnMrQ==
+slash-up@1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/slash-up/-/slash-up-1.2.1.tgz#ecec9dfc35b8014d07a91855131ea4913b23ea02"
+  integrity sha512-muCgCC0OE2VrpoQnSh4+eQl/Pax1XQCo8jrv0ucdNXrGgydbgwh3RjU9NUJ6i2Yfa5qHAYItb4CLBTPfNbRF2g==
   dependencies:
     ansi-colors "^4.1.1"
     common-tags "^1.8.2"
