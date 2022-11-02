@@ -65,7 +65,7 @@ export default class LabelsCommand extends SlashCommand {
           labels
             .map(
               (label) => oneLine`
-                ${label.color ? LABEL_EMOJIS[label.color] : LABEL_EMOJIS.none}
+                ${label.color ? LABEL_EMOJIS[label.color.split('_')[0]] : LABEL_EMOJIS.none}
                 ${truncate(label.name, 50) || '*[unnamed]*'}`
             )
             .join('\n')
