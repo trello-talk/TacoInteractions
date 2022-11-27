@@ -506,7 +506,7 @@ export default class WebhookCommand extends SlashCommand {
           if ('response' in err) {
             const response = err.response as AxiosResponse;
             if (response.data === 'unauthorized permission requested') return t('webhook.board_unauthorized');
-            else if (response.data === 'invalid id') return t('webhook.board_invalid');
+            else if (response.data === 'invalid id' || response.data === 'Board not found') return t('webhook.board_invalid');
           } else throw err;
         }
 
