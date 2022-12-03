@@ -23,9 +23,11 @@ export const action: ActionFunction = {
     await prisma.webhook.delete({ where: { id: webhook.id } });
 
     // Remove the internal webhook if there are no more webhooks depending on it
-    const trelloMember = webhook.memberID ? await prisma.user.findUnique({
-      where: { userID: webhook.memberID }
-    }) : null;
+    const trelloMember = webhook.memberID
+      ? await prisma.user.findUnique({
+          where: { userID: webhook.memberID }
+        })
+      : null;
     try {
       if (trelloMember?.trelloToken) {
         const trello = new Trello(trelloMember.trelloToken);
