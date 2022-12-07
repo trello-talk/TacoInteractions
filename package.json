@@ -30,7 +30,7 @@
     "depCheck": false
   },
   "dependencies": {
-    "@influxdata/influxdb-client": "1.32.0",
+    "@influxdata/influxdb-client": "1.33.0",
     "@prisma/client": "4.7.0",
     "@sentry/integrations": "7.22.0",
     "@sentry/node": "7.22.0",
