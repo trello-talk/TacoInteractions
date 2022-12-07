@@ -35,7 +35,7 @@
     "@sentry/integrations": "7.22.0",
     "@sentry/node": "7.22.0",
     "@sentry/tracing": "7.22.0",
-    "axios": "1.2.0",
+    "axios": "1.2.1",
     "cat-loggr": "1.2.2",
     "common-tags": "1.8.2",
     "cron": "2.1.0",
