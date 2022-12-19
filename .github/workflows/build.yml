@@ -7,7 +7,7 @@ on:
       - ".dockerignore"
       - "Dockerfile"
       - "package.json"
-      - "yarn.lock"
+      - "pnpm-lock.yaml"
     branches:
       - 'master'
     tags:

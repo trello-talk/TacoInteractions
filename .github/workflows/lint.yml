@@ -11,7 +11,7 @@ on:
       - ".prettierrc"
       - ".github/workflows/lint.yml"
       - "package.json"
-      - "yarn.lock"
+      - "pnpm-lock.yaml"
   pull_request:
     tags:
       - '!*'
