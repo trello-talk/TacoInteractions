@@ -1,39 +1,46 @@
 # syntax=docker/dockerfile:1
 
-# This builds the server
-FROM node:18-alpine AS builder
+# ---- Builder ----
+FROM --platform=$BUILDPLATFORM node:18-alpine3.16 AS builder
 
 RUN mkdir /build
 WORKDIR /build
 
 COPY package.json .
-COPY yarn.lock .
-RUN yarn install --immutable
+COPY pnpm-lock.yaml .
+
+RUN apk add --update --no-cache git
+RUN npm install -g pnpm@7
+
+RUN pnpm install --frozen-lockfile
 
 COPY . .
-RUN yarn generate
-RUN yarn build
+RUN pnpm run generate
+RUN pnpm run build
 
 # ---- Dependencies ----
-FROM node:18-alpine AS deps
+FROM --platform=$BUILDPLATFORM node:18-alpine3.16 AS deps
 
 WORKDIR /deps
 
 COPY package.json .
-COPY yarn.lock .
+COPY pnpm-lock.yaml .
 COPY ./prisma .
-RUN yarn install --frozen-lockfile --prod --ignore-optional
-RUN yarn generate
+
+RUN apk add --update --no-cache git
+RUN npm install -g pnpm@7
+
+RUN pnpm install --frozen-lockfile --prod --no-optional
+RUN pnpm dlx prisma generate
 
 # ---- Runner ----
-FROM node:18-alpine
+FROM --platform=$BUILDPLATFORM node:18-alpine3.16
 
-RUN apk add dumb-init
-
-WORKDIR /app
+RUN apk add --update --no-cache dumb-init git
+RUN npm install -g pnpm@7
 
 COPY --from=builder /build/package.json ./package.json
-COPY --from=builder /build/yarn.lock ./yarn.lock
+COPY --from=builder /build/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=builder /build/slash-up.config.js ./slash-up.config.js
 COPY --from=deps /deps/node_modules ./node_modules
 COPY --from=builder /build/prisma ./prisma
@@ -45,4 +52,4 @@ EXPOSE 8020
 ENV SERVER_HOST=0.0.0.0
 
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["sh", "-c", "yarn migrate && yarn start"]
+CMD ["sh", "-c", "pnpm run migrate && pnpm run start"]
