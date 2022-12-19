@@ -39,6 +39,8 @@ FROM --platform=$BUILDPLATFORM node:18-alpine3.16
 RUN apk add --update --no-cache dumb-init git
 RUN npm install -g pnpm@7
 
+WORKDIR /app
+
 COPY --from=builder /build/package.json ./package.json
 COPY --from=builder /build/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY --from=builder /build/slash-up.config.js ./slash-up.config.js
