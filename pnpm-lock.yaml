@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@influxdata/influxdb-client': 1.33.0
-  '@prisma/client': 4.7.1
+  '@prisma/client': 4.8.0
   '@sentry/integrations': 7.28.1
   '@sentry/node': 7.28.1
   '@sentry/tracing': 7.28.1
@@ -25,7 +25,7 @@ specifiers:
   i18next-fs-backend: 2.1.1
   ioredis: 5.2.4
   nanoid: 3.3.4
-  prisma: 4.7.1
+  prisma: 4.8.0
   rimraf: 3.0.2
   slash-create: 5.11.0
   slash-up: 1.2.1
@@ -35,7 +35,7 @@ specifiers:
 
 dependencies:
   '@influxdata/influxdb-client': 1.33.0
-  '@prisma/client': 4.7.1_prisma@4.7.1
+  '@prisma/client': 4.8.0_prisma@4.8.0
   '@sentry/integrations': 7.28.1
   '@sentry/node': 7.28.1
   '@sentry/tracing': 7.28.1
@@ -61,7 +61,7 @@ devDependencies:
   '@types/node': 18.11.18
   eslint: 8.30.0
   eslint-config-snazzah: 1.2.1_typescript@4.9.4
-  prisma: 4.7.1
+  prisma: 4.8.0
   rimraf: 3.0.2
   slash-up: 1.2.1_bgqjmm7nfviaqjw5wqkpzl5sw4
   ts-devscript: 3.0.7
@@ -183,8 +183,8 @@ packages:
       fastq: 1.14.0
     dev: true
 
-  /@prisma/client/4.7.1_prisma@4.7.1:
-    resolution: {integrity: sha512-/GbnOwIPtjiveZNUzGXOdp7RxTEkHL4DZP3vBaFNadfr6Sf0RshU5EULFzVaSi9i9PIK9PYd+1Rn7z2B2npb9w==}
+  /@prisma/client/4.8.0_prisma@4.8.0:
+    resolution: {integrity: sha512-Y1riB0p2W52kh3zgssP/YAhln3RjBFcJy3uwEiyjmU+TQYh6QTZDRFBo3JtBWuq2FyMOl1Rye8jxzUP+n0l5Cg==}
     engines: {node: '>=14.17'}
     requiresBuild: true
     peerDependencies:
@@ -193,16 +193,16 @@ packages:
       prisma:
         optional: true
     dependencies:
-      '@prisma/engines-version': 4.7.1-1.272861e07ab64f234d3ffc4094e32bd61775599c
-      prisma: 4.7.1
+      '@prisma/engines-version': 4.8.0-61.d6e67a83f971b175a593ccc12e15c4a757f93ffe
+      prisma: 4.8.0
     dev: false
 
-  /@prisma/engines-version/4.7.1-1.272861e07ab64f234d3ffc4094e32bd61775599c:
-    resolution: {integrity: sha512-Bd4LZ+WAnUHOq31e9X/ihi5zPlr4SzTRwUZZYxvWOxlerIZ7HJlVa9zXpuKTKLpI9O1l8Ec4OYCKsivWCs5a3Q==}
+  /@prisma/engines-version/4.8.0-61.d6e67a83f971b175a593ccc12e15c4a757f93ffe:
+    resolution: {integrity: sha512-MHSOSexomRMom8QN4t7bu87wPPD+pa+hW9+71JnVcF3DqyyO/ycCLhRL1we3EojRpZxKvuyGho2REQsMCvxcJw==}
     dev: false
 
-  /@prisma/engines/4.7.1:
-    resolution: {integrity: sha512-zWabHosTdLpXXlMefHmnouhXMoTB1+SCbUU3t4FCmdrtIOZcarPKU3Alto7gm/pZ9vHlGOXHCfVZ1G7OIrSbog==}
+  /@prisma/engines/4.8.0:
+    resolution: {integrity: sha512-A1Asn2rxZMlLAj1HTyfaCv0VQrLUv034jVay05QlqZg1qiHPeA3/pGTfNMijbsMYCsGVxfWEJuaZZuNxXGMCrA==}
     requiresBuild: true
 
   /@sentry/core/7.28.1:
@@ -2535,13 +2535,13 @@ packages:
     hasBin: true
     dev: true
 
-  /prisma/4.7.1:
-    resolution: {integrity: sha512-CCQP+m+1qZOGIZlvnL6T3ZwaU0LAleIHYFPN9tFSzjs/KL6vH9rlYbGOkTuG9Q1s6Ki5D0LJlYlW18Z9EBUpGg==}
+  /prisma/4.8.0:
+    resolution: {integrity: sha512-DWIhxvxt8f4h6MDd35mz7BJff+fu7HItW3WPDIEpCR3RzcOWyiHBbLQW5/DOgmf+pRLTjwXQob7kuTZVYUAw5w==}
     engines: {node: '>=14.17'}
     hasBin: true
     requiresBuild: true
     dependencies:
-      '@prisma/engines': 4.7.1
+      '@prisma/engines': 4.8.0
 
   /process-warning/2.1.0:
     resolution: {integrity: sha512-9C20RLxrZU/rFnxWncDkuF6O999NdIf3E1ws4B0ZeY3sRVPzWBMsYDE2lxjxhiXxg464cQTgKUGm8/i6y2YGXg==}
