@@ -1,7 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@influxdata/influxdb-client': 1.33.0
+  '@influxdata/influxdb-client': 1.33.1
   '@prisma/client': 4.9.0
   '@sentry/integrations': 7.31.1
   '@sentry/node': 7.31.1
@@ -34,7 +34,7 @@ specifiers:
   typescript: 4.9.4
 
 dependencies:
-  '@influxdata/influxdb-client': 1.33.0
+  '@influxdata/influxdb-client': 1.33.1
   '@prisma/client': 4.9.0_prisma@4.9.0
   '@sentry/integrations': 7.31.1
   '@sentry/node': 7.31.1
@@ -138,8 +138,8 @@ packages:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
     dev: true
 
-  /@influxdata/influxdb-client/1.33.0:
-    resolution: {integrity: sha512-ctICXZqq4Nff44Q5Pk3I63/jpZGTZ9VPr8dPJ78eujEHrTjz1M6mlNnXuF+TdqFfzlpmjxo4TcYEyDOPK+SQbQ==}
+  /@influxdata/influxdb-client/1.33.1:
+    resolution: {integrity: sha512-MAKevkaXAVMGqCqEHA0bBd10wzHjF4UDk1Dhkx7rWR784VpiOFxFjMBtO7A4f3jJGSdqdMvn8Lr1U/iS8PlVNw==}
     dev: false
 
   /@ioredis/commands/1.2.0:
