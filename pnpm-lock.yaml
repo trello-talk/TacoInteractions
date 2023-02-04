@@ -26,7 +26,7 @@ specifiers:
   ioredis: 5.2.5
   nanoid: 3.3.4
   prisma: 4.9.0
-  rimraf: 3.0.2
+  rimraf: 4.1.2
   slash-create: 5.11.0
   slash-up: 1.2.1
   ts-devscript: 3.0.7
@@ -62,7 +62,7 @@ devDependencies:
   eslint: 8.32.0
   eslint-config-snazzah: 1.2.1_typescript@4.9.4
   prisma: 4.9.0
-  rimraf: 3.0.2
+  rimraf: 4.1.2
   slash-up: 1.2.1_bgqjmm7nfviaqjw5wqkpzl5sw4
   ts-devscript: 3.0.7
   ts-node: 10.9.1_awa2wsr5thmg3i7jqycphctjfq
@@ -2715,6 +2715,12 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.3
+    dev: true
+
+  /rimraf/4.1.2:
+    resolution: {integrity: sha512-BlIbgFryTbw3Dz6hyoWFhKk+unCcHMSkZGrTFVAx2WmttdBSonsdtRlwiuTbDqTKr+UlXIUqJVS4QT5tUzGENQ==}
+    engines: {node: '>=14'}
+    hasBin: true
     dev: true
 
   /run-async/2.4.1:
