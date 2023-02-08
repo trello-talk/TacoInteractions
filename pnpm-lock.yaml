@@ -10,7 +10,7 @@ specifiers:
   '@types/cron': 2.0.0
   '@types/express': 4.17.17
   '@types/i18next-fs-backend': 1.1.2
-  '@types/node': 18.11.19
+  '@types/node': 18.13.0
   axios: 0.27.2
   cat-loggr: 1.2.2
   common-tags: 1.8.2
@@ -58,14 +58,14 @@ devDependencies:
   '@types/cron': 2.0.0
   '@types/express': 4.17.17
   '@types/i18next-fs-backend': 1.1.2
-  '@types/node': 18.11.19
+  '@types/node': 18.13.0
   eslint: 8.33.0
   eslint-config-snazzah: 1.2.1_typescript@4.9.5
   prisma: 4.9.0
   rimraf: 4.1.2
-  slash-up: 1.2.1_oh65htgi2zcairbebsozeu43xm
+  slash-up: 1.2.1_tyhyuqndse2gkbvwhxqzo5boxm
   ts-devscript: 3.0.7
-  ts-node: 10.9.1_qqdszkrtcshgbphghj7vnvrrby
+  ts-node: 10.9.1_4bewfcp2iebiwuold25d6rgcsy
   typescript: 4.9.5
 
 packages:
@@ -294,7 +294,7 @@ packages:
     resolution: {integrity: sha512-ALYone6pm6QmwZoAgeyNksccT9Q4AWZQ6PvfwR37GT6r6FWUPguq6sUmNGSMV2Wr761oQoBxwGGa6DR5o1DC9g==}
     dependencies:
       '@types/connect': 3.4.35
-      '@types/node': 18.11.19
+      '@types/node': 18.13.0
     dev: true
 
   /@types/common-tags/1.8.1:
@@ -304,20 +304,20 @@ packages:
   /@types/connect/3.4.35:
     resolution: {integrity: sha512-cdeYyv4KWoEgpBISTxWvqYsVy444DOqehiF3fM3ne10AmJ62RSyNkUnxMJXHQWRQQX2eR94m5y1IZyDwBjV9FQ==}
     dependencies:
-      '@types/node': 18.11.19
+      '@types/node': 18.13.0
     dev: true
 
   /@types/cron/2.0.0:
     resolution: {integrity: sha512-xZM08fqvwIXgghtPVkSPKNgC+JoMQ2OHazEvyTKnNf7aWu1aB6/4lBbQFrb03Td2cUGG7ITzMv3mFYnMu6xRaQ==}
     dependencies:
       '@types/luxon': 3.1.0
-      '@types/node': 18.11.19
+      '@types/node': 18.13.0
     dev: true
 
   /@types/express-serve-static-core/4.17.33:
     resolution: {integrity: sha512-TPBqmR/HRYI3eC2E5hmiivIzv+bidAfXofM+sbonAGvyDhySGw9/PQZFt2BLOrjUUR++4eJVpx6KnLQK1Fk9tA==}
     dependencies:
-      '@types/node': 18.11.19
+      '@types/node': 18.13.0
       '@types/qs': 6.9.7
       '@types/range-parser': 1.2.4
     dev: true
@@ -348,7 +348,7 @@ packages:
   /@types/keyv/3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
-      '@types/node': 18.11.19
+      '@types/node': 18.13.0
     dev: true
 
   /@types/luxon/3.1.0:
@@ -359,8 +359,8 @@ packages:
     resolution: {integrity: sha512-Y4XFY5VJAuw0FgAqPNd6NNoV44jbq9Bz2L7Rh/J6jLTiHBSBJa9fxqQIvkIld4GsoDOcCbvzOUAbLPsSKKg+uA==}
     dev: true
 
-  /@types/node/18.11.19:
-    resolution: {integrity: sha512-YUgMWAQBWLObABqrvx8qKO1enAvBUdjZOAWQ5grBAkp5LQv45jBvYKZ3oFS9iKRCQyFjqw6iuEa1vmFqtxYLZw==}
+  /@types/node/18.13.0:
+    resolution: {integrity: sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==}
     dev: true
 
   /@types/qs/6.9.7:
@@ -374,7 +374,7 @@ packages:
   /@types/responselike/1.0.0:
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
     dependencies:
-      '@types/node': 18.11.19
+      '@types/node': 18.13.0
     dev: true
 
   /@types/semver/7.3.13:
@@ -385,7 +385,7 @@ packages:
     resolution: {integrity: sha512-z5xyF6uh8CbjAu9760KDKsH2FcDxZ2tFCsA4HIMWE6IkiYMXfVoa+4f9KX+FN0ZLsaMw1WNG2ETLA6N+/YA+cg==}
     dependencies:
       '@types/mime': 3.0.1
-      '@types/node': 18.11.19
+      '@types/node': 18.13.0
     dev: true
 
   /@typescript-eslint/eslint-plugin/5.46.1_6keo6vt5qskgv7uzbtvjhrraue:
@@ -2823,7 +2823,7 @@ packages:
       lodash.isequal: 4.5.0
       tweetnacl: 1.0.3
 
-  /slash-up/1.2.1_oh65htgi2zcairbebsozeu43xm:
+  /slash-up/1.2.1_tyhyuqndse2gkbvwhxqzo5boxm:
     resolution: {integrity: sha512-muCgCC0OE2VrpoQnSh4+eQl/Pax1XQCo8jrv0ucdNXrGgydbgwh3RjU9NUJ6i2Yfa5qHAYItb4CLBTPfNbRF2g==}
     engines: {node: '>=14'}
     hasBin: true
@@ -2837,7 +2837,7 @@ packages:
       find-up: 5.0.0
       log-symbols: 4.1.0
       slash-create: 5.11.0_fastify@4.12.0
-      ts-node: 10.9.1_qqdszkrtcshgbphghj7vnvrrby
+      ts-node: 10.9.1_4bewfcp2iebiwuold25d6rgcsy
       yargs: 17.6.2
     transitivePeerDependencies:
       - '@swc/core'
@@ -3019,7 +3019,7 @@ packages:
       - supports-color
     dev: true
 
-  /ts-node/10.9.1_qqdszkrtcshgbphghj7vnvrrby:
+  /ts-node/10.9.1_4bewfcp2iebiwuold25d6rgcsy:
     resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
     hasBin: true
     peerDependencies:
@@ -3038,7 +3038,7 @@ packages:
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.3
-      '@types/node': 18.11.19
+      '@types/node': 18.13.0
       acorn: 8.8.1
       acorn-walk: 8.2.0
       arg: 4.1.3
