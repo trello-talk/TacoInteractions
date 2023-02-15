@@ -19,7 +19,7 @@ specifiers:
   dotenv: 16.0.3
   eslint: 8.33.0
   eslint-config-snazzah: 1.2.1
-  fastify: 4.12.0
+  fastify: 4.13.0
   fuzzy: 0.1.3
   i18next: 22.4.9
   i18next-fs-backend: 2.1.1
@@ -45,13 +45,13 @@ dependencies:
   cron: 2.2.0
   dayjs: 1.11.7
   dotenv: 16.0.3
-  fastify: 4.12.0
+  fastify: 4.13.0
   fuzzy: 0.1.3
   i18next: 22.4.9
   i18next-fs-backend: 2.1.1
   ioredis: 5.2.5
   nanoid: 3.3.4
-  slash-create: 5.11.0_fastify@4.12.0
+  slash-create: 5.11.0_fastify@4.13.0
 
 devDependencies:
   '@types/common-tags': 1.8.1
@@ -63,7 +63,7 @@ devDependencies:
   eslint-config-snazzah: 1.2.1_typescript@4.9.5
   prisma: 4.9.0
   rimraf: 4.1.2
-  slash-up: 1.2.1_tyhyuqndse2gkbvwhxqzo5boxm
+  slash-up: 1.2.1_krrihkwnmtmqkqzld3nhkddvee
   ts-devscript: 3.0.7
   ts-node: 10.9.1_4bewfcp2iebiwuold25d6rgcsy
   typescript: 4.9.5
@@ -1527,8 +1527,8 @@ packages:
   /fast-uri/2.2.0:
     resolution: {integrity: sha512-cIusKBIt/R/oI6z/1nyfe2FvGKVTohVRfvkOhvx0nCEW+xf5NoCXjAHcWp93uOUBchzYcsvPlrapAdX1uW+YGg==}
 
-  /fastify/4.12.0:
-    resolution: {integrity: sha512-Hh2GCsOCqnOuewWSvqXlpq5V/9VA+/JkVoooQWUhrU6gryO9+/UGOoF/dprGcKSDxkM/9TkMXSffYp8eA/YhYQ==}
+  /fastify/4.13.0:
+    resolution: {integrity: sha512-p9ibdFWH3pZ7KPgmfHPKGUy2W4EWU2TEpwlcu58w4CwGyU3ARFfh2kwq6zpZ5W2ZGVbufi4tZbqHIHAlX/9Z/A==}
     dependencies:
       '@fastify/ajv-compiler': 3.5.0
       '@fastify/error': 3.2.0
@@ -2806,7 +2806,7 @@ packages:
     resolution: {integrity: sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==}
     dev: true
 
-  /slash-create/5.11.0_fastify@4.12.0:
+  /slash-create/5.11.0_fastify@4.13.0:
     resolution: {integrity: sha512-FIJxEv6gOXLCYf1ds7mdcsJywyrw359h2ytACEJ9DL/8LQ6CujAov4bbnZjSvgmr/QsztUvZEX9B4bIQjQtoNA==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -2819,11 +2819,11 @@ packages:
         optional: true
     dependencies:
       eventemitter3: 5.0.0
-      fastify: 4.12.0
+      fastify: 4.13.0
       lodash.isequal: 4.5.0
       tweetnacl: 1.0.3
 
-  /slash-up/1.2.1_tyhyuqndse2gkbvwhxqzo5boxm:
+  /slash-up/1.2.1_krrihkwnmtmqkqzld3nhkddvee:
     resolution: {integrity: sha512-muCgCC0OE2VrpoQnSh4+eQl/Pax1XQCo8jrv0ucdNXrGgydbgwh3RjU9NUJ6i2Yfa5qHAYItb4CLBTPfNbRF2g==}
     engines: {node: '>=14'}
     hasBin: true
@@ -2836,7 +2836,7 @@ packages:
       enquirer: 2.3.6
       find-up: 5.0.0
       log-symbols: 4.1.0
-      slash-create: 5.11.0_fastify@4.12.0
+      slash-create: 5.11.0_fastify@4.13.0
       ts-node: 10.9.1_4bewfcp2iebiwuold25d6rgcsy
       yargs: 17.6.2
     transitivePeerDependencies:
