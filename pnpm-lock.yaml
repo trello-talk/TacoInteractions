@@ -21,7 +21,7 @@ specifiers:
   eslint-config-snazzah: 1.2.1
   fastify: 4.14.1
   fuzzy: 0.1.3
-  i18next: 22.4.10
+  i18next: 22.4.11
   i18next-fs-backend: 2.1.1
   ioredis: 5.3.1
   nanoid: 3.3.4
@@ -47,7 +47,7 @@ dependencies:
   dotenv: 16.0.3
   fastify: 4.14.1
   fuzzy: 0.1.3
-  i18next: 22.4.10
+  i18next: 22.4.11
   i18next-fs-backend: 2.1.1
   ioredis: 5.3.1
   nanoid: 3.3.4
@@ -1862,8 +1862,8 @@ packages:
       '@babel/runtime': 7.20.6
     dev: true
 
-  /i18next/22.4.10:
-    resolution: {integrity: sha512-3EqgGK6fAJRjnGgfkNSStl4mYLCjUoJID338yVyLMj5APT67HUtWoqSayZewiiC5elzMUB1VEUwcmSCoeQcNEA==}
+  /i18next/22.4.11:
+    resolution: {integrity: sha512-ShfTzXVMjXdF2iPiT/wbizOrssLh9Ab6VpuVROihLCAu+u25KbZiEYVgsA0W6g0SgjPa/JmGWcUEV/g6cKzEjQ==}
     dependencies:
       '@babel/runtime': 7.20.6
     dev: false
