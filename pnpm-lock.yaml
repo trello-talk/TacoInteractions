@@ -7,14 +7,14 @@ specifiers:
   '@sentry/node': 7.31.1
   '@sentry/tracing': 7.31.1
   '@types/common-tags': 1.8.1
-  '@types/cron': 2.0.0
+  '@types/cron': 2.0.1
   '@types/express': 4.17.17
   '@types/i18next-fs-backend': 1.1.2
   '@types/node': 18.15.3
   axios: 0.27.2
   cat-loggr: 1.2.2
   common-tags: 1.8.2
-  cron: 2.2.0
+  cron: 2.3.0
   dayjs: 1.11.7
   dotenv: 16.0.3
   eslint: 8.36.0
@@ -42,7 +42,7 @@ dependencies:
   axios: 0.27.2
   cat-loggr: 1.2.2
   common-tags: 1.8.2
-  cron: 2.2.0
+  cron: 2.3.0
   dayjs: 1.11.7
   dotenv: 16.0.3
   fastify: 4.14.1
@@ -55,7 +55,7 @@ dependencies:
 
 devDependencies:
   '@types/common-tags': 1.8.1
-  '@types/cron': 2.0.0
+  '@types/cron': 2.0.1
   '@types/express': 4.17.17
   '@types/i18next-fs-backend': 1.1.2
   '@types/node': 18.15.3
@@ -539,8 +539,8 @@ packages:
       '@types/node': 18.15.3
     dev: true
 
-  /@types/cron/2.0.0:
-    resolution: {integrity: sha512-xZM08fqvwIXgghtPVkSPKNgC+JoMQ2OHazEvyTKnNf7aWu1aB6/4lBbQFrb03Td2cUGG7ITzMv3mFYnMu6xRaQ==}
+  /@types/cron/2.0.1:
+    resolution: {integrity: sha512-WHa/1rtNtD2Q/H0+YTTZoty+/5rcE66iAFX2IY+JuUoOACsevYyFkSYu/2vdw+G5LrmO7Lxowrqm0av4k3qWNQ==}
     dependencies:
       '@types/luxon': 3.1.0
       '@types/node': 18.15.3
@@ -1191,8 +1191,8 @@ packages:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
     dev: true
 
-  /cron/2.2.0:
-    resolution: {integrity: sha512-GPiI3OgMv83XRtEUc2gUdaLvJhO3XbLN288layOBkDTupg0RK5IECNGpkykIMHg+muVR2bxt29b0xvCAcBrjYQ==}
+  /cron/2.3.0:
+    resolution: {integrity: sha512-ZN5HP8zDY41sJolMsbc+GksRATcbvkPKF5wR/qc8FrV4NBVi9ORQa1HmYa5GydaysUB80X9XpRlRkooa5uEtTA==}
     dependencies:
       luxon: 3.2.1
     dev: false
