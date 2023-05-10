@@ -57,7 +57,7 @@
     "@types/cron": "2.0.1",
     "@types/express": "4.17.17",
     "@types/i18next-fs-backend": "1.1.2",
-    "@types/node": "18.16.3",
+    "@types/node": "18.16.7",
     "eslint": "8.40.0",
     "eslint-config-snazzah": "1.2.1",
     "prisma": "4.13.0",
