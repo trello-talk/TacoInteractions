@@ -39,7 +39,7 @@
     "cat-loggr": "1.2.2",
     "common-tags": "1.8.2",
     "cron": "2.3.0",
-    "dayjs": "1.11.7",
+    "dayjs": "1.11.8",
     "dotenv": "16.0.3",
     "fastify": "4.17.0",
     "fuzzy": "0.1.3",
