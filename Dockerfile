@@ -10,7 +10,7 @@ COPY package.json .
 COPY pnpm-lock.yaml .
 
 RUN apk add --update --no-cache git
-RUN npm install -g pnpm@7
+RUN npm install -g pnpm@8
 
 RUN pnpm install --frozen-lockfile
 
@@ -28,7 +28,7 @@ COPY pnpm-lock.yaml .
 COPY ./prisma .
 
 RUN apk add --update --no-cache git
-RUN npm install -g pnpm@7
+RUN npm install -g pnpm@8
 
 RUN pnpm install --frozen-lockfile --prod --no-optional
 RUN pnpm dlx prisma generate
@@ -37,7 +37,7 @@ RUN pnpm dlx prisma generate
 FROM --platform=$BUILDPLATFORM node:18-alpine3.16
 
 RUN apk add --update --no-cache dumb-init git
-RUN npm install -g pnpm@7
+RUN npm install -g pnpm@8
 
 WORKDIR /app
 
