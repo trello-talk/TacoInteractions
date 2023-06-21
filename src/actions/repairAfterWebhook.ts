@@ -20,7 +20,7 @@ export const action: ActionFunction = {
           {
             name: !action.webhookName || action.webhookName.toLowerCase() === 'clyde' ? t('webhook.new_wh_name') : truncate(action.webhookName, 32)
           },
-          `Requested by ${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`
+          `Requested by ${ctx.user.discriminator === '0' ? ctx.user.username : `${ctx.user.username}#${ctx.user.discriminator}`} (${ctx.user.id})`
         );
       } catch (e) {
         logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${action.channelID})`, e);

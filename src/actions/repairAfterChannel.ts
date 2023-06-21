@@ -34,7 +34,7 @@ export const action: ActionFunction = {
           {
             name: !action.webhookName || action.webhookName.toLowerCase() === 'clyde' ? t('webhook.new_wh_name') : truncate(action.webhookName, 32)
           },
-          `Requested by ${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id})`
+          `Requested by ${ctx.user.discriminator === '0' ? ctx.user.username : `${ctx.user.username}#${ctx.user.discriminator}`} (${ctx.user.id})`
         );
       } catch (e) {
         logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${data.id})`, e);
@@ -92,7 +92,9 @@ export const action: ActionFunction = {
                 .filter((dwh) => dwh.token)
                 .map((dwh) => ({
                   label: truncate(dwh.name, 100),
-                  description: t('webhook.created_by', { user: `${dwh.user.username}#${dwh.user.discriminator}` }),
+                  description: t('webhook.created_by', {
+                    user: dwh.user.discriminator === '0' ? dwh.user.username : `${dwh.user.username}#${dwh.user.discriminator}`
+                  }),
                   value: dwh.id
                 })),
               custom_id: `action:${newAction}`,
