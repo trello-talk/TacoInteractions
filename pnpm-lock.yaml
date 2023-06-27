@@ -39,8 +39,8 @@ dependencies:
     specifier: 16.3.1
     version: 16.3.1
   fastify:
-    specifier: 4.17.0
-    version: 4.17.0
+    specifier: 4.18.0
+    version: 4.18.0
   fuzzy:
     specifier: 0.1.3
     version: 0.1.3
@@ -58,7 +58,7 @@ dependencies:
     version: 3.3.6
   slash-create:
     specifier: 5.12.0
-    version: 5.12.0(fastify@4.17.0)
+    version: 5.12.0(fastify@4.18.0)
 
 devDependencies:
   '@types/common-tags':
@@ -90,7 +90,7 @@ devDependencies:
     version: 5.0.1
   slash-up:
     specifier: 1.3.0
-    version: 1.3.0(fastify@4.17.0)
+    version: 1.3.0(fastify@4.18.0)
   ts-devscript:
     specifier: 3.0.7
     version: 3.0.7
@@ -700,7 +700,7 @@ packages:
       ignore: 5.2.1
       natural-compare-lite: 1.4.0
       regexpp: 3.2.0
-      semver: 7.3.8
+      semver: 7.5.3
       tsutils: 3.21.0(typescript@5.0.4)
       typescript: 5.0.4
     transitivePeerDependencies:
@@ -774,7 +774,7 @@ packages:
       debug: 4.3.4
       globby: 11.1.0
       is-glob: 4.0.3
-      semver: 7.3.8
+      semver: 7.5.3
       tsutils: 3.21.0(typescript@5.0.4)
       typescript: 5.0.4
     transitivePeerDependencies:
@@ -795,7 +795,7 @@ packages:
       eslint: 8.43.0
       eslint-scope: 5.1.1
       eslint-utils: 3.0.0(eslint@8.43.0)
-      semver: 7.3.8
+      semver: 7.5.3
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -1001,8 +1001,8 @@ packages:
       source-map-support: 0.5.21
     dev: true
 
-  /avvio@8.2.0:
-    resolution: {integrity: sha512-bbCQdg7bpEv6kGH41RO/3B2/GMMmJSo2iBK+X8AWN9mujtfUipMDfIjsgHCfpnKqoGEQrrmCDKSa5OQ19+fDmg==}
+  /avvio@8.2.1:
+    resolution: {integrity: sha512-TAlMYvOuwGyLK3PfBb5WKBXZmXz2fVCgv23d6zZFdle/q3gPjmxBaeuC0pY0Dzs5PWMSgfqqEZkrye19GlDTgw==}
     dependencies:
       archy: 1.0.0
       debug: 4.3.4
@@ -1875,24 +1875,24 @@ packages:
   /fast-uri@2.2.0:
     resolution: {integrity: sha512-cIusKBIt/R/oI6z/1nyfe2FvGKVTohVRfvkOhvx0nCEW+xf5NoCXjAHcWp93uOUBchzYcsvPlrapAdX1uW+YGg==}
 
-  /fastify@4.17.0:
-    resolution: {integrity: sha512-tzuY1tgWJo2Y6qEKwmLhFvACUmr68Io2pqP/sDKU71KRM6A6R3DrCDqLGqANbeLZcKUfdfY58ut35CGqemcTgg==}
+  /fastify@4.18.0:
+    resolution: {integrity: sha512-L5o/2GEkBastQ3HV0dtKo7SUZ497Z1+q4fcqAoPyq6JCQ/8zdk1JQEoTQwnBWCp+EmA7AQa6mxNqSAEhzP0RwQ==}
     dependencies:
       '@fastify/ajv-compiler': 3.5.0
       '@fastify/error': 3.2.0
       '@fastify/fast-json-stringify-compiler': 4.3.0
       abstract-logging: 2.0.1
-      avvio: 8.2.0
+      avvio: 8.2.1
       fast-content-type-parse: 1.0.0
       fast-json-stringify: 5.7.0
       find-my-way: 7.6.0
-      light-my-request: 5.8.0
-      pino: 8.8.0
-      process-warning: 2.1.0
+      light-my-request: 5.10.0
+      pino: 8.14.1
+      process-warning: 2.2.0
       proxy-addr: 2.0.7
       rfdc: 1.3.0
       secure-json-parse: 2.6.0
-      semver: 7.3.8
+      semver: 7.5.3
       tiny-lru: 11.0.1
     transitivePeerDependencies:
       - supports-color
@@ -2560,11 +2560,11 @@ packages:
       immediate: 3.0.6
     dev: false
 
-  /light-my-request@5.8.0:
-    resolution: {integrity: sha512-4BtD5C+VmyTpzlDPCZbsatZMJVgUIciSOwYhJDCbLffPZ35KoDkDj4zubLeHDEb35b4kkPeEv5imbh+RJxK/Pg==}
+  /light-my-request@5.10.0:
+    resolution: {integrity: sha512-ZU2D9GmAcOUculTTdH9/zryej6n8TzT+fNGdNtm6SDp5MMMpHrJJkvAdE3c6d8d2chE9i+a//dS9CWZtisknqA==}
     dependencies:
       cookie: 0.5.0
-      process-warning: 2.1.0
+      process-warning: 2.2.0
       set-cookie-parser: 2.5.1
 
   /localforage@1.10.0:
@@ -2899,8 +2899,8 @@ packages:
   /pino-std-serializers@6.0.0:
     resolution: {integrity: sha512-mMMOwSKrmyl+Y12Ri2xhH1lbzQxwwpuru9VjyJpgFIH4asSj88F2csdMwN6+M5g1Ll4rmsYghHLQJw81tgZ7LQ==}
 
-  /pino@8.8.0:
-    resolution: {integrity: sha512-cF8iGYeu2ODg2gIwgAHcPrtR63ILJz3f7gkogaHC/TXVVXxZgInmNYiIpDYEwgEkxZti2Se6P2W2DxlBIZe6eQ==}
+  /pino@8.14.1:
+    resolution: {integrity: sha512-8LYNv7BKWXSfS+k6oEc6occy5La+q2sPwU3q2ljTX5AZk7v+5kND2o5W794FyRaqha6DJajmkNRsWtPpFyMUdw==}
     hasBin: true
     dependencies:
       atomic-sleep: 1.0.0
@@ -2908,7 +2908,7 @@ packages:
       on-exit-leak-free: 2.1.0
       pino-abstract-transport: 1.0.0
       pino-std-serializers: 6.0.0
-      process-warning: 2.1.0
+      process-warning: 2.2.0
       quick-format-unescaped: 4.0.4
       real-require: 0.2.0
       safe-stable-stringify: 2.4.1
@@ -2946,8 +2946,8 @@ packages:
     dependencies:
       '@prisma/engines': 4.14.1
 
-  /process-warning@2.1.0:
-    resolution: {integrity: sha512-9C20RLxrZU/rFnxWncDkuF6O999NdIf3E1ws4B0ZeY3sRVPzWBMsYDE2lxjxhiXxg464cQTgKUGm8/i6y2YGXg==}
+  /process-warning@2.2.0:
+    resolution: {integrity: sha512-/1WZ8+VQjR6avWOgHeEPd7SDQmFQ1B5mC1eRXsCm5TarlNmx/wCsa5GEaxGm05BORRtyG/Ex/3xq3TuRvq57qg==}
 
   /process@0.11.10:
     resolution: {integrity: sha512-cdGef/drWFoydD1JsMzuFf8100nZl+GT+yacc2bEced5f9Rjk4z+WtFUTBu9PhOi9j/jfmBPu0mMEY4wIdAF8A==}
@@ -3177,8 +3177,8 @@ packages:
     hasBin: true
     dev: true
 
-  /semver@7.3.8:
-    resolution: {integrity: sha512-NB1ctGL5rlHrPJtFDVIVzTyQylMLu9N9VICA6HSFJo8MCGVTMW6gfpicwKmmK/dAjTOrqu5l63JJOpDSrAis3A==}
+  /semver@7.5.3:
+    resolution: {integrity: sha512-QBlUtyVk/5EeHbi7X0fw6liDZc7BBmEaSYn01fMU1OUYbf6GPsbTtd8WmnqbI20SeycoHSeiybkE/q1Q+qlThQ==}
     engines: {node: '>=10'}
     hasBin: true
     dependencies:
@@ -3216,7 +3216,7 @@ packages:
     engines: {node: '>=14'}
     dev: true
 
-  /slash-create@5.12.0(fastify@4.17.0):
+  /slash-create@5.12.0(fastify@4.18.0):
     resolution: {integrity: sha512-IGYIs7utRiJ9AzOhTdLEb3dJHKCsSkVdiqvPCGsfs55dIwly+BzLKxMnnMP+J8JjIJvxSEcfyQV5ahacsoq6bQ==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -3229,11 +3229,11 @@ packages:
         optional: true
     dependencies:
       eventemitter3: 5.0.0
-      fastify: 4.17.0
+      fastify: 4.18.0
       lodash.isequal: 4.5.0
       tweetnacl: 1.0.3
 
-  /slash-up@1.3.0(fastify@4.17.0):
+  /slash-up@1.3.0(fastify@4.18.0):
     resolution: {integrity: sha512-M3KwqVWyN8tY0mYtQXdjF23zbSh0UErZ/4jQy9+zntvJV9gdYxCFajZ1wbosdoat3fvAEcH3h6LI14A52PNQWg==}
     engines: {node: '>=14'}
     hasBin: true
@@ -3247,7 +3247,7 @@ packages:
       enquirer: 2.3.6
       find-up: 5.0.0
       log-symbols: 4.1.0
-      slash-create: 5.12.0(fastify@4.17.0)
+      slash-create: 5.12.0(fastify@4.18.0)
       yargs: 17.7.1
     transitivePeerDependencies:
       - express
