@@ -30,8 +30,8 @@ dependencies:
     specifier: 1.8.2
     version: 1.8.2
   cron:
-    specifier: 2.3.0
-    version: 2.3.0
+    specifier: 2.4.0
+    version: 2.4.0
   dayjs:
     specifier: 1.11.9
     version: 1.11.9
@@ -1274,8 +1274,8 @@ packages:
     resolution: {integrity: sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==}
     dev: true
 
-  /cron@2.3.0:
-    resolution: {integrity: sha512-ZN5HP8zDY41sJolMsbc+GksRATcbvkPKF5wR/qc8FrV4NBVi9ORQa1HmYa5GydaysUB80X9XpRlRkooa5uEtTA==}
+  /cron@2.4.0:
+    resolution: {integrity: sha512-Cx77ic1TyIAtUggr0oAhtS8MLzPBUqGNIvdDM7jE3oFIxfe8LXWI9q3iQN/H2CebAiMir53LQKWOhEKnzkJTAQ==}
     dependencies:
       luxon: 3.2.1
     dev: false
