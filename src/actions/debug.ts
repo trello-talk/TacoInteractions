@@ -1,7 +1,7 @@
 import { ComponentContext } from 'slash-create';
 import { inspect } from 'util';
 
-import { ActionFunction, ActionType } from '../util/actions';
+import { ActionFunction, ActionType } from "../util/actions";
 
 export const action: ActionFunction = {
   type: ActionType.DEBUG,
