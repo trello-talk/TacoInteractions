@@ -24,7 +24,7 @@ export class TrelloAPIError extends Error {
   }
 }
 
-async function recacheKey(key: string, data: any, defaultTtl = 60 * 60) {
+async function recacheKey(key: string, data: any, defaultTtl = 10 * 60) {
   const ttl = await client.ttl(key);
   await client.set(key, JSON.stringify(data), 'EX', ttl || defaultTtl);
 }
@@ -38,7 +38,7 @@ export async function getMember(token: string, id: string): Promise<TrelloMember
   const response = await trello.getMember(id);
   if (response.status >= 400) throw new TrelloAPIError(response);
 
-  await client.set(key, JSON.stringify(response.data), 'EX', 3 * 60 * 60);
+  await client.set(key, JSON.stringify(response.data), 'EX', 10 * 60);
   return response.data;
 }
 
@@ -128,8 +128,8 @@ export async function getBoard(token: string, id: string, memberId: string, requ
     cards: subscribedCards
   };
 
-  await client.set(key, JSON.stringify(response.data), 'EX', 3 * 60 * 60);
-  await client.set(subsKey, JSON.stringify(subscriptions), 'EX', 3 * 60 * 60);
+  await client.set(key, JSON.stringify(response.data), 'EX', 10 * 60);
+  await client.set(subsKey, JSON.stringify(subscriptions), 'EX', 20 * 60);
   return [response.data, subscriptions];
 }
 
@@ -171,7 +171,7 @@ export async function getCard(token: string, id: string): Promise<TrelloCard> {
   const response = await trello.getCard(id);
   if (response.status >= 400) throw new TrelloAPIError(response);
 
-  await client.set(key, JSON.stringify(response.data), 'EX', 30 * 60);
+  await client.set(key, JSON.stringify(response.data), 'EX', 5 * 60);
   return response.data;
 }
 
