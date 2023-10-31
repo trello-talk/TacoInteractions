@@ -63,8 +63,8 @@ dependencies:
     specifier: 3.3.6
     version: 3.3.6
   slash-create:
-    specifier: 5.13.0
-    version: 5.13.0(fastify@4.24.3)
+    specifier: 5.14.0
+    version: 5.14.0(fastify@4.24.3)
   slash-up:
     specifier: 1.3.0
     version: 1.3.0(fastify@4.24.3)
@@ -3396,8 +3396,8 @@ packages:
     engines: {node: '>=14'}
     dev: true
 
-  /slash-create@5.13.0(fastify@4.24.3):
-    resolution: {integrity: sha512-cxvX6qCfVAhSuR+fkgN3u705c+lD3XuHCV/HWNCa7upHH9R46K9v73+AShMmWfmWlBszM9zJFKcB1MCgS/bHUw==}
+  /slash-create@5.14.0(fastify@4.24.3):
+    resolution: {integrity: sha512-V+Zcvs2a9e3obm+zrWw3jr8HcoX5Jtj6cI1ByT0/henOTdEsfh1roOLLhLiLxo80poBZfkLcy3fnn5hTAwF59g==}
     engines: {node: '>=14'}
     peerDependencies:
       express: ^4
@@ -3428,7 +3428,7 @@ packages:
       enquirer: 2.4.1
       find-up: 5.0.0
       log-symbols: 4.1.0
-      slash-create: 5.13.0(fastify@4.24.3)
+      slash-create: 5.14.0(fastify@4.24.3)
       yargs: 17.7.2
     transitivePeerDependencies:
       - express
