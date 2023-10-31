@@ -83,8 +83,8 @@ devDependencies:
     specifier: 4.17.20
     version: 4.17.20
   '@types/i18next-fs-backend':
-    specifier: 1.1.2
-    version: 1.1.2
+    specifier: 1.1.4
+    version: 1.1.4
   '@types/node':
     specifier: 20.5.9
     version: 20.5.9
@@ -656,8 +656,8 @@ packages:
     resolution: {integrity: sha512-lPG6KlZs88gef6aD85z3HNkztpj7w2R7HmR3gygjfXCQmsLloWNARFkMuzKiiY8FGdh1XDpgBdrSf4aKDiA7Kg==}
     dev: true
 
-  /@types/i18next-fs-backend@1.1.2:
-    resolution: {integrity: sha512-ZzTRXA5B0x0oGhzKNp08IsYjZpli4LjRZpg3q4j0XFxN5lKG2MVLnR4yHX8PPExBk4sj9Yfk1z9O6CjPrAlmIQ==}
+  /@types/i18next-fs-backend@1.1.4:
+    resolution: {integrity: sha512-wzpP9CTffoFo5er1REmfKVaZm5Ox+rVEucy6mTRgEDGIUrz3+Ixw/bmqkJLUooLmvDEf8JlnZutGzOZo7s1BaA==}
     dependencies:
       i18next: 21.10.0
     dev: true
