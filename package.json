@@ -47,7 +47,7 @@
     "i18next-fs-backend": "2.2.0",
     "ioredis": "5.3.2",
     "nanoid": "3.3.6",
-    "slash-create": "6.0.1",
+    "slash-create": "5.14.0",
     "slash-up": "1.4.2"
   },
   "devDependencies": {
