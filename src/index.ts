@@ -41,6 +41,12 @@ server.route({
   }
 });
 
+// Bug for slash-create+fastify, where undefined responses are being returned before the real requests replies.
+server.addHook('onSend', (request, reply, payload, done) => {
+  if (payload === undefined) return;
+  done(null, payload);
+});
+
 creator.on('debug', (message) => logger.log(message));
 creator.on('warn', (message) => logger.warn(message));
 creator.on('error', (error) => logger.error(error));
