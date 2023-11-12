@@ -63,8 +63,8 @@ dependencies:
     specifier: 3.3.6
     version: 3.3.6
   slash-create:
-    specifier: 6.0.1
-    version: 6.0.1(fastify@4.24.3)
+    specifier: 5.14.0
+    version: 5.14.0(fastify@4.24.3)
   slash-up:
     specifier: 1.4.2
     version: 1.4.2(fastify@4.24.3)
@@ -3490,6 +3490,24 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
     dev: true
+
+  /slash-create@5.14.0(fastify@4.24.3):
+    resolution: {integrity: sha512-V+Zcvs2a9e3obm+zrWw3jr8HcoX5Jtj6cI1ByT0/henOTdEsfh1roOLLhLiLxo80poBZfkLcy3fnn5hTAwF59g==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      express: ^4
+      fastify: ^3 || ^4
+    peerDependenciesMeta:
+      express:
+        optional: true
+      fastify:
+        optional: true
+    dependencies:
+      eventemitter3: 5.0.1
+      fastify: 4.24.3
+      lodash.isequal: 4.5.0
+      tweetnacl: 1.0.3
+    dev: false
 
   /slash-create@6.0.1(fastify@4.24.3):
     resolution: {integrity: sha512-2KZc2WLMNLGzKlEX/uQN47qtL/TUKfl3Vd2/EPJEqYHXHWABeyYfrtelWZwjGJevYNYKNnVoHkQ87g6pwRRQ/A==}
