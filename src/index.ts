@@ -55,6 +55,7 @@ creator.on('commandError', (command, error) => logger.error(`Command ${command.c
 creator.withServer(new FastifyServer(server)).registerCommandsIn(path.join(__dirname, 'commands'));
 
 creator.on('componentInteraction', async (ctx) => {
+  logger.info(`${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran component ${ctx.customID}`);
   try {
     if (ctx.customID === 'none') return ctx.acknowledge();
     else if (ctx.customID === 'delete') {
@@ -136,6 +137,7 @@ creator.on('componentInteraction', async (ctx) => {
 });
 
 creator.on('modalInteraction', async (ctx) => {
+  logger.info(`${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran modal ${ctx.customID}`);
   try {
     const { t } = await getData(ctx);
     if (ctx.customID.startsWith('action:')) {
