@@ -52,7 +52,7 @@ creator.on('commandRun', (command, _, ctx) => {
 creator.on('commandRegister', (command) => logger.log(`Registered command ${command.commandName}`));
 creator.on('commandError', (command, error) => logger.error(`Command ${command.commandName}:`, error));
 
-creator.withServer(new FastifyServer(server));
+creator.withServer(new FastifyServer(server)).registerCommandsIn(path.join(__dirname, 'commands'));
 
 creator.on('componentInteraction', async (ctx) => {
   try {
@@ -197,7 +197,6 @@ creator.on('modalInteraction', async (ctx) => {
 });
 
 (async () => {
-  await creator.registerCommandsIn(path.join(__dirname, 'commands'));
   await initLocale();
   await connect();
   await prisma.$connect();
