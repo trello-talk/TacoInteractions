@@ -55,7 +55,7 @@ creator.on('commandError', (command, error) => logger.error(`Command ${command.c
 creator.withServer(new FastifyServer(server)).registerCommandsIn(path.join(__dirname, 'commands'));
 
 creator.on('componentInteraction', async (ctx) => {
-  logger.info(`${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran component ${ctx.customID}`);
+  logger.info(`${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran component ${ctx.customID} for message ${ctx.message.id}`);
   try {
     if (ctx.customID === 'none') return ctx.acknowledge();
     else if (ctx.customID === 'delete') {
