@@ -68,7 +68,7 @@ creator.on('componentInteraction', async (ctx) => {
       try {
         await deleteInteraction(ctx, t);
       } catch (e) {}
-    } else if (ctx.customID.startsWith('prompt:')) return handlePrompt(ctx);
+    } else if (ctx.customID.startsWith('prompt:')) return await handlePrompt(ctx);
     else if (ctx.customID.startsWith('action:')) {
       const { t } = await getData(ctx);
       if (ctx.message.interaction!.user.id !== ctx.user.id)
@@ -79,7 +79,7 @@ creator.on('componentInteraction', async (ctx) => {
 
       const [, actionID, actionType, actionExtra] = ctx.customID.split(':');
       if (!actionID && !actionType)
-        return ctx.send({
+        return await ctx.send({
           content: t('interactions.prompt_no_action_id_or_type'),
           ephemeral: true
         });
@@ -96,11 +96,11 @@ creator.on('componentInteraction', async (ctx) => {
         const actionCache = await client.get(`action:${actionID}`);
         if (!actionCache) {
           if (ctx.message.flags === InteractionResponseFlags.EPHEMERAL)
-            return ctx.send({
+            return await ctx.send({
               content: t('interactions.prompt_action_expired'),
               ephemeral: true
             });
-          return ctx.editParent({
+          return await ctx.editParent({
             content: t('interactions.prompt_action_expired'),
             embeds: [],
             components: []
@@ -112,18 +112,18 @@ creator.on('componentInteraction', async (ctx) => {
       }
 
       if (!actions.has(action.type))
-        return ctx.send({
+        return await ctx.send({
           content: t('interactions.prompt_action_invalid_type'),
           ephemeral: true
         });
 
       if (actions.get(action.type).requiresData && !actionExtra)
-        return ctx.send({
+        return await ctx.send({
           content: t('interactions.prompt_action_requires_data'),
           ephemeral: true
         });
 
-      return actions.get(action.type).onAction(ctx, action);
+      return await actions.get(action.type).onAction(ctx, action);
     }
   } catch (e) {
     logger.error(e);
