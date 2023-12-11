@@ -40,8 +40,9 @@ export default class Trello {
     // User Agent
     options.headers['User-Agent'] = `TacoInteractions (https://github.com/trello-talk/TacoInteractions, ${VERSION}) Node.js/${process.version}`;
 
-    const response = await axios(options);
-    return response;
+    const response = await axios({ ...options, validateStatus: () => true });
+    if (response.status >= 200 && response.status < 300) return response;
+    throw response;
   }
 
   // #region Get methods

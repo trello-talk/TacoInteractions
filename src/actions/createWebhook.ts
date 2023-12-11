@@ -39,7 +39,7 @@ export const action: ActionFunction = {
         name: truncate(action.name || action.board.name, 100),
         memberID: userData.trelloID,
         modelID: action.board.id,
-        trelloWebhookID: trelloWebhook.id,
+        trelloWebhookID: trelloWebhook.data.id,
         guildID: ctx.guildID,
         filters: DEFAULT.toString(),
         locale,

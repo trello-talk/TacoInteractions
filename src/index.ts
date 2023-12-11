@@ -129,6 +129,7 @@ creator.on('componentInteraction', async (ctx) => {
           ephemeral: true
         });
 
+      logger.info(`${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) - Running action ${action.type}`);
       return await actions.get(action.type).onAction(ctx, action);
     }
   } catch (e) {
@@ -189,12 +190,11 @@ creator.on('modalInteraction', async (ctx) => {
       return actions.get(action.type).onAction(ctx, action);
     }
 
-    return ctx.send({
+    return await ctx.send({
       content: t('interactions.modal_unknown'),
       ephemeral: true
     });
   } catch (e) {
-    logger.error(e);
     reportErrorFromModal(ctx, e);
     const { t } = await getData(ctx);
     return ctx.send({

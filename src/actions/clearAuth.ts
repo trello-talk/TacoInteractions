@@ -10,7 +10,7 @@ export const action: ActionFunction = {
     const { userData, t, trello } = await getData(ctx);
     if (!userData || !userData.trelloToken) return void ctx.editParent(t('clearauth.no_auth'), { components: [] });
 
-    await trello.invalidate();
+    await trello.invalidate().catch(() => {});
     await prisma.user.update({
       where: { userID: action.user },
       data: { trelloID: null, trelloToken: null }
