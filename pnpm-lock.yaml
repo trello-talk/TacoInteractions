@@ -63,8 +63,8 @@ dependencies:
     specifier: 5.0.4
     version: 5.0.4
   slash-create:
-    specifier: 5.14.0
-    version: 5.14.0(fastify@4.24.3)
+    specifier: 6.2.1
+    version: 6.2.1(fastify@4.24.3)
   slash-up:
     specifier: 1.4.2
     version: 1.4.2(fastify@4.24.3)
@@ -419,7 +419,7 @@ packages:
     engines: {node: '>= 14'}
     dependencies:
       eslint: 8.56.0
-      jschardet: 3.0.0
+      jschardet: 3.1.3
       lodash: 4.17.21
       utf8: 3.0.0
     transitivePeerDependencies:
@@ -2544,8 +2544,8 @@ packages:
       argparse: 2.0.1
     dev: true
 
-  /jschardet@3.0.0:
-    resolution: {integrity: sha512-lJH6tJ77V8Nzd5QWRkFYCLc13a3vADkh3r/Fi8HupZGWk2OVVDfnZP8V/VgQgZ+lzW0kG2UGb5hFgt3V3ndotQ==}
+  /jschardet@3.1.3:
+    resolution: {integrity: sha512-Q1PKVMK/uu+yjdlobgWIYkUOCR1SqUmW9m/eUJNNj4zI2N12i25v8fYpVf+zCakQeaTdBdhnZTFbVIAVZIVVOg==}
     engines: {node: '>=0.1.90'}
     dev: true
 
@@ -3334,26 +3334,8 @@ packages:
     engines: {node: '>=14'}
     dev: true
 
-  /slash-create@5.14.0(fastify@4.24.3):
-    resolution: {integrity: sha512-V+Zcvs2a9e3obm+zrWw3jr8HcoX5Jtj6cI1ByT0/henOTdEsfh1roOLLhLiLxo80poBZfkLcy3fnn5hTAwF59g==}
-    engines: {node: '>=14'}
-    peerDependencies:
-      express: ^4
-      fastify: ^3 || ^4
-    peerDependenciesMeta:
-      express:
-        optional: true
-      fastify:
-        optional: true
-    dependencies:
-      eventemitter3: 5.0.1
-      fastify: 4.24.3
-      lodash.isequal: 4.5.0
-      tweetnacl: 1.0.3
-    dev: false
-
-  /slash-create@6.0.2(fastify@4.24.3):
-    resolution: {integrity: sha512-V2gqs7Ov3C8hjS2aODwzGUM/4WqpRiNXSPh69Bk3soyL7Kvkc/75HfwOgz9fTNNU+H/u5EMtvjR4hJgey0HKHA==}
+  /slash-create@6.2.1(fastify@4.24.3):
+    resolution: {integrity: sha512-ootudSRNVVeOdTgD4WLWwLOhw31Tfgi3243du3UiqDpGcAUJQNJ4dSBRcf44pmlmT7T/8YppHU1bS847S1iYbg==}
     engines: {node: '>=16'}
     peerDependencies:
       express: ^4
@@ -3368,7 +3350,7 @@ packages:
       fastify: 4.24.3
       lodash.isequal: 4.5.0
       tweetnacl: 1.0.3
-      undici: 5.28.2
+      undici: 5.28.4
     dev: false
 
   /slash-up@1.4.2(fastify@4.24.3):
@@ -3385,7 +3367,7 @@ packages:
       enquirer: 2.4.1
       find-up: 5.0.0
       log-symbols: 4.1.0
-      slash-create: 6.0.2(fastify@4.24.3)
+      slash-create: 6.2.1(fastify@4.24.3)
       yargs: 17.7.2
     transitivePeerDependencies:
       - express
@@ -3711,8 +3693,8 @@ packages:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
     dev: true
 
-  /undici@5.28.2:
-    resolution: {integrity: sha512-wh1pHJHnUeQV5Xa8/kyQhO7WFa8M34l026L5P/+2TYiakvGy5Rdc8jWZVyG7ieht/0WgJLEd3kcU5gKx+6GC8w==}
+  /undici@5.28.4:
+    resolution: {integrity: sha512-72RFADWFqKmUb2hmmvNODKL3p9hcB6Gt2DOQMis1SEBaV6a4MH8soBvzg+95CYhCKPFedut2JY9bMfrDl9D23g==}
     engines: {node: '>=14.0'}
     dependencies:
       '@fastify/busboy': 2.1.0
