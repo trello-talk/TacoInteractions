@@ -209,17 +209,17 @@ export default abstract class Command extends SlashCommand {
     reportErrorFromCommand(ctx, err, this.commandName, 'autocomplete');
   }
 
-  async onError(err: Error, ctx: CommandContext) {
-    if ('response' in err) {
-      const response = (err as any).response as AxiosResponse;
-      if (response.status === 401 && response.data === 'invalid token') {
-        const userData = await prisma.user.update({
-          where: { userID: ctx.user.id },
-          data: { trelloID: null, trelloToken: null }
-        });
-        const t = createT(userData?.locale);
-        return ctx.send(t('auth.expired'), { components: noAuthResponse(t).components });
-      }
+  async onError(err: Error & { response?: AxiosResponse; status?: number; data?: any }, ctx: CommandContext) {
+    if (
+      ('response' in err && err.response.status === 401 && err.response.data === 'invalid token') ||
+      (err.status === 401 && err.data === 'invalid token')
+    ) {
+      const userData = await prisma.user.update({
+        where: { userID: ctx.user.id },
+        data: { trelloID: null, trelloToken: null }
+      });
+      const t = createT(userData?.locale);
+      return ctx.send(t('auth.expired'), { components: noAuthResponse(t).components });
     }
 
     reportErrorFromCommand(ctx, err, ctx.commandName, 'command');
