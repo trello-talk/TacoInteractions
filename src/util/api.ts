@@ -24,7 +24,7 @@ export class TrelloAPIError extends Error {
   }
 }
 
-async function recacheKey(key: string, data: any, defaultTtl = 10 * 60) {
+async function recacheKey(key: string, data: any, defaultTtl = 2 * 60) {
   const ttl = await client.ttl(key);
   await client.set(key, JSON.stringify(data), 'EX', ttl || defaultTtl);
 }
@@ -128,8 +128,8 @@ export async function getBoard(token: string, id: string, memberId: string, requ
     cards: subscribedCards
   };
 
-  await client.set(key, JSON.stringify(response.data), 'EX', 10 * 60);
-  await client.set(subsKey, JSON.stringify(subscriptions), 'EX', 20 * 60);
+  await client.set(key, JSON.stringify(response.data), 'EX', 30);
+  await client.set(subsKey, JSON.stringify(subscriptions), 'EX', 60);
   return [response.data, subscriptions];
 }
 
