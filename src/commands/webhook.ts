@@ -593,7 +593,7 @@ export default class WebhookCommand extends SlashCommand {
               type: ComponentType.ACTION_ROW,
               components: [
                 {
-                  type: ComponentType.SELECT,
+                  type: ComponentType.STRING_SELECT,
                   placeholder: t('webhook.select_webhook_placeholder'),
                   options: discordWebhooks
                     .filter((dwh) => dwh.token)

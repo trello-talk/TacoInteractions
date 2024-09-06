@@ -8,7 +8,7 @@ export const action: ActionFunction = {
   type: ActionType.USER_CLEAR_DATA,
   async onAction(ctx: ComponentContext) {
     const { userData, t, trello } = await getData(ctx);
-    if (!userData) return void ctx.editParent(t('cleardata.no_data'), { components: [] });
+    if (!userData) return void ctx.editParent({ content: t('cleardata.no_data'), components: [] });
 
     try {
       if (userData.trelloToken) await trello.invalidate();
@@ -22,6 +22,6 @@ export const action: ActionFunction = {
         data: { active: false, memberID: null }
       });
 
-    return void ctx.editParent(t('cleardata.done'), { components: [] });
+    return void ctx.editParent({ content: t('cleardata.done'), components: [] });
   }
 };

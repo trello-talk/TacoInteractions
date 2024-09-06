@@ -16,6 +16,6 @@ export const action: ActionFunction = {
     await uncacheBoard(userData.currentBoard);
     await uncacheCard(action.extra);
 
-    return void ctx.editParent(t('deletecard.done'), { components: [] });
+    return void ctx.editParent({ content: t('deletecard.done'), components: [] });
   }
 };

@@ -15,6 +15,6 @@ export const action: ActionFunction = {
     await trello.deleteLabel(action.extra);
     await uncacheBoard(userData.currentBoard);
 
-    return void ctx.editParent(t('deletelabel.done'), { components: [] });
+    return void ctx.editParent({ content: t('deletelabel.done'), components: [] });
   }
 };

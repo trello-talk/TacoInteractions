@@ -167,7 +167,7 @@ export function isElevated(user: string) {
 }
 
 export async function deleteInteraction(ctx: ComponentContext, t: TFunction) {
-  if (ctx.message.flags === InteractionResponseFlags.EPHEMERAL) await ctx.editParent(t('interactions.dismiss'), { components: [] });
+  if (ctx.message.flags === InteractionResponseFlags.EPHEMERAL) await ctx.editParent({ content: t('interactions.dismiss'), components: [] });
   else {
     await ctx.acknowledge();
     await ctx.delete();

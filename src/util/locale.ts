@@ -23,7 +23,6 @@ export const init = async () => {
     fallbackLng: 'en',
     ns: ['commands', 'webhook'],
     defaultNS: 'commands',
-    debug: process.env.COMMANDS_DEBUG === 'true',
     interpolation: {
       escapeValue: false
     },

@@ -11,18 +11,18 @@ export const action: ActionFunction = {
   requiresData: true,
   async onAction(ctx: ComponentContext, action: RepairWebhookAction, data: DiscordChannel) {
     const { t } = await getData(ctx);
-    if (!ctx.guildID) return void ctx.editParent(t('interactions.no_server'), { components: [], embeds: [] });
+    if (!ctx.guildID) return void ctx.editParent({ content: t('interactions.no_server'), components: [], embeds: [] });
 
     let discordWebhooks: DiscordWebhook[];
     try {
       discordWebhooks = action.webhooks.filter((dwh) => dwh.channel_id === data.id);
     } catch (e) {
-      return void ctx.editParent(t('webhook.dwh_fail'), { components: [] });
+      return void ctx.editParent({ content: t('webhook.dwh_fail'), components: [] });
     }
 
     // Special case: if all the webhooks are made by other apps
     if (discordWebhooks.length >= 10 && discordWebhooks.every((dwh) => !dwh.token))
-      return void ctx.editParent(t('webhook.no_dwh_available'), { components: [] });
+      return void ctx.editParent({ content: t('webhook.no_dwh_available'), components: [] });
 
     // If there are no webhooks w/ tokens, we can create a new one
     if (!discordWebhooks.some((dwh) => dwh.token)) {
@@ -38,7 +38,7 @@ export const action: ActionFunction = {
         );
       } catch (e) {
         logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${data.id})`, e);
-        return void ctx.editParent(t('webhook.dwh_fail_create'), { components: [] });
+        return void ctx.editParent({ content: t('webhook.dwh_fail_create'), components: [] });
       }
 
       await prisma.webhook.update({
@@ -67,7 +67,7 @@ export const action: ActionFunction = {
         ]
       });
 
-      return void ctx.editParent(t('webhook.repair_done'), { components: [] });
+      return void ctx.editParent({ content: t('webhook.repair_done'), components: [] });
     }
 
     // If there are webhooks w/ tokens, we need to ask the user to choose one
@@ -86,7 +86,7 @@ export const action: ActionFunction = {
           type: ComponentType.ACTION_ROW,
           components: [
             {
-              type: ComponentType.SELECT,
+              type: ComponentType.STRING_SELECT,
               placeholder: t('webhook.select_webhook_placeholder'),
               options: discordWebhooks
                 .filter((dwh) => dwh.token)

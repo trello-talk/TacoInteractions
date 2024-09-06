@@ -8,7 +8,7 @@ export const action: ActionFunction = {
   type: ActionType.USER_CLEAR_AUTH,
   async onAction(ctx: ComponentContext, action) {
     const { userData, t, trello } = await getData(ctx);
-    if (!userData || !userData.trelloToken) return void ctx.editParent(t('clearauth.no_auth'), { components: [] });
+    if (!userData || !userData.trelloToken) return void ctx.editParent({ content: t('clearauth.no_auth'), components: [] });
 
     await trello.invalidate().catch(() => {});
     await prisma.user.update({
@@ -21,6 +21,6 @@ export const action: ActionFunction = {
         data: { active: false, memberID: null }
       });
 
-    return void ctx.editParent(t('clearauth.done'), { components: [] });
+    return void ctx.editParent({ content: t('clearauth.done'), components: [] });
   }
 };

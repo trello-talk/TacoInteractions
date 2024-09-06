@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { SlashCreator } from 'slash-create';
+import { BaseSlashCreator } from 'slash-create';
 
 import { client } from './redis';
 import Trello from './trello';
@@ -175,23 +175,23 @@ export async function getCard(token: string, id: string): Promise<TrelloCard> {
   return response.data;
 }
 
-export async function getWebhooks(id: string, creator: SlashCreator): Promise<DiscordWebhook[]> {
+export async function getWebhooks(id: string, creator: BaseSlashCreator): Promise<DiscordWebhook[]> {
   const key = `discord.webhooks:${id}`;
   const cached = await client.get(key);
   if (cached) return JSON.parse(cached);
 
-  const webhooks = await creator.requestHandler.request('GET', `/guilds/${id}/webhooks`);
+  const webhooks = await creator.requestHandler.request<DiscordWebhook[]>('GET', `/guilds/${id}/webhooks`);
 
   await client.set(key, JSON.stringify(webhooks), 'EX', 6 * 60 * 60);
   return webhooks;
 }
 
-export async function getChannels(id: string, creator: SlashCreator): Promise<DiscordChannel[]> {
+export async function getChannels(id: string, creator: BaseSlashCreator): Promise<DiscordChannel[]> {
   const key = `discord.channels:${id}`;
   const cached = await client.get(key);
   if (cached) return JSON.parse(cached);
 
-  const channels = await creator.requestHandler.request('GET', `/guilds/${id}/channels`);
+  const channels = await creator.requestHandler.request<DiscordChannel[]>('GET', `/guilds/${id}/channels`);
 
   await client.set(key, JSON.stringify(channels), 'EX', 6 * 60 * 60);
   return channels;

@@ -10,7 +10,7 @@ export const action: ActionFunction = {
   requiresData: true,
   async onAction(ctx: ComponentContext, action: WebhookEditAction, data: string[]) {
     const { userData, t } = await getData(ctx);
-    if (!ctx.guildID) return void ctx.editParent(t('interactions.no_server'), { components: [], embeds: [] });
+    if (!ctx.guildID) return void ctx.editParent({ content: t('interactions.no_server'), components: [], embeds: [] });
     if (!userData || !userData.trelloToken) return void ctx.editParent(noAuthResponse(t));
 
     await prisma.webhook.update({
@@ -18,6 +18,6 @@ export const action: ActionFunction = {
       data: { filters: new WebhookFilters(data).bitfield.toString() }
     });
 
-    return void ctx.editParent(t('webhook.filters_updated'), { components: [], embeds: [] });
+    return void ctx.editParent({ content: t('webhook.filters_updated'), components: [], embeds: [] });
   }
 };

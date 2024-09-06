@@ -135,7 +135,7 @@ export type Prompt = ListPrompt | QueryPrompt | SelectPrompt | AttachmentPrompt 
 export async function handlePrompt(ctx: ComponentContext) {
   const { t, locale } = await getData(ctx);
 
-  if (ctx.message.interaction!.user.id !== ctx.user.id)
+  if (ctx.message.interactionMetadata!.userID !== ctx.user.id)
     return ctx.send({
       content: t(['interactions.prompt_wrong_user', 'interactions.wrong_user']),
       ephemeral: true
@@ -373,7 +373,7 @@ export async function createQueryPrompt(
         type: ComponentType.ACTION_ROW,
         components: [
           {
-            type: ComponentType.SELECT,
+            type: ComponentType.STRING_SELECT,
             ...(prompt.placeholder ? { placeholder: prompt.placeholder } : {}),
             options: prompt.display.map((opt, i) => ({ ...opt, value: String(i) })).slice(offset, prompt.page * 25),
             custom_id: `prompt:${PromptType.QUERY}:${PromptAction.SELECT}`,
@@ -469,7 +469,7 @@ async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, act
         type: ComponentType.ACTION_ROW,
         components: [
           {
-            type: ComponentType.SELECT,
+            type: ComponentType.STRING_SELECT,
             ...(prompt.placeholder ? { placeholder: prompt.placeholder } : {}),
             options: prompt.display.map((opt, i) => ({ ...opt, value: String(i) })).slice(offset, prompt.page * 25),
             custom_id: `prompt:${PromptType.QUERY}:${PromptAction.SELECT}`,
@@ -561,7 +561,7 @@ export async function createSelectPrompt(
         type: ComponentType.ACTION_ROW,
         components: [
           {
-            type: ComponentType.SELECT,
+            type: ComponentType.STRING_SELECT,
             ...(prompt.placeholder ? { placeholder: prompt.placeholder } : {}),
             options: prompt.display
               .map((opt, i) => ({ ...opt, value: String(i), default: prompt.selected[prompt.page - 1].includes(i) }))
@@ -671,7 +671,7 @@ async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, a
         type: ComponentType.ACTION_ROW,
         components: [
           {
-            type: ComponentType.SELECT,
+            type: ComponentType.STRING_SELECT,
             ...(prompt.placeholder ? { placeholder: prompt.placeholder } : {}),
             options: prompt.display
               .map((opt, i) => ({ ...opt, value: String(i), default: prompt.selected[prompt.page - 1].includes(i) }))
@@ -906,7 +906,7 @@ export async function createFiltersPrompt(
         type: ComponentType.ACTION_ROW,
         components: [
           {
-            type: ComponentType.SELECT,
+            type: ComponentType.STRING_SELECT,
             placeholder: t('webhook.view_group_placeholder'),
             options: Object.keys(filterGroups).map((group, i) => ({
               label: t(`group.${group}`, { ns: 'webhook' }),
@@ -924,7 +924,7 @@ export async function createFiltersPrompt(
         type: ComponentType.ACTION_ROW,
         components: [
           {
-            type: ComponentType.SELECT,
+            type: ComponentType.STRING_SELECT,
             placeholder: t('webhook.filters_placeholder'),
             options: filterGroups[pageGroup].map((filter) => ({
               label: t(`filters.${filter}`, { ns: 'webhook' }),
@@ -1018,7 +1018,7 @@ async function handleFiltersPrompt(ctx: ComponentContext, prompt: FiltersPrompt,
         type: ComponentType.ACTION_ROW,
         components: [
           {
-            type: ComponentType.SELECT,
+            type: ComponentType.STRING_SELECT,
             placeholder: t('webhook.view_group_placeholder'),
             options: Object.keys(filterGroups).map((group, i) => ({
               label: t(`group.${group}`, { ns: 'webhook' }),
@@ -1036,7 +1036,7 @@ async function handleFiltersPrompt(ctx: ComponentContext, prompt: FiltersPrompt,
         type: ComponentType.ACTION_ROW,
         components: [
           {
-            type: ComponentType.SELECT,
+            type: ComponentType.STRING_SELECT,
             placeholder: t('webhook.filters_placeholder'),
             options: filterGroups[pageGroup].map((filter) => ({
               label: t(`filters.${filter}`, { ns: 'webhook' }),

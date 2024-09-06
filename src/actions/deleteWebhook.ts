@@ -9,8 +9,8 @@ export const action: ActionFunction = {
   type: ActionType.DELETE_WEBHOOK,
   async onAction(ctx: ComponentContext, action) {
     const { t } = await getData(ctx);
-    if (!ctx.guildID) return void ctx.editParent(t('interactions.no_server'), { components: [] });
-    if (isNaN(parseInt(action.extra, 10))) return void ctx.editParent(t('query.not_found_webhook'), { components: [] });
+    if (!ctx.guildID) return void ctx.editParent({ content: t('interactions.no_server'), components: [] });
+    if (isNaN(parseInt(action.extra, 10))) return void ctx.editParent({ content: t('query.not_found_webhook'), components: [] });
 
     const webhook = await prisma.webhook.findFirst({
       where: {
@@ -18,7 +18,7 @@ export const action: ActionFunction = {
         id: parseInt(action.extra, 10)
       }
     });
-    if (!webhook) return void ctx.editParent(t('query.not_found_webhook'), { components: [] });
+    if (!webhook) return void ctx.editParent({ content: t('query.not_found_webhook'), components: [] });
 
     await prisma.webhook.delete({ where: { id: webhook.id } });
 
@@ -43,6 +43,6 @@ export const action: ActionFunction = {
       }
     } catch (e) {}
 
-    return void ctx.editParent(t('webhook.delete_done'), { components: [] });
+    return void ctx.editParent({ content: t('webhook.delete_done'), components: [] });
   }
 };

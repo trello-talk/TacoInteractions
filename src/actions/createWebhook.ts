@@ -10,7 +10,7 @@ export const action: ActionFunction = {
   type: ActionType.CREATE_WEBHOOK,
   async onAction(ctx: ComponentContext, action: WebhookCreateAction) {
     const { userData, t, trello, locale } = await getData(ctx);
-    if (!ctx.guildID) return void ctx.editParent(t('interactions.no_server'), { components: [] });
+    if (!ctx.guildID) return void ctx.editParent({ content: t('interactions.no_server'), components: [] });
     if (!userData || !userData.trelloToken) return void ctx.editParent(noAuthResponse(t));
 
     let discordWebhook = action.webhooks.find((w) => w.id === ctx.values[0]);
@@ -26,7 +26,7 @@ export const action: ActionFunction = {
         );
       } catch (e) {
         logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${action.channelID})`, e);
-        return void ctx.editParent(t('webhook.dwh_fail_create'), { components: [] });
+        return void ctx.editParent({ content: t('webhook.dwh_fail_create'), components: [] });
       }
 
     const callbackURL = process.env.WEBHOOK_BASE_URL + userData.trelloID;
@@ -65,7 +65,8 @@ export const action: ActionFunction = {
       ]
     });
 
-    return void ctx.editParent(t('webhook.add_done', { board: truncate(action.board.name, 32) }), {
+    return void ctx.editParent({
+      content: t('webhook.add_done', { board: truncate(action.board.name, 32) }),
       components: []
     });
   }

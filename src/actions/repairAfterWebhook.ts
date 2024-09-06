@@ -9,7 +9,7 @@ export const action: ActionFunction = {
   type: ActionType.REPAIR_AFTER_WEBHOOK,
   async onAction(ctx: ComponentContext, action: RepairWebhookAction) {
     const { t } = await getData(ctx);
-    if (!ctx.guildID) return void ctx.editParent(t('interactions.no_server'), { components: [] });
+    if (!ctx.guildID) return void ctx.editParent({ content: t('interactions.no_server'), components: [] });
 
     let discordWebhook = action.webhooks.find((w) => w.id === ctx.values[0]);
     if (!discordWebhook)
@@ -24,7 +24,7 @@ export const action: ActionFunction = {
         );
       } catch (e) {
         logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${action.channelID})`, e);
-        return void ctx.editParent(t('webhook.dwh_fail_create'), { components: [] });
+        return void ctx.editParent({ content: t('webhook.dwh_fail_create'), components: [] });
       }
 
     await prisma.webhook.update({
@@ -53,6 +53,6 @@ export const action: ActionFunction = {
       ]
     });
 
-    return void ctx.editParent(t('webhook.repair_done'), { components: [] });
+    return void ctx.editParent({ content: t('webhook.repair_done'), components: [] });
   }
 };

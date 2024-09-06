@@ -58,7 +58,7 @@ creator.on('commandRun', (command, _, ctx) => {
 creator.on('commandRegister', (command) => logger.log(`Registered command ${command.commandName}`));
 creator.on('commandError', (command, error) => logger.error(`Command ${command.commandName}:`, error));
 
-creator.withServer(new FastifyServer(server)).registerCommandsIn(path.join(__dirname, 'commands'));
+creator.withServer(new FastifyServer(server)).registerCommandsIn(path.join(__dirname, 'commands'), ['.ts']);
 
 creator.on('componentInteraction', async (ctx) => {
   logger.info(`${ctx.user.username}#${ctx.user.discriminator} (${ctx.user.id}) ran component ${ctx.customID} for message ${ctx.message.id}`);
@@ -66,7 +66,7 @@ creator.on('componentInteraction', async (ctx) => {
     if (ctx.customID === 'none') return ctx.acknowledge();
     else if (ctx.customID === 'delete') {
       const { t } = await getData(ctx);
-      if (ctx.message.interaction!.user.id !== ctx.user.id)
+      if (ctx.message.interactionMetadata!.userID !== ctx.user.id)
         return ctx.send({
           content: t(['interactions.delete_wrong_user', 'interactions.wrong_user']),
           ephemeral: true
@@ -77,7 +77,7 @@ creator.on('componentInteraction', async (ctx) => {
     } else if (ctx.customID.startsWith('prompt:')) return await handlePrompt(ctx);
     else if (ctx.customID.startsWith('action:')) {
       const { t } = await getData(ctx);
-      if (ctx.message.interaction!.user.id !== ctx.user.id)
+      if (ctx.message.interactionMetadata!.userID !== ctx.user.id)
         return ctx.send({
           content: t('interactions.wrong_user'),
           ephemeral: true
@@ -214,6 +214,7 @@ creator.on('modalInteraction', async (ctx) => {
 
   // PM2 graceful start/shutdown
   if (process.send) process.send('ready');
+  logger.info('Ready!');
 })().catch((e) => {
   logger.error('Failed to start', e);
 });

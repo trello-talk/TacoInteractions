@@ -8,11 +8,13 @@ export const action: ActionFunction = {
   async onAction(ctx, action, data) {
     console.log(action, data);
     if (ctx instanceof ComponentContext)
-      return void ctx.editParent(`Debug action used.\n\`\`\`js\n${inspect(data)}\n\`\`\``, {
+      return void ctx.editParent({
+        content: `Debug action used.\n\`\`\`js\n${inspect(data)}\n\`\`\``,
         components: [],
         embeds: []
       });
-    return void ctx.send(`Debug action used.\n\`\`\`js\n${inspect(data)}\n\`\`\``, {
+    return void ctx.send({
+      content: `Debug action used.\n\`\`\`js\n${inspect(data)}\n\`\`\``,
       ephemeral: true
     });
   }

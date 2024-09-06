@@ -18,6 +18,6 @@ export const action: ActionFunction = {
     await uncacheBoard(userData.currentBoard);
     await uncacheCard(action.extra);
 
-    return void ctx.editParent(t('edit.labels_updated'), { components: [], embeds: [] });
+    return void ctx.editParent({ content: t('edit.labels_updated'), components: [], embeds: [] });
   }
 };

@@ -219,7 +219,7 @@ export default abstract class Command extends SlashCommand {
         data: { trelloID: null, trelloToken: null }
       });
       const t = createT(userData?.locale);
-      return ctx.send(t('auth.expired'), { components: noAuthResponse(t).components });
+      return ctx.send({ content: t('auth.expired'), components: noAuthResponse(t).components });
     }
 
     reportErrorFromCommand(ctx, err, ctx.commandName, 'command');
