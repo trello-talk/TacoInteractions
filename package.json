@@ -24,7 +24,8 @@
     "lint": "eslint --ext .ts ./src",
     "lint:fix": "eslint --ext .ts ./src --fix",
     "generate": "prisma generate",
-    "migrate": "prisma migrate deploy"
+    "migrate": "prisma migrate deploy",
+    "role-metadata": "tsx scripts/roleMetadata"
   },
   "dependencies": {
     "@influxdata/influxdb-client": "1.33.2",
