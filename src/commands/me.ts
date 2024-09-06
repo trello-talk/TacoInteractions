@@ -1,7 +1,7 @@
 import { CommandContext, MessageEmbedOptions, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../command';
-import { getData, noAuthResponse, truncate } from '../util';
+import { defaultContexts, getData, noAuthResponse, truncate } from '../util';
 import { getMember } from '../util/api';
 
 export default class MeCommand extends SlashCommand {
@@ -9,11 +9,13 @@ export default class MeCommand extends SlashCommand {
     super(creator, {
       name: 'me',
       description: 'Get your own Trello user information.',
-      deferEphemeral: true
+      deferEphemeral: true,
+      ...defaultContexts
     });
   }
 
   async run(ctx: CommandContext) {
+    console.log(ctx.authorizingIntegrationOwners)
     const { userData, t } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
 

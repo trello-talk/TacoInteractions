@@ -1,7 +1,7 @@
 import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, sortCards, splitMessage, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, sortCards, splitMessage, truncate } from '../../util';
 import { getBoard } from '../../util/api';
 import { LABEL_COLORS } from '../../util/constants';
 import { createListPrompt } from '../../util/prompt';
@@ -11,6 +11,7 @@ export default class LabelCommand extends SlashCommand {
     super(creator, {
       name: 'label',
       description: 'View cards that are assigned a given label on your selected board.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

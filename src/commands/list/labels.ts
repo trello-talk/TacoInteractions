@@ -2,7 +2,7 @@ import { oneLine } from 'common-tags';
 import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, splitMessage, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, splitMessage, truncate } from '../../util';
 import { getBoard } from '../../util/api';
 import { LABEL_EMOJIS } from '../../util/constants';
 import { formatNumber } from '../../util/locale';
@@ -18,6 +18,7 @@ export default class LabelsCommand extends SlashCommand {
     super(creator, {
       name: 'labels',
       description: 'List Trello labels in the selected board.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

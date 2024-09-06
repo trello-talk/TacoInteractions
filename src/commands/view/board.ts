@@ -1,7 +1,7 @@
 import { AutocompleteContext, ButtonStyle, CommandContext, CommandOptionType, ComponentType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { getBoard, getMember } from '../../util/api';
 
 export default class BoardCommand extends SlashCommand {
@@ -9,6 +9,7 @@ export default class BoardCommand extends SlashCommand {
     super(creator, {
       name: 'board',
       description: 'View a Trello board.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

@@ -1,7 +1,7 @@
 import { ButtonStyle, CommandContext, ComponentType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData } from '../../util';
+import { defaultContexts, getData } from '../../util';
 import { ActionType } from '../../util/actions';
 
 export default class ClearAuthCommand extends SlashCommand {
@@ -9,6 +9,7 @@ export default class ClearAuthCommand extends SlashCommand {
     super(creator, {
       name: 'clear-auth',
       description: 'Remove your authentication data.',
+      ...defaultContexts,
       deferEphemeral: true
     });
   }

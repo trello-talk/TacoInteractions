@@ -1,12 +1,13 @@
 import { ButtonStyle, CommandContext, ComponentType, SlashCommand, SlashCreator } from 'slash-create';
 
-import { getData } from '../../util';
+import { defaultContexts, getData } from '../../util';
 
 export default class AuthCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
       name: 'auth',
       description: 'Sends a link to authenticate to Trello.',
+      ...defaultContexts,
       deferEphemeral: true
     });
   }

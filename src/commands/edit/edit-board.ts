@@ -1,7 +1,7 @@
 import { AutocompleteContext, ButtonStyle, CommandContext, CommandOptionType, ComponentType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { getBoard, getMember, uncacheBoard, uncacheMember } from '../../util/api';
 
 export default class EditBoardCommand extends SlashCommand {
@@ -9,6 +9,7 @@ export default class EditBoardCommand extends SlashCommand {
     super(creator, {
       name: 'edit-board',
       description: 'Edit a board.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

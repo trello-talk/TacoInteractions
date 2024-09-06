@@ -1,7 +1,7 @@
 import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { getBoard, uncacheBoard } from '../../util/api';
 import { LABEL_EMOJIS } from '../../util/constants';
 
@@ -10,6 +10,7 @@ export default class EditLabelCommand extends SlashCommand {
     super(creator, {
       name: 'edit-label',
       description: 'Edit a label from your selected board.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

@@ -1,7 +1,7 @@
 import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { ActionType, createAction } from '../../util/actions';
 import { getBoard, getCard, uncacheBoard, uncacheCard } from '../../util/api';
 import { LABEL_EMOJIS } from '../../util/constants';
@@ -12,6 +12,7 @@ export default class EditCardCommand extends SlashCommand {
     super(creator, {
       name: 'edit-card',
       description: 'Edit a card from your selected board.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.SUB_COMMAND,

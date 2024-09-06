@@ -1,7 +1,7 @@
 import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../command';
-import { getData } from '../util';
+import { defaultContexts, getData } from '../util';
 import { createT, langs } from '../util/locale';
 import { prisma } from '../util/prisma';
 
@@ -11,6 +11,7 @@ export default class UserSettingsCommand extends SlashCommand {
       name: 'user-settings',
       description: 'Edit user settings.',
       deferEphemeral: true,
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.SUB_COMMAND,

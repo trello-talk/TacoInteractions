@@ -1,7 +1,7 @@
 import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, truncate } from '../../util';
 import { getBoard, updateBoardSub } from '../../util/api';
 
 export default class WatchListCommand extends SlashCommand {
@@ -9,6 +9,7 @@ export default class WatchListCommand extends SlashCommand {
     super(creator, {
       name: 'watch-list',
       description: 'Subscribe to a list to get notifications on Trello.com.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,
@@ -38,6 +39,9 @@ export default class WatchListCommand extends SlashCommand {
     await trello.updateList(list.id, { subscribed: subbed });
     await updateBoardSub(userData.trelloID, board.id, list.id, 'list', subbed);
 
-    return t(subbed ? 'watchlist.watched' : 'watchlist.unwatched', { list: truncate(list.name, 100) });
+    return {
+      content: t(subbed ? 'watchlist.watched' : 'watchlist.unwatched', { list: truncate(list.name, 100) }),
+      ephemeral: true
+    }
   }
 }

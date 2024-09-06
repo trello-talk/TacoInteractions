@@ -2,7 +2,7 @@ import { User, Webhook } from '@prisma/client';
 import { AxiosResponse } from 'axios';
 import { oneLine } from 'common-tags';
 import i18next from 'i18next';
-import { AutocompleteContext, ButtonStyle, ChannelType, CommandContext, CommandOptionType, ComponentType, SlashCreator } from 'slash-create';
+import { ApplicationIntegrationType, AutocompleteContext, ButtonStyle, ChannelType, CommandContext, CommandOptionType, ComponentType, InteractionContextType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../command';
 import { logger } from '../logger';
@@ -31,7 +31,8 @@ export default class WebhookCommand extends SlashCommand {
     super(creator, {
       name: 'webhook',
       description: 'Manage server webhooks.',
-      dmPermission: false,
+      contexts: [InteractionContextType.GUILD],
+      integrationTypes: [ApplicationIntegrationType.GUILD_INSTALL],
       options: [
         {
           type: CommandOptionType.SUB_COMMAND,

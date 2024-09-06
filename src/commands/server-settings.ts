@@ -1,4 +1,4 @@
-import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
+import { ApplicationIntegrationType, AutocompleteContext, CommandContext, CommandOptionType, InteractionContextType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../command';
 import { getData } from '../util';
@@ -10,7 +10,8 @@ export default class ServerSettingsCommand extends SlashCommand {
     super(creator, {
       name: 'server-settings',
       description: 'Edit server settings.',
-      dmPermission: false,
+      contexts: [InteractionContextType.GUILD],
+      integrationTypes: [ApplicationIntegrationType.GUILD_INSTALL],
       options: [
         {
           type: CommandOptionType.SUB_COMMAND,

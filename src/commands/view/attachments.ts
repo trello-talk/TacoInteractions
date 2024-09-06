@@ -1,7 +1,7 @@
 import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse } from '../../util';
+import { defaultContexts, getData, noAuthResponse } from '../../util';
 import { getBoard, getCard } from '../../util/api';
 import { createAttachmentPrompt } from '../../util/prompt';
 
@@ -10,6 +10,7 @@ export default class AttachmentsCommand extends SlashCommand {
     super(creator, {
       name: 'attachments',
       description: "View a card's attachments.",
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

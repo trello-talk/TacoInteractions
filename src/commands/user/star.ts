@@ -1,7 +1,7 @@
 import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, truncate } from '../../util';
 import { getMember, starBoard, unstarBoard, updateBoardInMember } from '../../util/api';
 
 export default class StarCommand extends SlashCommand {
@@ -9,6 +9,7 @@ export default class StarCommand extends SlashCommand {
     super(creator, {
       name: 'star',
       description: 'Star a board to put it at the top of your boards.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,
@@ -38,6 +39,9 @@ export default class StarCommand extends SlashCommand {
     else await starBoard(userData.trelloToken, userData.trelloID, board.id);
     await updateBoardInMember(member.id, board.id, { starred: !board.starred });
 
-    return t(board.starred ? 'star.unstar' : 'star.star', { board: truncate(board.name, 100) });
+    return {
+      content: t(board.starred ? 'star.unstar' : 'star.star', { board: truncate(board.name, 100) }),
+      ephemeral: true
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { AutocompleteContext, ButtonStyle, CommandContext, CommandOptionType, ComponentType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, truncate } from '../../util';
 import { getBoard } from '../../util/api';
 
 export default class CommentCommand extends SlashCommand {
@@ -9,6 +9,7 @@ export default class CommentCommand extends SlashCommand {
     super(creator, {
       name: 'add-attachment',
       description: 'Add an attachment to a card.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

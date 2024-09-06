@@ -1,7 +1,7 @@
 import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { getBoard, uncacheBoard } from '../../util/api';
 
 export default class EditListCommand extends SlashCommand {
@@ -9,6 +9,7 @@ export default class EditListCommand extends SlashCommand {
     super(creator, {
       name: 'edit-list',
       description: 'Edit a list from your selected board.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

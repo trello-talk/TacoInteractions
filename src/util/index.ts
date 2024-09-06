@@ -3,7 +3,7 @@ import { stripIndentTransformer, TemplateTag } from 'common-tags';
 import { promises as fs } from 'fs';
 import i18next, { TFunction } from 'i18next';
 import path from 'path';
-import { ButtonStyle, ComponentContext, ComponentType, InteractionResponseFlags, MessageInteractionContext, MessageOptions } from 'slash-create';
+import { ApplicationIntegrationType, ButtonStyle, ComponentContext, ComponentType, InteractionContextType, InteractionResponseFlags, MessageInteractionContext, MessageOptions } from 'slash-create';
 
 import { VERSION } from './constants';
 import { createT } from './locale';
@@ -271,4 +271,9 @@ export function getBoardID(value: string) {
   const match = BOARD_ID_REGEX.exec(value);
   if (!match) return null;
   return match[1];
+}
+
+export const defaultContexts = {
+  contexts: [InteractionContextType.BOT_DM, InteractionContextType.GUILD, InteractionContextType.PRIVATE_CHANNEL],
+  integrationTypes: [ApplicationIntegrationType.USER_INSTALL, ApplicationIntegrationType.GUILD_INSTALL]
 }

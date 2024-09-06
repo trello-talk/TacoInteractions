@@ -1,4 +1,4 @@
-import { CommandContext, CommandOptionType, SlashCommand, SlashCreator } from 'slash-create';
+import { ApplicationIntegrationType, CommandContext, CommandOptionType, InteractionContextType, SlashCommand, SlashCreator } from 'slash-create';
 
 import { stripIndentsAndNewlines } from '../util';
 import { prisma } from '../util/prisma';
@@ -10,7 +10,8 @@ export default class BotCommand extends SlashCommand {
       description: 'Dev stuff.',
       deferEphemeral: true,
       guildIDs: [process.env.DEV_GUILD],
-      dmPermission: false,
+      contexts: [InteractionContextType.GUILD],
+      integrationTypes: [ApplicationIntegrationType.GUILD_INSTALL],
       requiredPermissions: [],
       options: [
         {

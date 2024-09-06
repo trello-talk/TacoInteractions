@@ -1,7 +1,7 @@
 import { AutocompleteContext, ButtonStyle, CommandContext, CommandOptionType, ComponentType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, truncate } from '../../util';
 import { ActionType } from '../../util/actions';
 import { getBoard } from '../../util/api';
 import { LABEL_EMOJIS } from '../../util/constants';
@@ -11,6 +11,7 @@ export default class DeleteLabelCommand extends SlashCommand {
     super(creator, {
       name: 'delete-label',
       description: 'Delete a label from your selected board.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

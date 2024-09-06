@@ -1,7 +1,7 @@
 import { AutocompleteContext, CommandContext, CommandOptionType, ComponentType, SlashCreator, TextInputStyle } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse } from '../../util';
+import { defaultContexts, getData, noAuthResponse } from '../../util';
 import { ActionType } from '../../util/actions';
 import { getBoard } from '../../util/api';
 
@@ -10,6 +10,7 @@ export default class AddCardCommand extends SlashCommand {
     super(creator, {
       name: 'add-card',
       description: 'Create a card on your selected board.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

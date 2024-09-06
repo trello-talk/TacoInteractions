@@ -1,7 +1,7 @@
 import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, truncate } from '../../util';
 import { getMember } from '../../util/api';
 import { prisma } from '../../util/prisma';
 
@@ -10,6 +10,7 @@ export default class SwitchCommand extends SlashCommand {
     super(creator, {
       name: 'switch',
       description: 'Switch your board context to interact with board elements.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,
@@ -40,6 +41,9 @@ export default class SwitchCommand extends SlashCommand {
       data: { currentBoard: board.id }
     });
 
-    return t('switch.success', { board: truncate(board.name, 100) });
+    return {
+      content: t('switch.success', { board: truncate(board.name, 100) }),
+      ephemeral: true
+    }
   }
 }

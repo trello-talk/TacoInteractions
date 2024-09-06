@@ -1,7 +1,7 @@
 import { AutocompleteContext, ButtonStyle, CommandContext, CommandOptionType, ComponentType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, truncate } from '../../util';
 import { ActionType } from '../../util/actions';
 import { getBoard } from '../../util/api';
 
@@ -10,6 +10,7 @@ export default class DeleteCardCommand extends SlashCommand {
     super(creator, {
       name: 'delete-card',
       description: 'Delete a card from your selected board.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

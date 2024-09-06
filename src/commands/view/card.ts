@@ -2,7 +2,7 @@ import { oneLine } from 'common-tags';
 import { AutocompleteContext, ButtonStyle, CommandContext, CommandOptionType, ComponentType, MessageEmbedOptions, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { formatTime, getData, noAuthResponse, stripIndentsAndNewlines, toColorInt, truncate, truncateList } from '../../util';
+import { defaultContexts, formatTime, getData, noAuthResponse, stripIndentsAndNewlines, toColorInt, truncate, truncateList } from '../../util';
 import { getBoard, getCard } from '../../util/api';
 import { EMOJIS, LABEL_COLORS, LABEL_EMOJIS, STICKER_EMOJIS } from '../../util/constants';
 import { formatNumber } from '../../util/locale';
@@ -12,6 +12,7 @@ export default class CardCommand extends SlashCommand {
     super(creator, {
       name: 'card',
       description: 'View a Trello card on your selected board.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

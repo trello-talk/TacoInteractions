@@ -1,7 +1,7 @@
 import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, truncate } from '../../util';
 import { getBoard, uncacheBoard } from '../../util/api';
 
 // TODO add position option (left, right)
@@ -10,6 +10,7 @@ export default class AddListCommand extends SlashCommand {
     super(creator, {
       name: 'add-list',
       description: 'Create a list on your selected board.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

@@ -13,7 +13,7 @@
   "bugs": {
     "url": "https://github.com/trello-talk/TacoInteraction/issues"
   },
-  "homepage": "https:/tacobot.app/",
+  "homepage": "https://tacobot.app/",
   "private": true,
   "scripts": {
     "start": "cd dist && node index.js",

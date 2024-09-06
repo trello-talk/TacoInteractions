@@ -1,7 +1,7 @@
 import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 
 import SlashCommand from '../../command';
-import { getData, noAuthResponse, splitMessage, truncate } from '../../util';
+import { defaultContexts, getData, noAuthResponse, splitMessage, truncate } from '../../util';
 import { getMember } from '../../util/api';
 import { formatNumber } from '../../util/locale';
 import { createListPrompt } from '../../util/prompt';
@@ -19,6 +19,7 @@ export default class BoardsCommand extends SlashCommand {
     super(creator, {
       name: 'boards',
       description: 'List Trello boards.',
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.STRING,

@@ -1,6 +1,6 @@
 import { ButtonStyle, CommandContext, CommandOptionType, ComponentType, SlashCommand, SlashCreator } from 'slash-create';
 
-import { getData } from '../util';
+import { defaultContexts, getData } from '../util';
 import { REPOSITORY } from '../util/constants';
 
 export default class BotCommand extends SlashCommand {
@@ -9,6 +9,7 @@ export default class BotCommand extends SlashCommand {
       name: 'bot',
       description: 'Bot-related information.',
       deferEphemeral: true,
+      ...defaultContexts,
       options: [
         {
           type: CommandOptionType.SUB_COMMAND,

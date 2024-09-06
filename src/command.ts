@@ -1,7 +1,7 @@
 import { User } from '@prisma/client';
 import { AxiosResponse } from 'axios';
 import fuzzy from 'fuzzy';
-import { AutocompleteContext, CommandContext, SlashCommand } from 'slash-create';
+import { ApplicationIntegrationType, AutocompleteContext, CommandContext, InteractionContextType, SlashCommand } from 'slash-create';
 
 import {
   getBoardTextLabel,
