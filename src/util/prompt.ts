@@ -135,7 +135,7 @@ export type Prompt = ListPrompt | QueryPrompt | SelectPrompt | AttachmentPrompt 
 export async function handlePrompt(ctx: ComponentContext) {
   const { t, locale } = await getData(ctx);
 
-  if (ctx.message.interactionMetadata!.userID !== ctx.user.id)
+  if (ctx.message.interaction!.user.id !== ctx.user.id)
     return ctx.send({
       content: t(['interactions.prompt_wrong_user', 'interactions.wrong_user']),
       ephemeral: true

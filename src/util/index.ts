@@ -85,7 +85,7 @@ export function flattenObject(data: any) {
   return result;
 }
 
-export async function iterateFolder(folderPath: string, callback: (filePath: string) => void | Promise<void>, extension = '.js') {
+export async function iterateFolder(folderPath: string, callback: (filePath: string) => void | Promise<void>, extensions = ['.js', '.ts']) {
   const files = await fs.readdir(folderPath);
   await Promise.all(
     files.map(async (file) => {
@@ -93,13 +93,13 @@ export async function iterateFolder(folderPath: string, callback: (filePath: str
       const stat = await fs.lstat(filePath);
       if (stat.isSymbolicLink()) {
         const realPath = await fs.readlink(filePath);
-        if (stat.isFile() && file.endsWith(extension)) {
+        if (stat.isFile() && extensions.find(e => realPath.endsWith(e))) {
           await callback(realPath);
         } else if (stat.isDirectory()) {
-          await iterateFolder(realPath, callback, extension);
+          await iterateFolder(realPath, callback, extensions);
         }
-      } else if (stat.isFile() && file.endsWith(extension)) await callback(filePath);
-      else if (stat.isDirectory()) await iterateFolder(filePath, callback, extension);
+      } else if (stat.isFile() && extensions.find(e => file.endsWith(e))) await callback(filePath);
+      else if (stat.isDirectory()) await iterateFolder(filePath, callback, extensions);
     })
   );
 }

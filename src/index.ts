@@ -66,7 +66,7 @@ creator.on('componentInteraction', async (ctx) => {
     if (ctx.customID === 'none') return ctx.acknowledge();
     else if (ctx.customID === 'delete') {
       const { t } = await getData(ctx);
-      if (ctx.message.interactionMetadata!.userID !== ctx.user.id)
+      if (ctx.message.interaction!.user.id !== ctx.user.id)
         return ctx.send({
           content: t(['interactions.delete_wrong_user', 'interactions.wrong_user']),
           ephemeral: true
@@ -77,7 +77,7 @@ creator.on('componentInteraction', async (ctx) => {
     } else if (ctx.customID.startsWith('prompt:')) return await handlePrompt(ctx);
     else if (ctx.customID.startsWith('action:')) {
       const { t } = await getData(ctx);
-      if (ctx.message.interactionMetadata!.userID !== ctx.user.id)
+      if (ctx.message.interaction!.user.id !== ctx.user.id)
         return ctx.send({
           content: t('interactions.wrong_user'),
           ephemeral: true
