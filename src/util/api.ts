@@ -180,7 +180,7 @@ export async function getWebhooks(id: string, creator: BaseSlashCreator): Promis
   const cached = await client.get(key);
   if (cached) return JSON.parse(cached);
 
-  const webhooks = await creator.requestHandler.request<DiscordWebhook[]>('GET', `/guilds/${id}/webhooks`);
+  const webhooks = await creator.requestHandler.request<DiscordWebhook[]>('GET', `/guilds/${id}/webhooks`, { auth: true });
 
   await client.set(key, JSON.stringify(webhooks), 'EX', 6 * 60 * 60);
   return webhooks;
@@ -191,7 +191,7 @@ export async function getChannels(id: string, creator: BaseSlashCreator): Promis
   const cached = await client.get(key);
   if (cached) return JSON.parse(cached);
 
-  const channels = await creator.requestHandler.request<DiscordChannel[]>('GET', `/guilds/${id}/channels`);
+  const channels = await creator.requestHandler.request<DiscordChannel[]>('GET', `/guilds/${id}/channels`, { auth: true });
 
   await client.set(key, JSON.stringify(channels), 'EX', 6 * 60 * 60);
   return channels;
