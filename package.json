@@ -5,7 +5,7 @@
     "email": "me@snazzah.com",
     "url": "https://snazzah.com/"
   },
-  "version": "8.2.0",
+  "version": "8.2.1",
   "description": "Taco Bot over Discord Interactions: Manage Trello boards straight from Discord!",
   "main": "dist/index.js",
   "license": "MIT",
