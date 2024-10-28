@@ -540,7 +540,8 @@ export default class WebhookCommand extends SlashCommand {
           try {
             discordWebhook = await createDiscordWebhook(ctx.guildID, ctx.options.add.channel, { name: webhookName }, reason);
           } catch (e) {
-            logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${ctx.options.add.channel})`, e, { reason, webhookName });
+            logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${ctx.options.add.channel})`);
+            logger.warn({ e, reason, webhookName });
             return t('webhook.dwh_fail_create');
           }
 
