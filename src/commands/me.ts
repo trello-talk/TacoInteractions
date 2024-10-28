@@ -15,7 +15,6 @@ export default class MeCommand extends SlashCommand {
   }
 
   async run(ctx: CommandContext) {
-    console.log(ctx.authorizingIntegrationOwners)
     const { userData, t } = await getData(ctx);
     if (!userData || !userData.trelloToken) return noAuthResponse(t);
 
