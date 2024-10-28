@@ -36,6 +36,10 @@ enum WebhookFilter {
 
 const MAX_WEBHOOKS = parseInt(process.env.WEBHOOK_LIMIT, 10) || 5;
 
+// https://discord.com/developers/docs/resources/user#usernames-and-nicknames
+const BLACKLISTED_WEBHOOK_SUBSTRINGS = ['clyde', 'discord', '@', ':', '#', '```'];
+const BLACKLISTED_WEBHOOK_NAMES = ['everyone', 'here'];
+
 export default class WebhookCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
     super(creator, {
@@ -535,8 +539,16 @@ export default class WebhookCommand extends SlashCommand {
         if (!discordWebhooks.some((dwh) => dwh.token)) {
           let discordWebhook: DiscordWebhook;
           const reason = `Requested by ${ctx.user.discriminator === '0' ? ctx.user.username : `${ctx.user.username}#${ctx.user.discriminator}`} (${ctx.user.id})`;
-          const webhookName =
-            (board.name.toLowerCase() === 'clyde' ? '' : truncate(ctx.options.add.name || board.name, 32)) || t('webhook.new_wh_name');
+
+          /**
+           * An error will be returned if a webhook name (`name`) is not valid. A webhook name is valid if:
+           * - It does not contain the substrings `clyde` or `discord` (case-insensitive)
+           * - It follows the nickname guidelines in the Usernames and Nicknames documentation, with an exception that webhook names can be up to 80 characters
+           * https://discord.com/developers/docs/resources/webhook#create-webhook
+           */
+          const boardName = board.name.toLowerCase();
+          const nameInvalid = BLACKLISTED_WEBHOOK_SUBSTRINGS.find((str) => boardName.includes(str)) || BLACKLISTED_WEBHOOK_NAMES.includes(boardName);
+          const webhookName = (nameInvalid ? '' : truncate(ctx.options.add.name || board.name, 80)) || t('webhook.new_wh_name');
           try {
             discordWebhook = await createDiscordWebhook(ctx.guildID, ctx.options.add.channel, { name: webhookName }, reason);
           } catch (e) {
