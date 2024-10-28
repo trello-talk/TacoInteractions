@@ -2,7 +2,17 @@ import { User, Webhook } from '@prisma/client';
 import { AxiosResponse } from 'axios';
 import { oneLine } from 'common-tags';
 import i18next from 'i18next';
-import { ApplicationIntegrationType, AutocompleteContext, ButtonStyle, ChannelType, CommandContext, CommandOptionType, ComponentType, InteractionContextType, SlashCreator } from 'slash-create';
+import {
+  ApplicationIntegrationType,
+  AutocompleteContext,
+  ButtonStyle,
+  ChannelType,
+  CommandContext,
+  CommandOptionType,
+  ComponentType,
+  InteractionContextType,
+  SlashCreator
+} from 'slash-create';
 
 import SlashCommand from '../command';
 import { logger } from '../logger';
@@ -524,17 +534,13 @@ export default class WebhookCommand extends SlashCommand {
         // If there are no webhooks w/ tokens, we can create a new one
         if (!discordWebhooks.some((dwh) => dwh.token)) {
           let discordWebhook: DiscordWebhook;
+          const reason = `Requested by ${ctx.user.discriminator === '0' ? ctx.user.username : `${ctx.user.username}#${ctx.user.discriminator}`} (${ctx.user.id})`;
+          const webhookName =
+            (board.name.toLowerCase() === 'clyde' ? '' : truncate(ctx.options.add.name || board.name, 32)) || t('webhook.new_wh_name');
           try {
-            discordWebhook = await createDiscordWebhook(
-              ctx.guildID,
-              ctx.options.add.channel,
-              {
-                name: board.name.toLowerCase() === 'clyde' ? t('webhook.new_wh_name') : truncate(ctx.options.add.name || board.name, 32)
-              },
-              `Requested by ${ctx.user.discriminator === '0' ? ctx.user.username : `${ctx.user.username}#${ctx.user.discriminator}`} (${ctx.user.id})`
-            );
+            discordWebhook = await createDiscordWebhook(ctx.guildID, ctx.options.add.channel, { name: webhookName }, reason);
           } catch (e) {
-            logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${ctx.options.add.channel})`, e);
+            logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${ctx.options.add.channel})`, e, { reason, webhookName });
             return t('webhook.dwh_fail_create');
           }
 
