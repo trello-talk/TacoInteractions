@@ -546,7 +546,7 @@ export default class WebhookCommand extends SlashCommand {
            * - It follows the nickname guidelines in the Usernames and Nicknames documentation, with an exception that webhook names can be up to 80 characters
            * https://discord.com/developers/docs/resources/webhook#create-webhook
            */
-          const boardName = board.name.toLowerCase();
+          const boardName = (ctx.options.add.name || board.name).toLowerCase();
           const nameInvalid = BLACKLISTED_WEBHOOK_SUBSTRINGS.find((str) => boardName.includes(str)) || BLACKLISTED_WEBHOOK_NAMES.includes(boardName);
           const webhookName = (nameInvalid ? '' : truncate(ctx.options.add.name || board.name, 80)) || t('webhook.new_wh_name');
           try {
