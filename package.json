@@ -28,7 +28,7 @@
     "role-metadata": "tsx scripts/roleMetadata"
   },
   "dependencies": {
-    "@influxdata/influxdb-client": "1.33.2",
+    "@influxdata/influxdb-client": "1.35.0",
     "@prisma/client": "4.16.2",
     "@sentry/integrations": "7.92.0",
     "@sentry/node": "7.92.0",
