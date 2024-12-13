@@ -16,7 +16,18 @@ import {
 
 import SlashCommand from '../command';
 import { logger } from '../logger';
-import { createDiscordWebhook, getBoardID, getData, noAuthResponse, postToWebhook, splitMessage, stripIndentsAndNewlines, truncate } from '../util';
+import {
+  BLACKLISTED_WEBHOOK_NAMES,
+  BLACKLISTED_WEBHOOK_SUBSTRINGS,
+  createDiscordWebhook,
+  getBoardID,
+  getData,
+  noAuthResponse,
+  postToWebhook,
+  splitMessage,
+  stripIndentsAndNewlines,
+  truncate
+} from '../util';
 import { ActionType, createAction } from '../util/actions';
 import { getBoard, getChannels, getWebhooks } from '../util/api';
 import { EMOJIS } from '../util/constants';
@@ -35,10 +46,6 @@ enum WebhookFilter {
 }
 
 const MAX_WEBHOOKS = parseInt(process.env.WEBHOOK_LIMIT, 10) || 5;
-
-// https://discord.com/developers/docs/resources/user#usernames-and-nicknames
-const BLACKLISTED_WEBHOOK_SUBSTRINGS = ['clyde', 'discord', '@', ':', '#', '```'];
-const BLACKLISTED_WEBHOOK_NAMES = ['everyone', 'here'];
 
 export default class WebhookCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -669,7 +676,7 @@ export default class WebhookCommand extends SlashCommand {
                     type: ComponentType.BUTTON,
                     style: ButtonStyle.LINK,
                     label: t('bot.donate_button'),
-                    url: process.env.AUTH_LINK
+                    url: process.env.DONATE_LINK
                   }
                 ]
               }

@@ -3,7 +3,16 @@ import { stripIndentTransformer, TemplateTag } from 'common-tags';
 import { promises as fs } from 'fs';
 import i18next, { TFunction } from 'i18next';
 import path from 'path';
-import { ApplicationIntegrationType, ButtonStyle, ComponentContext, ComponentType, InteractionContextType, InteractionResponseFlags, MessageInteractionContext, MessageOptions } from 'slash-create';
+import {
+  ApplicationIntegrationType,
+  ButtonStyle,
+  ComponentContext,
+  ComponentType,
+  InteractionContextType,
+  InteractionResponseFlags,
+  MessageInteractionContext,
+  MessageOptions
+} from 'slash-create';
 
 import { VERSION } from './constants';
 import { createT } from './locale';
@@ -93,12 +102,12 @@ export async function iterateFolder(folderPath: string, callback: (filePath: str
       const stat = await fs.lstat(filePath);
       if (stat.isSymbolicLink()) {
         const realPath = await fs.readlink(filePath);
-        if (stat.isFile() && extensions.find(e => realPath.endsWith(e))) {
+        if (stat.isFile() && extensions.find((e) => realPath.endsWith(e))) {
           await callback(realPath);
         } else if (stat.isDirectory()) {
           await iterateFolder(realPath, callback, extensions);
         }
-      } else if (stat.isFile() && extensions.find(e => file.endsWith(e))) await callback(filePath);
+      } else if (stat.isFile() && extensions.find((e) => file.endsWith(e))) await callback(filePath);
       else if (stat.isDirectory()) await iterateFolder(filePath, callback, extensions);
     })
   );
@@ -229,6 +238,10 @@ export function sortCards(card: TrelloCard[]) {
   });
 }
 
+// https://discord.com/developers/docs/resources/user#usernames-and-nicknames
+export const BLACKLISTED_WEBHOOK_SUBSTRINGS = ['clyde', 'discord', '@', ':', '#', '```'];
+export const BLACKLISTED_WEBHOOK_NAMES = ['everyone', 'here'];
+
 export async function createDiscordWebhook(guildID: string, channelID: string, body: any, reason?: string): Promise<DiscordWebhook> {
   await client.del(`discord.webhooks:${guildID}`);
   const response = await axios.post(`https://discord.com/api/v9/channels/${channelID}/webhooks`, body, {
@@ -276,4 +289,4 @@ export function getBoardID(value: string) {
 export const defaultContexts = {
   contexts: [InteractionContextType.BOT_DM, InteractionContextType.GUILD, InteractionContextType.PRIVATE_CHANNEL],
   integrationTypes: [ApplicationIntegrationType.USER_INSTALL, ApplicationIntegrationType.GUILD_INSTALL]
-}
+};
