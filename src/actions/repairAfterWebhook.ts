@@ -1,7 +1,7 @@
 import { ComponentContext } from 'slash-create';
 
 import { logger } from '../logger';
-import { BLACKLISTED_WEBHOOK_NAMES, BLACKLISTED_WEBHOOK_SUBSTRINGS, createDiscordWebhook, getData, postToWebhook, truncate } from '../util';
+import { createDiscordWebhook, filterWebhookName, getData, postToWebhook, truncate } from '../util';
 import { ActionFunction, ActionType, RepairWebhookAction } from '../util/actions';
 import { prisma } from '../util/prisma';
 
@@ -14,12 +14,12 @@ export const action: ActionFunction = {
     let discordWebhook = action.webhooks.find((w) => w.id === ctx.values[0]);
     if (!discordWebhook)
       try {
-        const boardName = action.webhookName.toLowerCase();
-        const nameInvalid = BLACKLISTED_WEBHOOK_SUBSTRINGS.find((str) => boardName.includes(str)) || BLACKLISTED_WEBHOOK_NAMES.includes(boardName);
-        const webhookName = (nameInvalid ? '' : truncate(action.webhookName, 80)) || t('webhook.new_wh_name');
-        const reason = `Requested by ${ctx.user.discriminator === '0' ? ctx.user.username : `${ctx.user.username}#${ctx.user.discriminator}`} (${ctx.user.id})`;
-
-        discordWebhook = await createDiscordWebhook(ctx.guildID, action.channelID, { name: webhookName }, reason);
+        discordWebhook = await createDiscordWebhook(
+          ctx.guildID,
+          action.channelID,
+          { name: filterWebhookName(action.webhookName, t('webhook.new_wh_name')) },
+          `Requested by ${ctx.user.discriminator === '0' ? ctx.user.username : `${ctx.user.username}#${ctx.user.discriminator}`} (${ctx.user.id})`
+        );
       } catch (e) {
         logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${action.channelID})`, e);
         return void ctx.editParent({ content: t('webhook.dwh_fail_create'), components: [] });

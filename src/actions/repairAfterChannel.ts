@@ -1,7 +1,7 @@
 import { ButtonStyle, ComponentContext, ComponentType } from 'slash-create';
 
 import { logger } from '../logger';
-import { createDiscordWebhook, getData, postToWebhook, truncate } from '../util';
+import { createDiscordWebhook, filterWebhookName, getData, postToWebhook, truncate } from '../util';
 import { ActionFunction, ActionType, createAction, RepairWebhookAction } from '../util/actions';
 import { prisma } from '../util/prisma';
 import { DiscordChannel, DiscordWebhook } from '../util/types';
@@ -31,9 +31,7 @@ export const action: ActionFunction = {
         discordWebhook = await createDiscordWebhook(
           ctx.guildID,
           data.id,
-          {
-            name: !action.webhookName || action.webhookName.toLowerCase() === 'clyde' ? t('webhook.new_wh_name') : truncate(action.webhookName, 32)
-          },
+          { name: filterWebhookName(action.webhookName, t('webhook.new_wh_name')) },
           `Requested by ${ctx.user.discriminator === '0' ? ctx.user.username : `${ctx.user.username}#${ctx.user.discriminator}`} (${ctx.user.id})`
         );
       } catch (e) {

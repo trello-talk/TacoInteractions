@@ -242,6 +242,19 @@ export function sortCards(card: TrelloCard[]) {
 export const BLACKLISTED_WEBHOOK_SUBSTRINGS = ['clyde', 'discord', '@', ':', '#', '```'];
 export const BLACKLISTED_WEBHOOK_NAMES = ['everyone', 'here'];
 
+/**
+ * An error will be returned if a webhook name (`name`) is not valid. A webhook name is valid if:
+ * - It does not contain the substrings `clyde` or `discord` (case-insensitive)
+ * - It follows the nickname guidelines in the Usernames and Nicknames documentation, with an exception that webhook names can be up to 80 characters
+ * https://discord.com/developers/docs/resources/webhook#create-webhook
+ */
+export function filterWebhookName(webhookName: string, defaultName: string) {
+  if (!webhookName) return defaultName;
+  const boardName = webhookName.toLowerCase();
+  const nameInvalid = BLACKLISTED_WEBHOOK_SUBSTRINGS.find((str) => boardName.includes(str)) || BLACKLISTED_WEBHOOK_NAMES.includes(boardName);
+  return (nameInvalid ? '' : truncate(webhookName, 80)) || defaultName;
+}
+
 export async function createDiscordWebhook(guildID: string, channelID: string, body: any, reason?: string): Promise<DiscordWebhook> {
   await client.del(`discord.webhooks:${guildID}`);
   const response = await axios.post(`https://discord.com/api/v9/channels/${channelID}/webhooks`, body, {
