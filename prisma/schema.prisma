@@ -72,3 +72,17 @@ model Webhook {
 
   @@map("webhooks")
 }
+
+model DiscordEntitlement {
+  id              String    @id
+  userId          String?
+  guildId         String?
+  skuId           String
+  type            Int
+  active          Boolean   @default(false)
+  createdAt       DateTime  @db.Timestamptz(6) @default(now())
+  updatedAt       DateTime  @db.Timestamptz(6) @updatedAt
+  endsAt          DateTime? @db.Timestamptz(6)
+
+  @@map("discord_entitlement")
+}
