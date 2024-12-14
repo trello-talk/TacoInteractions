@@ -76,8 +76,7 @@ export default class BotCommand extends SlashCommand {
                   type: ComponentType.BUTTON,
                   style: ButtonStyle.LINK,
                   label: t('bot.donate_button'),
-                  url: process.env.DONATE_LINK,
-                  emoji: { id: '921015136569925662' }
+                  url: process.env.DONATE_LINK
                 }
               ]
             }
@@ -127,7 +126,7 @@ export default class BotCommand extends SlashCommand {
       }
       case 'support': {
         return {
-          content: t('bot.support_content', { invite: process.env.SUPPORT_INVITE }),
+          content: t('bot.support_content', { invite: `https://discord.gg/${process.env.SUPPORT_INVITE}` }),
           ephemeral: true
         };
       }
