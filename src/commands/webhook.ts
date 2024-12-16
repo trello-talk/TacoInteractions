@@ -29,7 +29,7 @@ import {
 } from '../util';
 import { ActionType, createAction } from '../util/actions';
 import { getBoard, getChannels, getWebhooks } from '../util/api';
-import { EMOJIS } from '../util/constants';
+import { EMOJIS, ENTITLEMENTS_ENABLED } from '../util/constants';
 import { formatNumber, langs } from '../util/locale';
 import { prisma } from '../util/prisma';
 import { createFiltersPrompt, createListPrompt, createQueryPrompt, createSelectPrompt } from '../util/prompt';
@@ -498,7 +498,9 @@ export default class WebhookCommand extends SlashCommand {
         const maxWebhooks = serverData ? serverData.maxWebhooks : MAX_WEBHOOKS;
         if (maxWebhooks <= webhooks.length)
           return {
-            content: t('webhook.max'),
+            content:
+              t('webhook.max') +
+              (ENTITLEMENTS_ENABLED ? `\n${t('bot.donate_extra')}: https://discord.com/application-directory/${ctx.data.application_id}/store` : ''),
             ephemeral: true,
             components: [
               {
@@ -661,7 +663,9 @@ export default class WebhookCommand extends SlashCommand {
         const available = this.webhookAvailable(webhook.id, webhooks, maxWebhooks);
         if (!available)
           return {
-            content: t('webhook.wh_expire'),
+            content:
+              t('webhook.wh_expire') +
+              (ENTITLEMENTS_ENABLED ? `\n${t('bot.donate_extra')}: https://discord.com/application-directory/${ctx.data.application_id}/store` : ''),
             ephemeral: true,
             components: [
               {

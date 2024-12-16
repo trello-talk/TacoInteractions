@@ -17,16 +17,17 @@ model ApiUser {
 }
 
 model Server {
-  id            Int      @id @default(autoincrement())
-  serverID      String   @unique @db.VarChar(255)
-  bannedFromUse Boolean  @default(false)
-  banReason     String?  @db.VarChar(255)
-  locale        String?  @db.VarChar(255)
-  trelloRole    String?  @db.VarChar(255)
-  prefix        String?  @db.VarChar(255)
-  maxWebhooks   Int      @default(5)
-  createdAt     DateTime @db.Timestamptz(6) @default(now())
-  updatedAt     DateTime @db.Timestamptz(6) @updatedAt
+  id             Int      @id @default(autoincrement())
+  serverID       String   @unique @db.VarChar(255)
+  bannedFromUse  Boolean  @default(false)
+  banReason      String?  @db.VarChar(255)
+  locale         String?  @db.VarChar(255)
+  trelloRole     String?  @db.VarChar(255)
+  prefix         String?  @db.VarChar(255)
+  maxWebhooks    Int      @default(5)
+  manualBenefits Boolean  @default(false)
+  createdAt      DateTime @db.Timestamptz(6) @default(now())
+  updatedAt      DateTime @db.Timestamptz(6) @updatedAt
 
   @@map("servers")
 }

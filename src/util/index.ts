@@ -14,7 +14,8 @@ import {
   MessageOptions
 } from 'slash-create';
 
-import { VERSION } from './constants';
+import { logger } from '../logger';
+import { ENTITLEMENTS_ENABLED, VERSION } from './constants';
 import { createT } from './locale';
 import { prisma } from './prisma';
 import { client } from './redis';
@@ -42,6 +43,60 @@ export function toColorInt(hex: string) {
   return parseInt(hex.slice(1), 16);
 }
 
+async function resolveBenefits(ctx: MessageInteractionContext, serverData?: { maxWebhooks: number; manualBenefits: boolean } | null) {
+  if (!ctx.guildID || !ENTITLEMENTS_ENABLED) return null;
+
+  const maxWebhooks = ctx.entitlements.find((e) => e.sku_id === process.env.DISCORD_SKU_TIER_2)
+    ? 200
+    : ctx.entitlements.find((e) => e.sku_id === process.env.DISCORD_SKU_TIER_1)
+      ? 20
+      : 5;
+
+  if ((maxWebhooks !== serverData.maxWebhooks || (!serverData && maxWebhooks !== 5)) && !serverData?.manualBenefits) {
+    logger.info(`Benefits for ${ctx.guildID} updated (maxWebhooks=${maxWebhooks})`);
+    await prisma.server.upsert({
+      where: {
+        serverID: ctx.guildID
+      },
+      create: {
+        serverID: ctx.guildID,
+        maxWebhooks
+      },
+      update: {
+        maxWebhooks
+      }
+    });
+
+    // Upsert all entitlements to make sure they are in sync
+    await prisma.$transaction(
+      ctx.entitlements.map((entitlement) =>
+        prisma.discordEntitlement.upsert({
+          where: {
+            id: entitlement.id
+          },
+          update: {
+            active: entitlement.ends_at ? Date.now() < new Date(entitlement.ends_at).valueOf() : true,
+            startsAt: entitlement.starts_at ? new Date(entitlement.starts_at) : null,
+            endsAt: entitlement.ends_at ? new Date(entitlement.ends_at) : null
+          },
+          create: {
+            id: entitlement.id,
+            skuId: entitlement.sku_id,
+            type: entitlement.type,
+            guildId: entitlement.guild_id,
+            userId: entitlement.user_id,
+            active: entitlement.ends_at ? Date.now() < new Date(entitlement.ends_at).valueOf() : true,
+            startsAt: entitlement.starts_at ? new Date(entitlement.starts_at) : null,
+            endsAt: entitlement.ends_at ? new Date(entitlement.ends_at) : null
+          }
+        })
+      )
+    );
+
+    return maxWebhooks;
+  }
+}
+
 export async function getData(ctx: MessageInteractionContext) {
   const userData = await prisma.user.findUnique({
     where: { userID: ctx.user.id }
@@ -58,6 +113,9 @@ export async function getData(ctx: MessageInteractionContext) {
     if (i18next.hasResourceBundle(ctx.locale, 'commands')) discordLocale = ctx.locale;
     else if (i18next.hasResourceBundle(ctx.locale.split('-')[0], 'commands')) discordLocale = ctx.locale.split('-')[0];
   }
+
+  const newMaxWebhooks = await resolveBenefits(ctx, serverData);
+  if (newMaxWebhooks !== null) serverData.maxWebhooks = newMaxWebhooks;
 
   return { userData, serverData, t, trello, locale: userData?.locale || serverData?.locale || discordLocale || 'en' };
 }
