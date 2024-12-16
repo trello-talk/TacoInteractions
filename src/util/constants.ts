@@ -78,8 +78,6 @@ export const EMOJIS: Record<string, string> = {
   uncheck: '<:uncheck:632444550115491910>'
 };
 
-export const ENTITLEMENTS_ENABLED = !!process.env.DISCORD_SKU_TIER_1 && !!process.env.DISCORD_SKU_TIER_2;
-
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pkg = require('../../package.json');
 

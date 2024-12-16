@@ -15,12 +15,14 @@ import {
 } from 'slash-create';
 
 import { logger } from '../logger';
-import { ENTITLEMENTS_ENABLED, VERSION } from './constants';
+import { VERSION } from './constants';
 import { createT } from './locale';
 import { prisma } from './prisma';
 import { client } from './redis';
 import Trello from './trello';
 import { DiscordWebhook, TrelloBoard, TrelloCard, TrelloLabel, TrelloList } from './types';
+
+export const isEntitlementsEnabled = () => !!process.env.DISCORD_SKU_TIER_1 && !!process.env.DISCORD_SKU_TIER_2;
 
 export function truncate(text: string, limit = 2000) {
   return text.length > limit ? text.slice(0, limit - 1) + '…' : text;
@@ -44,7 +46,7 @@ export function toColorInt(hex: string) {
 }
 
 async function resolveBenefits(ctx: MessageInteractionContext, serverData?: { maxWebhooks: number; manualBenefits: boolean } | null) {
-  if (!ctx.guildID || !ENTITLEMENTS_ENABLED || serverData?.manualBenefits) return null;
+  if (!ctx.guildID || !isEntitlementsEnabled() || serverData?.manualBenefits) return null;
 
   const maxWebhooks = ctx.entitlements.find((e) => e.sku_id === process.env.DISCORD_SKU_TIER_2)
     ? 200

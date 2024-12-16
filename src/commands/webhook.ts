@@ -21,6 +21,7 @@ import {
   filterWebhookName,
   getBoardID,
   getData,
+  isEntitlementsEnabled,
   noAuthResponse,
   postToWebhook,
   splitMessage,
@@ -29,7 +30,7 @@ import {
 } from '../util';
 import { ActionType, createAction } from '../util/actions';
 import { getBoard, getChannels, getWebhooks } from '../util/api';
-import { EMOJIS, ENTITLEMENTS_ENABLED } from '../util/constants';
+import { EMOJIS } from '../util/constants';
 import { formatNumber, langs } from '../util/locale';
 import { prisma } from '../util/prisma';
 import { createFiltersPrompt, createListPrompt, createQueryPrompt, createSelectPrompt } from '../util/prompt';
@@ -500,7 +501,9 @@ export default class WebhookCommand extends SlashCommand {
           return {
             content:
               t('webhook.max') +
-              (ENTITLEMENTS_ENABLED ? `\n${t('bot.donate_extra')}: https://discord.com/application-directory/${ctx.data.application_id}/store` : ''),
+              (isEntitlementsEnabled()
+                ? `\n${t('bot.donate_extra')}: https://discord.com/application-directory/${ctx.data.application_id}/store`
+                : ''),
             ephemeral: true,
             components: [
               {
@@ -665,7 +668,9 @@ export default class WebhookCommand extends SlashCommand {
           return {
             content:
               t('webhook.wh_expire') +
-              (ENTITLEMENTS_ENABLED ? `\n${t('bot.donate_extra')}: https://discord.com/application-directory/${ctx.data.application_id}/store` : ''),
+              (isEntitlementsEnabled()
+                ? `\n${t('bot.donate_extra')}: https://discord.com/application-directory/${ctx.data.application_id}/store`
+                : ''),
             ephemeral: true,
             components: [
               {
