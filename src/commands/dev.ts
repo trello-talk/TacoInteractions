@@ -202,16 +202,34 @@ export default class BotCommand extends SlashCommand {
         return { content: 'Invalid subcommand.', ephemeral: true };
       }
       case 'smw': {
-        if (ctx.options.smw.maxwebhooks < 1) return { content: 'Max webhooks must be greater than 0.', ephemeral: true };
+        if (ctx.options.smw.maxwebhooks < 0)
+          return { content: 'Max webhooks must be a positive number. Set to 0 to remove the manual benefits flag.', ephemeral: true };
+
+        if (ctx.options.smw.maxwebhooks === 0) {
+          await prisma.server.upsert({
+            where: { serverID: ctx.options.smw.id },
+            create: {
+              serverID: ctx.options.smw.id,
+              manualBenefits: false
+            },
+            update: {
+              manualBenefits: false
+            }
+          });
+
+          return { content: 'Manual benefits flag removed.', ephemeral: true };
+        }
 
         await prisma.server.upsert({
           where: { serverID: ctx.options.smw.id },
           create: {
             serverID: ctx.options.smw.id,
-            maxWebhooks: ctx.options.smw.maxwebhooks
+            maxWebhooks: ctx.options.smw.maxwebhooks,
+            manualBenefits: true
           },
           update: {
-            maxWebhooks: ctx.options.smw.maxwebhooks
+            maxWebhooks: ctx.options.smw.maxwebhooks,
+            manualBenefits: true
           }
         });
 
