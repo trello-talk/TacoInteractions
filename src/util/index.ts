@@ -118,7 +118,7 @@ export async function getData(ctx: MessageInteractionContext) {
   }
 
   const newMaxWebhooks = await resolveBenefits(ctx, serverData);
-  if (newMaxWebhooks !== null) serverData.maxWebhooks = newMaxWebhooks;
+  if (newMaxWebhooks !== null && serverData) serverData.maxWebhooks = newMaxWebhooks;
 
   return { userData, serverData, t, trello, locale: userData?.locale || serverData?.locale || discordLocale || 'en' };
 }
