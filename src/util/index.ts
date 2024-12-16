@@ -68,30 +68,31 @@ async function resolveBenefits(ctx: MessageInteractionContext, serverData?: { ma
     });
 
     // Upsert all entitlements to make sure they are in sync
-    await prisma.$transaction(
-      ctx.entitlements.map((entitlement) =>
-        prisma.discordEntitlement.upsert({
-          where: {
-            id: entitlement.id
-          },
-          update: {
-            active: entitlement.ends_at ? Date.now() < new Date(entitlement.ends_at).valueOf() : true,
-            startsAt: entitlement.starts_at ? new Date(entitlement.starts_at) : null,
-            endsAt: entitlement.ends_at ? new Date(entitlement.ends_at) : null
-          },
-          create: {
-            id: entitlement.id,
-            skuId: entitlement.sku_id,
-            type: entitlement.type,
-            guildId: entitlement.guild_id,
-            userId: entitlement.user_id,
-            active: entitlement.ends_at ? Date.now() < new Date(entitlement.ends_at).valueOf() : true,
-            startsAt: entitlement.starts_at ? new Date(entitlement.starts_at) : null,
-            endsAt: entitlement.ends_at ? new Date(entitlement.ends_at) : null
-          }
-        })
-      )
-    );
+    if (ctx.entitlements.length !== 0)
+      await prisma.$transaction(
+        ctx.entitlements.map((entitlement) =>
+          prisma.discordEntitlement.upsert({
+            where: {
+              id: entitlement.id
+            },
+            update: {
+              active: entitlement.ends_at ? Date.now() < new Date(entitlement.ends_at).valueOf() : true,
+              startsAt: entitlement.starts_at ? new Date(entitlement.starts_at) : null,
+              endsAt: entitlement.ends_at ? new Date(entitlement.ends_at) : null
+            },
+            create: {
+              id: entitlement.id,
+              skuId: entitlement.sku_id,
+              type: entitlement.type,
+              guildId: entitlement.guild_id,
+              userId: entitlement.user_id,
+              active: entitlement.ends_at ? Date.now() < new Date(entitlement.ends_at).valueOf() : true,
+              startsAt: entitlement.starts_at ? new Date(entitlement.starts_at) : null,
+              endsAt: entitlement.ends_at ? new Date(entitlement.ends_at) : null
+            }
+          })
+        )
+      );
 
     return maxWebhooks;
   }
