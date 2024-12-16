@@ -44,7 +44,7 @@ export function toColorInt(hex: string) {
 }
 
 async function resolveBenefits(ctx: MessageInteractionContext, serverData?: { maxWebhooks: number; manualBenefits: boolean } | null) {
-  if (!ctx.guildID || !ENTITLEMENTS_ENABLED) return null;
+  if (!ctx.guildID || !ENTITLEMENTS_ENABLED || serverData?.manualBenefits) return null;
 
   const maxWebhooks = ctx.entitlements.find((e) => e.sku_id === process.env.DISCORD_SKU_TIER_2)
     ? 200
@@ -52,7 +52,7 @@ async function resolveBenefits(ctx: MessageInteractionContext, serverData?: { ma
       ? 20
       : 5;
 
-  if ((maxWebhooks !== serverData.maxWebhooks || (!serverData && maxWebhooks !== 5)) && !serverData?.manualBenefits) {
+  if (maxWebhooks !== serverData.maxWebhooks || (!serverData && maxWebhooks !== 5)) {
     logger.info(`Benefits for ${ctx.guildID} updated (maxWebhooks=${maxWebhooks})`);
     await prisma.server.upsert({
       where: {
