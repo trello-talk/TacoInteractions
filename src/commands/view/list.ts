@@ -123,7 +123,10 @@ export default class ListCommand extends SlashCommand {
           title: t('list.title', { list: truncate(list.name, 100), cards: cards.length }),
           pages: splitMessage(
             cards
-              .map((card) => `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} ${truncate(card.name, 100)}`)
+              .map(
+                (card) =>
+                  `${card.closed ? '🗃️ ' : ''}${subs.cards[card.id] || card.subscribed ? '🔔 ' : ''} [${truncate(card.name, 100)}](https://trello.com/c/${card.shortLink}?utm_source=tacobot.app)`
+              )
               .join('\n')
           )
         },
