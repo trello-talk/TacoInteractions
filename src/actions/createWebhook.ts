@@ -42,29 +42,36 @@ export const action: ActionFunction = {
         filters: DEFAULT.toString(),
         locale,
         webhookID: discordWebhook.id,
-        webhookToken: discordWebhook.token
+        webhookToken: discordWebhook.token,
+        threadID: action.threadID !== '0' ? action.threadID : null,
+        threadParent: action.threadID ? action.channelID : null
       }
     });
 
-    await postToWebhook(discordWebhook, {
-      embeds: [
+    if (action.threadID !== '0')
+      await postToWebhook(
+        discordWebhook,
         {
-          type: 'rich',
-          title: t('webhook.add_wh_title'),
-          description: t('webhook.add_wh_content', {
-            name: truncate(action.board.name, 1000)
-          }),
-          thumbnail: { url: 'https://tacobot.app/logo_happy.png' },
-          footer: {
-            icon_url: 'https://tacobot.app/logo_happy.png',
-            text: 'tacobot.app'
-          }
-        }
-      ]
-    });
+          embeds: [
+            {
+              type: 'rich',
+              title: t('webhook.add_wh_title'),
+              description: t('webhook.add_wh_content', {
+                name: truncate(action.board.name, 1000)
+              }),
+              thumbnail: { url: 'https://tacobot.app/logo_happy.png' },
+              footer: {
+                icon_url: 'https://tacobot.app/logo_happy.png',
+                text: 'tacobot.app'
+              }
+            }
+          ]
+        },
+        action.threadID
+      );
 
     return void ctx.editParent({
-      content: t('webhook.add_done', { board: truncate(action.board.name, 32) }),
+      content: t(action.threadID === '0' ? 'webhook.add_need_thread' : 'webhook.add_done', { board: truncate(action.board.name, 32) }),
       components: []
     });
   }

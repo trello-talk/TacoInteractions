@@ -330,13 +330,17 @@ export async function createDiscordWebhook(guildID: string, channelID: string, b
   return response.data;
 }
 
-export async function postToWebhook(webhook: DiscordWebhook, body: any): Promise<any> {
-  const response = await axios.post(`https://discord.com/api/v9/webhooks/${webhook.id}/${webhook.token}`, body, {
-    headers: {
-      'Content-Type': 'application/json',
-      'User-Agent': `TacoInteractions (https://github.com/trello-talk/TacoInteractions, ${VERSION}) Node.js/${process.version}`
+export async function postToWebhook(webhook: DiscordWebhook, body: any, threadID?: string): Promise<any> {
+  const response = await axios.post(
+    `https://discord.com/api/v9/webhooks/${webhook.id}/${webhook.token}${threadID ? `?thread_id=${threadID}` : ''}`,
+    body,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'User-Agent': `TacoInteractions (https://github.com/trello-talk/TacoInteractions, ${VERSION}) Node.js/${process.version}`
+      }
     }
-  });
+  );
 
   return response.data;
 }

@@ -35,7 +35,7 @@ import { formatNumber, langs } from '../util/locale';
 import { prisma } from '../util/prisma';
 import { createFiltersPrompt, createListPrompt, createQueryPrompt, createSelectPrompt } from '../util/prompt';
 import Trello from '../util/trello';
-import { DiscordWebhook, TrelloBoard } from '../util/types';
+import { DiscordWebhook, PartialDiscordWebhook, TrelloBoard } from '../util/types';
 import WebhookFilters, { DEFAULT } from '../util/webhookFilters';
 
 enum WebhookFilter {
@@ -116,7 +116,13 @@ export default class WebhookCommand extends SlashCommand {
               name: 'channel',
               description: 'The channel to post updates to.',
               required: true,
-              channel_types: [ChannelType.GUILD_TEXT, ChannelType.GUILD_NEWS]
+              channel_types: [
+                ChannelType.GUILD_TEXT,
+                ChannelType.GUILD_NEWS,
+                ChannelType.GUILD_NEWS_THREAD,
+                ChannelType.GUILD_PUBLIC_THREAD,
+                ChannelType.GUILD_PRIVATE_THREAD
+              ]
             },
             {
               type: CommandOptionType.STRING,
@@ -310,6 +316,27 @@ export default class WebhookCommand extends SlashCommand {
                   required: true
                 }
               ]
+            },
+            {
+              type: CommandOptionType.SUB_COMMAND,
+              name: 'thread',
+              description: "Edit a webhook's thread.",
+              options: [
+                {
+                  type: CommandOptionType.STRING,
+                  name: 'webhook',
+                  description: 'The webhook to edit.',
+                  autocomplete: true,
+                  required: true
+                },
+                {
+                  type: CommandOptionType.CHANNEL,
+                  name: 'thread',
+                  description: 'The thread to set the webhook to.',
+                  required: true,
+                  channel_types: [ChannelType.GUILD_NEWS_THREAD, ChannelType.GUILD_PUBLIC_THREAD, ChannelType.GUILD_PRIVATE_THREAD]
+                }
+              ]
             }
           ]
         },
@@ -441,6 +468,16 @@ export default class WebhookCommand extends SlashCommand {
                 ${discordWebhook ? `**${t('webhook.dwh')}:** ${discordWebhook.name}` : ''}
                 ${discordWebhook ? `**${t('webhook.dwh_creator')}:** <@${discordWebhook.user.id}>` : ''}
                 ${discordWebhook ? `**${t('webhook.dwh_channel')}:** <#${discordWebhook.channel_id}>` : ''}
+                ${discordWebhook && webhook.threadID ? `**${t('webhook.dwh_thread')}:** <#${webhook.threadID}>` : ''}
+                ${
+                  discordWebhook && webhook.threadID && discordWebhook.channel_id !== webhook.threadParent
+                    ? `> :warning: ${t('webhook.thread_parent_mismatch')}`
+                    : discordWebhook && webhook.threadParent === '0' && !webhook.active
+                      ? `> :no_entry_sign: ${t('webhook.thread_send_fail')}.`
+                      : discordWebhook && webhook.threadParent && !webhook.threadID
+                        ? `> :warning: ${t('webhook.thread_was_unset')}.`
+                        : ''
+                }
 
                 ${
                   !trelloMember || !discordWebhook
@@ -536,9 +573,17 @@ export default class WebhookCommand extends SlashCommand {
           } else throw err;
         }
 
+        const channel = ctx.channels.get(ctx.options.add.channel)!;
+        const isThread =
+          channel.type === ChannelType.GUILD_NEWS_THREAD ||
+          channel.type === ChannelType.GUILD_PUBLIC_THREAD ||
+          channel.type === ChannelType.GUILD_PRIVATE_THREAD;
+        const isForum = channel.type === ChannelType.GUILD_FORUM || channel.type === (16 as ChannelType); /* GUILD_MEDIA */
+        const channelID = isThread ? channel.parentID! : channel.id;
+
         let discordWebhooks: DiscordWebhook[];
         try {
-          discordWebhooks = (await getWebhooks(ctx.guildID, ctx.creator)).filter((dwh) => dwh.channel_id === ctx.options.add.channel);
+          discordWebhooks = (await getWebhooks(ctx.guildID, ctx.creator)).filter((dwh) => dwh.channel_id === channelID);
         } catch (e) {
           return t('webhook.dwh_fail');
         }
@@ -554,12 +599,12 @@ export default class WebhookCommand extends SlashCommand {
           try {
             discordWebhook = await createDiscordWebhook(
               ctx.guildID,
-              ctx.options.add.channel,
+              channelID,
               { name: filterWebhookName(ctx.options.add.name || board.name, t('webhook.new_wh_name')) },
               reason
             );
           } catch (e) {
-            logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${ctx.options.add.channel})`);
+            logger.warn(`Couldn't create a Discord Webhook (${ctx.guildID}, ${channelID})`);
             logger.warn({ e, reason });
             return t('webhook.dwh_fail_create');
           }
@@ -579,29 +624,36 @@ export default class WebhookCommand extends SlashCommand {
               filters: DEFAULT.toString(),
               locale,
               webhookID: discordWebhook.id,
-              webhookToken: discordWebhook.token
+              webhookToken: discordWebhook.token,
+              threadID: isThread ? channel.id : null,
+              threadParent: isThread || isForum ? channelID : null
             }
           });
 
-          await postToWebhook(discordWebhook, {
-            embeds: [
+          if (!isForum)
+            await postToWebhook(
+              discordWebhook,
               {
-                type: 'rich',
-                title: t('webhook.add_wh_title'),
-                description: t('webhook.add_wh_content', {
-                  name: truncate(board.name, 1000)
-                }),
-                thumbnail: { url: 'https://tacobot.app/logo_happy.png' },
-                timestamp: new Date().toISOString(),
-                footer: {
-                  icon_url: 'https://tacobot.app/logo_happy.png',
-                  text: 'tacobot.app'
-                }
-              }
-            ]
-          });
+                embeds: [
+                  {
+                    type: 'rich',
+                    title: t('webhook.add_wh_title'),
+                    description: t('webhook.add_wh_content', {
+                      name: truncate(board.name, 1000)
+                    }),
+                    thumbnail: { url: 'https://tacobot.app/logo_happy.png' },
+                    timestamp: new Date().toISOString(),
+                    footer: {
+                      icon_url: 'https://tacobot.app/logo_happy.png',
+                      text: 'tacobot.app'
+                    }
+                  }
+                ]
+              },
+              isThread ? channel.id : undefined
+            );
 
-          return t('webhook.add_done', { board: truncate(board.name, 32) });
+          return t(isForum ? 'webhook.add_need_thread' : 'webhook.add_done', { board: truncate(board.name, 32) });
         }
 
         // If there are webhooks w/ tokens, we need to ask the user to choose one
@@ -610,7 +662,8 @@ export default class WebhookCommand extends SlashCommand {
           board,
           name: ctx.options.add.name,
           webhooks: discordWebhooks,
-          channelID: ctx.options.add.channel
+          channelID,
+          threadID: isThread ? channel.id : isForum ? '0' : ''
         });
 
         return {
@@ -694,7 +747,10 @@ export default class WebhookCommand extends SlashCommand {
 
             await prisma.webhook.update({
               where: { id: webhook.id },
-              data: { active: ctx.options.set.active.active }
+              data: {
+                active: ctx.options.set.active.active,
+                threadID: webhook.threadID === '0' ? null : webhook.threadID
+              }
             });
 
             return t(ctx.options.set.active.active ? 'webhook.set_active' : 'webhook.set_inactive');
@@ -810,6 +866,70 @@ export default class WebhookCommand extends SlashCommand {
               locale
             );
           }
+          case 'thread': {
+            if (!ctx.options.set.thread.thread) {
+              await prisma.webhook.update({
+                where: { id: webhook.id },
+                data: {
+                  threadID: null,
+                  threadParent: null
+                }
+              });
+
+              return t('webhook.unset_thread');
+            }
+
+            const channel = ctx.channels.get(ctx.options.set.thread.thread)!;
+            const isThread =
+              channel.type === ChannelType.GUILD_NEWS_THREAD ||
+              channel.type === ChannelType.GUILD_PUBLIC_THREAD ||
+              channel.type === ChannelType.GUILD_PRIVATE_THREAD;
+
+            if (!isThread)
+              return {
+                content: t('webhook.set_thread_invalid'),
+                ephemeral: true
+              };
+
+            if (channel.threadMetadata?.locked)
+              return {
+                content: t('webhook.set_thread_locked'),
+                ephemeral: true
+              };
+
+            if (!webhook.webhookID || !webhook.webhookToken)
+              return {
+                content: t('webhook.set_thread_disconnected_dwh'),
+                ephemeral: true
+              };
+
+            const discordWebhook: PartialDiscordWebhook | null = await ctx.creator.requestHandler
+              .request<PartialDiscordWebhook>('GET', `/webhooks/${webhook.webhookID}/${webhook.webhookToken}`)
+              .catch(() => null);
+            if (!discordWebhook)
+              return {
+                content: t('webhook.set_thread_disconnected_dwh'),
+                ephemeral: true
+              };
+
+            if (channel.parentID !== discordWebhook.channel_id)
+              return {
+                content: t('webhook.set_thread', { channel: `<#${discordWebhook.channel_id}>` }),
+                ephemeral: true
+              };
+
+            await prisma.webhook.update({
+              where: { id: webhook.id },
+              data: {
+                threadID: channel.id,
+                threadParent: channel.parentID!,
+                // Set to active if there was a thread warning before
+                active: webhook.threadID === '0' || (webhook.threadParent && !webhook.threadID) || webhook.active
+              }
+            });
+
+            return t('webhook.set_thread', { thread: `<#${channel.id}>` });
+          }
         }
 
         return {
@@ -859,7 +979,7 @@ export default class WebhookCommand extends SlashCommand {
         const channels = await getChannels(ctx.guildID, ctx.creator);
         const availableChannels = channels
           .filter((c) => {
-            if (c.type !== ChannelType.GUILD_TEXT && c.type !== ChannelType.GUILD_NEWS) return false;
+            if (c.type !== ChannelType.GUILD_TEXT && c.type !== ChannelType.GUILD_NEWS && c.type !== ChannelType.GUILD_FORUM) return false;
             const channelWebhooks = discordWebhooks.filter((dwh) => dwh.channel_id === c.id);
             if (channelWebhooks.every((dwh) => !dwh.token) && channelWebhooks.length >= 10) return false;
             return true;
@@ -885,7 +1005,14 @@ export default class WebhookCommand extends SlashCommand {
             display: availableChannels.map((c) => ({
               label: truncate(c.name, 100),
               description: c.parent_id ? truncate(channels.find((ch) => ch.id === c.parent_id).name, 100) : '',
-              emoji: { id: c.type === ChannelType.GUILD_NEWS ? '658522693058166804' : '585783907841212418' }
+              emoji: {
+                id:
+                  c.type === ChannelType.GUILD_NEWS
+                    ? '658522693058166804'
+                    : c.type === ChannelType.GUILD_FORUM
+                      ? '1330683612290617444'
+                      : '585783907841212418'
+              }
             }))
           },
           ctx.messageID!,

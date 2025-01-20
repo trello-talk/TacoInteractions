@@ -1,4 +1,4 @@
-import { ComponentContext } from 'slash-create';
+import { ChannelType, ComponentContext } from 'slash-create';
 
 import { logger } from '../logger';
 import { createDiscordWebhook, filterWebhookName, getData, postToWebhook, truncate } from '../util';
@@ -25,32 +25,37 @@ export const action: ActionFunction = {
         return void ctx.editParent({ content: t('webhook.dwh_fail_create'), components: [] });
       }
 
+    const isForum = action.channelType === ChannelType.GUILD_FORUM || action.channelType === (16 as ChannelType); /* GUILD_MEDIA */
+
     await prisma.webhook.update({
       where: { id: action.webhookID },
       data: {
         webhookID: discordWebhook.id,
-        webhookToken: discordWebhook.token
+        webhookToken: discordWebhook.token,
+        threadID: null,
+        threadParent: isForum ? action.channelID : null
       }
     });
 
-    await postToWebhook(discordWebhook, {
-      embeds: [
-        {
-          type: 'rich',
-          title: t('webhook.repair_wh_title'),
-          description: t('webhook.repair_wh_content', {
-            name: action.webhookName ? truncate(action.webhookName, 100) : t('webhook.unnamed')
-          }),
-          thumbnail: { url: 'https://tacobot.app/logo_happy.png' },
-          timestamp: new Date().toISOString(),
-          footer: {
-            icon_url: 'https://tacobot.app/logo_happy.png',
-            text: 'tacobot.app'
+    if (!isForum)
+      await postToWebhook(discordWebhook, {
+        embeds: [
+          {
+            type: 'rich',
+            title: t('webhook.repair_wh_title'),
+            description: t('webhook.repair_wh_content', {
+              name: action.webhookName ? truncate(action.webhookName, 100) : t('webhook.unnamed')
+            }),
+            thumbnail: { url: 'https://tacobot.app/logo_happy.png' },
+            timestamp: new Date().toISOString(),
+            footer: {
+              icon_url: 'https://tacobot.app/logo_happy.png',
+              text: 'tacobot.app'
+            }
           }
-        }
-      ]
-    });
+        ]
+      });
 
-    return void ctx.editParent({ content: t('webhook.repair_done'), components: [] });
+    return void ctx.editParent({ content: t(isForum ? 'webhook.repair_need_thread' : 'webhook.repair_done'), components: [] });
   }
 };

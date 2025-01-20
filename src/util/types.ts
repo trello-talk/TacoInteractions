@@ -166,7 +166,7 @@ export interface TrelloMember {
   marketingOptIn: { optedIn: boolean };
 }
 
-export interface DiscordWebhook {
+export interface PartialDiscordWebhook {
   type: 1;
   id: string;
   name: string;
@@ -175,6 +175,9 @@ export interface DiscordWebhook {
   guild_id: string;
   application_id: string | null;
   token?: string;
+}
+
+export interface DiscordWebhook extends PartialDiscordWebhook {
   user: {
     id: string;
     username: string;

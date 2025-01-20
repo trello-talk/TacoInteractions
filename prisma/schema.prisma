@@ -65,6 +65,8 @@ model Webhook {
   guildID         String   @db.VarChar(255)
   webhookID       String?  @db.VarChar(255)
   webhookToken    String?  @db.VarChar(255)
+  threadID        String?  @db.VarChar(255)
+  threadParent    String?  @db.VarChar(255)
   whitelist       Boolean  @default(true)
   lists           String[] @db.VarChar(255)
   cards           String[] @db.VarChar(255)

@@ -51,6 +51,7 @@ export interface WebhookCreateAction extends RegularAction {
   type: ActionType.CREATE_WEBHOOK;
   board: TrelloBoard;
   channelID: string;
+  threadID?: string;
   name?: string;
   webhooks: DiscordWebhook[];
 }
@@ -65,6 +66,7 @@ export interface RepairWebhookAction extends RegularAction {
   webhookID: number;
   webhookName: string;
   channelID: string;
+  channelType: number;
   webhooks: DiscordWebhook[];
 }
 export interface ActionFunction<T = Action> {

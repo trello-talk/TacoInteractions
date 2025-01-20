@@ -1,4 +1,4 @@
-import { ButtonStyle, ComponentContext, ComponentType } from 'slash-create';
+import { ButtonStyle, ChannelType, ComponentContext, ComponentType } from 'slash-create';
 
 import { logger } from '../logger';
 import { createDiscordWebhook, filterWebhookName, getData, postToWebhook, truncate } from '../util';
@@ -19,6 +19,8 @@ export const action: ActionFunction = {
     } catch (e) {
       return void ctx.editParent({ content: t('webhook.dwh_fail'), components: [] });
     }
+
+    const isForum = data.type === ChannelType.GUILD_FORUM || data.type === (16 as ChannelType); /* GUILD_MEDIA */
 
     // Special case: if all the webhooks are made by other apps
     if (discordWebhooks.length >= 10 && discordWebhooks.every((dwh) => !dwh.token))
@@ -43,29 +45,32 @@ export const action: ActionFunction = {
         where: { id: action.webhookID },
         data: {
           webhookID: discordWebhook.id,
-          webhookToken: discordWebhook.token
+          webhookToken: discordWebhook.token,
+          threadID: null,
+          threadParent: isForum ? data.id : null
         }
       });
 
-      await postToWebhook(discordWebhook, {
-        embeds: [
-          {
-            type: 'rich',
-            title: t('webhook.repair_wh_title'),
-            description: t('webhook.repair_wh_content', {
-              name: action.webhookName ? truncate(action.webhookName, 100) : t('webhook.unnamed')
-            }),
-            thumbnail: { url: 'https://tacobot.app/logo_happy.png' },
-            timestamp: new Date().toISOString(),
-            footer: {
-              icon_url: 'https://tacobot.app/logo_happy.png',
-              text: 'tacobot.app'
+      if (!isForum)
+        await postToWebhook(discordWebhook, {
+          embeds: [
+            {
+              type: 'rich',
+              title: t('webhook.repair_wh_title'),
+              description: t('webhook.repair_wh_content', {
+                name: action.webhookName ? truncate(action.webhookName, 100) : t('webhook.unnamed')
+              }),
+              thumbnail: { url: 'https://tacobot.app/logo_happy.png' },
+              timestamp: new Date().toISOString(),
+              footer: {
+                icon_url: 'https://tacobot.app/logo_happy.png',
+                text: 'tacobot.app'
+              }
             }
-          }
-        ]
-      });
+          ]
+        });
 
-      return void ctx.editParent({ content: t('webhook.repair_done'), components: [] });
+      return void ctx.editParent({ content: t(isForum ? 'webhook.repair_need_thread' : 'webhook.repair_done'), components: [] });
     }
 
     // If there are webhooks w/ tokens, we need to ask the user to choose one
@@ -74,7 +79,8 @@ export const action: ActionFunction = {
       webhookID: action.webhookID,
       webhookName: action.webhookName,
       webhooks: discordWebhooks,
-      channelID: data.id
+      channelID: data.id,
+      channelType: data.type
     });
 
     return void ctx.editParent({
