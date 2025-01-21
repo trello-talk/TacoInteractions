@@ -913,7 +913,7 @@ export default class WebhookCommand extends SlashCommand {
 
             if (channel.parentID !== discordWebhook.channel_id)
               return {
-                content: t('webhook.set_thread', { channel: `<#${discordWebhook.channel_id}>` }),
+                content: t('webhook.set_thread_bad_parent', { channel: `<#${discordWebhook.channel_id}>` }),
                 ephemeral: true
               };
 
