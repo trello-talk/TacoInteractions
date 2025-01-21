@@ -469,10 +469,10 @@ export default class WebhookCommand extends SlashCommand {
                 ${discordWebhook ? `**${t('webhook.dwh_channel')}:** <#${discordWebhook.channel_id}>` : ''}
                 ${discordWebhook && webhook.threadID ? `**${t('webhook.dwh_thread')}:** <#${webhook.threadID}>` : ''}
                 ${
-                  discordWebhook && webhook.threadID && discordWebhook.channel_id !== webhook.threadParent
-                    ? `> :warning: ${t('webhook.thread_parent_mismatch')}`
-                    : discordWebhook && webhook.threadParent === '0' && !webhook.active
-                      ? `> :no_entry_sign: ${t('webhook.thread_send_fail')}`
+                  discordWebhook && webhook.threadParent === '0' && !webhook.active
+                    ? `> :no_entry_sign: ${t('webhook.thread_send_fail')}`
+                    : discordWebhook && webhook.threadID && discordWebhook.channel_id !== webhook.threadParent
+                      ? `> :warning: ${t('webhook.thread_parent_mismatch')}`
                       : discordWebhook && webhook.threadParent && !webhook.threadID
                         ? `> :warning: ${t('webhook.thread_was_unset')}`
                         : ''
