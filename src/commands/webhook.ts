@@ -473,9 +473,9 @@ export default class WebhookCommand extends SlashCommand {
                   discordWebhook && webhook.threadID && discordWebhook.channel_id !== webhook.threadParent
                     ? `> :warning: ${t('webhook.thread_parent_mismatch')}`
                     : discordWebhook && webhook.threadParent === '0' && !webhook.active
-                      ? `> :no_entry_sign: ${t('webhook.thread_send_fail')}.`
+                      ? `> :no_entry_sign: ${t('webhook.thread_send_fail')}`
                       : discordWebhook && webhook.threadParent && !webhook.threadID
-                        ? `> :warning: ${t('webhook.thread_was_unset')}.`
+                        ? `> :warning: ${t('webhook.thread_was_unset')}`
                         : ''
                 }
 
