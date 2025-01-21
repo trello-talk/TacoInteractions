@@ -748,7 +748,7 @@ export default class WebhookCommand extends SlashCommand {
               where: { id: webhook.id },
               data: {
                 active: ctx.options.set.active.active,
-                threadID: webhook.threadID === '0' ? null : webhook.threadID
+                threadParent: webhook.threadParent === '0' ? null : webhook.threadParent
               }
             });
 
@@ -923,7 +923,7 @@ export default class WebhookCommand extends SlashCommand {
                 threadID: channel.id,
                 threadParent: channel.parentID!,
                 // Set to active if there was a thread warning before
-                active: webhook.threadID === '0' || (webhook.threadParent && !webhook.threadID) || webhook.active
+                active: webhook.threadParent === '0' || (webhook.threadParent && !webhook.threadID) || webhook.active
               }
             });
 
