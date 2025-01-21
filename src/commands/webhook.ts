@@ -333,7 +333,6 @@ export default class WebhookCommand extends SlashCommand {
                   type: CommandOptionType.CHANNEL,
                   name: 'thread',
                   description: 'The thread to set the webhook to.',
-                  required: true,
                   channel_types: [ChannelType.GUILD_NEWS_THREAD, ChannelType.GUILD_PUBLIC_THREAD, ChannelType.GUILD_PRIVATE_THREAD]
                 }
               ]
