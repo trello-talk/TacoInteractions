@@ -357,9 +357,7 @@ export default class WebhookCommand extends SlashCommand {
     });
   }
 
-  webhookAvailable(webhookID: number, webhooks: Webhook[], maxWebhooks?: number) {
-    maxWebhooks = maxWebhooks || MAX_WEBHOOKS;
-
+  webhookAvailable(webhookID: number, webhooks: Webhook[], maxWebhooks: number) {
     if (maxWebhooks < webhooks.length)
       return !!webhooks
         .sort((a, b) => a.createdAt.valueOf() - b.createdAt.valueOf())
