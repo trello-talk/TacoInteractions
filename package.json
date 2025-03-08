@@ -33,9 +33,9 @@
   "dependencies": {
     "@influxdata/influxdb-client": "1.33.2",
     "@prisma/client": "6.0.1",
-    "@sentry/integrations": "7.92.0",
-    "@sentry/node": "7.92.0",
-    "@sentry/tracing": "7.92.0",
+    "@sentry/integrations": "7.114.0",
+    "@sentry/node": "7.120.3",
+    "@sentry/tracing": "7.120.3",
     "@snazzah/emoji-sync": "0.1.1",
     "axios": "0.27.2",
     "cat-loggr": "1.2.2",
