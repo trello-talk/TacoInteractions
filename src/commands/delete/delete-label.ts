@@ -4,7 +4,7 @@ import SlashCommand from '../../command';
 import { defaultContexts, getData, noAuthResponse, truncate } from '../../util';
 import { ActionType } from '../../util/actions';
 import { getBoard } from '../../util/api';
-import { LABEL_EMOJIS } from '../../util/constants';
+import { manager } from '../../util/emojiManager';
 
 export default class DeleteLabelCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -40,7 +40,7 @@ export default class DeleteLabelCommand extends SlashCommand {
 
     return {
       content: t('deletelabel.confirm', {
-        label: `${ctx.options.color ? LABEL_EMOJIS[ctx.options.color] : LABEL_EMOJIS.none} ${truncate(label.name, 100)}`
+        label: `${manager.getMarkdown(ctx.options.color ? (`label_${ctx.options.color}` as any) : 'label_none')} ${truncate(label.name, 100)}`
       }),
       components: [
         {

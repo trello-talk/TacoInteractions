@@ -5,6 +5,7 @@ import { ButtonStyle, ComponentContext, ComponentType, EditMessageOptions } from
 import { deleteInteraction, getData, toColorInt } from '.';
 import { Action, actions } from './actions';
 import { LABEL_COLORS } from './constants';
+import { manager } from './emojiManager';
 import { formatNumber } from './locale';
 import { client } from './redis';
 import { TrelloAttachment } from './types';
@@ -233,7 +234,7 @@ export async function createListPrompt(
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.LIST}:${PromptAction.PREVIOUS}`,
-            emoji: { id: '902219517969727488' },
+            emoji: manager.getPartial('prompt_previous'),
             disabled: prompt.page <= 1
           },
           {
@@ -248,14 +249,14 @@ export async function createListPrompt(
             style: ButtonStyle.DESTRUCTIVE,
             label: '',
             custom_id: `prompt:${PromptType.LIST}:${PromptAction.STOP}`,
-            emoji: { id: '887142796560060426' }
+            emoji: manager.getPartial('prompt_stop')
           },
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.LIST}:${PromptAction.NEXT}`,
-            emoji: { id: '902219517965525042' },
+            emoji: manager.getPartial('prompt_next'),
             disabled: prompt.page >= prompt.pages.length
           }
         ]
@@ -308,7 +309,7 @@ async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, actio
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.LIST}:${PromptAction.PREVIOUS}`,
-            emoji: { id: '902219517969727488' },
+            emoji: manager.getPartial('prompt_previous'),
             disabled: prompt.page <= 1
           },
           {
@@ -323,14 +324,14 @@ async function handleListPrompt(ctx: ComponentContext, prompt: ListPrompt, actio
             style: ButtonStyle.DESTRUCTIVE,
             label: '',
             custom_id: `prompt:${PromptType.LIST}:${PromptAction.STOP}`,
-            emoji: { id: '887142796560060426' }
+            emoji: manager.getPartial('prompt_stop')
           },
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.LIST}:${PromptAction.NEXT}`,
-            emoji: { id: '902219517965525042' },
+            emoji: manager.getPartial('prompt_next'),
             disabled: prompt.page >= prompt.pages.length
           }
         ]
@@ -390,7 +391,7 @@ export async function createQueryPrompt(
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.QUERY}:${PromptAction.PREVIOUS}`,
-            emoji: { id: '902219517969727488' },
+            emoji: manager.getPartial('prompt_previous'),
             disabled: prompt.page <= 1
           },
           {
@@ -405,14 +406,14 @@ export async function createQueryPrompt(
             style: ButtonStyle.DESTRUCTIVE,
             label: '',
             custom_id: `prompt:${PromptType.QUERY}:${PromptAction.STOP}`,
-            emoji: { id: '887142796560060426' }
+            emoji: manager.getPartial('prompt_stop')
           },
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.QUERY}:${PromptAction.NEXT}`,
-            emoji: { id: '902219517965525042' },
+            emoji: manager.getPartial('prompt_next'),
             disabled: prompt.page >= max
           }
         ]
@@ -486,7 +487,7 @@ async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, act
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.QUERY}:${PromptAction.PREVIOUS}`,
-            emoji: { id: '902219517969727488' },
+            emoji: manager.getPartial('prompt_previous'),
             disabled: prompt.page <= 1
           },
           {
@@ -501,14 +502,14 @@ async function handleQueryPrompt(ctx: ComponentContext, prompt: QueryPrompt, act
             style: ButtonStyle.DESTRUCTIVE,
             label: '',
             custom_id: `prompt:${PromptType.QUERY}:${PromptAction.STOP}`,
-            emoji: { id: '887142796560060426' }
+            emoji: manager.getPartial('prompt_stop')
           },
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.QUERY}:${PromptAction.NEXT}`,
-            emoji: { id: '902219517965525042' },
+            emoji: manager.getPartial('prompt_next'),
             disabled: prompt.page >= max
           }
         ]
@@ -580,7 +581,7 @@ export async function createSelectPrompt(
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.PREVIOUS}`,
-            emoji: { id: '902219517969727488' },
+            emoji: manager.getPartial('prompt_previous'),
             disabled: prompt.page <= 1
           },
           {
@@ -595,7 +596,7 @@ export async function createSelectPrompt(
             style: ButtonStyle.DESTRUCTIVE,
             label: '',
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.STOP}`,
-            emoji: { id: '887142796560060426' }
+            emoji: manager.getPartial('prompt_stop')
           },
           {
             type: ComponentType.BUTTON,
@@ -608,7 +609,7 @@ export async function createSelectPrompt(
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.NEXT}`,
-            emoji: { id: '902219517965525042' },
+            emoji: manager.getPartial('prompt_next'),
             disabled: prompt.page >= max
           }
         ]
@@ -690,7 +691,7 @@ async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, a
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.PREVIOUS}`,
-            emoji: { id: '902219517969727488' },
+            emoji: manager.getPartial('prompt_previous'),
             disabled: prompt.page <= 1
           },
           {
@@ -705,21 +706,21 @@ async function handleSelectPrompt(ctx: ComponentContext, prompt: SelectPrompt, a
             style: ButtonStyle.DESTRUCTIVE,
             label: '',
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.STOP}`,
-            emoji: { id: '887142796560060426' }
+            emoji: manager.getPartial('prompt_stop')
           },
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.SUCCESS,
             label: '',
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.DONE}`,
-            emoji: { id: '922944199450578995' }
+            emoji: manager.getPartial('prompt_done')
           },
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.SELECT}:${PromptAction.NEXT}`,
-            emoji: { id: '902219517965525042' },
+            emoji: manager.getPartial('prompt_next'),
             disabled: prompt.page >= max
           }
         ]
@@ -764,7 +765,7 @@ export async function createAttachmentPrompt(
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.PREVIOUS}`,
-            emoji: { id: '902219517969727488' },
+            emoji: manager.getPartial('prompt_previous'),
             disabled: prompt.page <= 1
           },
           {
@@ -781,14 +782,14 @@ export async function createAttachmentPrompt(
             style: ButtonStyle.DESTRUCTIVE,
             label: '',
             custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.STOP}`,
-            emoji: { id: '887142796560060426' }
+            emoji: manager.getPartial('prompt_stop')
           },
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.NEXT}`,
-            emoji: { id: '902219517965525042' },
+            emoji: manager.getPartial('prompt_next'),
             disabled: prompt.page >= prompt.attachments.length
           }
         ]
@@ -844,7 +845,7 @@ async function handleAttachmentPrompt(ctx: ComponentContext, prompt: AttachmentP
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.PREVIOUS}`,
-            emoji: { id: '902219517969727488' },
+            emoji: manager.getPartial('prompt_previous'),
             disabled: prompt.page <= 1
           },
           {
@@ -861,14 +862,14 @@ async function handleAttachmentPrompt(ctx: ComponentContext, prompt: AttachmentP
             style: ButtonStyle.DESTRUCTIVE,
             label: '',
             custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.STOP}`,
-            emoji: { id: '887142796560060426' }
+            emoji: manager.getPartial('prompt_stop')
           },
           {
             type: ComponentType.BUTTON,
             style: ButtonStyle.PRIMARY,
             label: '',
             custom_id: `prompt:${PromptType.ATTACHMENT}:${PromptAction.NEXT}`,
-            emoji: { id: '902219517965525042' },
+            emoji: manager.getPartial('prompt_next'),
             disabled: prompt.page >= prompt.attachments.length
           }
         ]
@@ -912,7 +913,7 @@ export async function createFiltersPrompt(
               label: t(`group.${group}`, { ns: 'webhook' }),
               value: String(i + 1),
               default: pageGroup === group,
-              emoji: { id: '624184549001396225' }
+              emoji: manager.getPartial('trello')
             })),
             custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.SET_PAGE}`,
             min_values: 1,
@@ -1024,7 +1025,7 @@ async function handleFiltersPrompt(ctx: ComponentContext, prompt: FiltersPrompt,
               label: t(`group.${group}`, { ns: 'webhook' }),
               value: String(i + 1),
               default: pageGroup === group,
-              emoji: { id: '624184549001396225' }
+              emoji: manager.getPartial('trello')
             })),
             custom_id: `prompt:${PromptType.FILTERS}:${PromptAction.SET_PAGE}`,
             min_values: 1,

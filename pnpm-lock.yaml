@@ -29,6 +29,9 @@ importers:
       '@sentry/tracing':
         specifier: 7.92.0
         version: 7.92.0
+      '@snazzah/emoji-sync':
+        specifier: 0.1.1
+        version: 0.1.1
       axios:
         specifier: 0.27.2
         version: 0.27.2
@@ -529,6 +532,10 @@ packages:
   '@sentry/utils@7.92.0':
     resolution: {integrity: sha512-3nEfrQ1z28b/2zgFGANPh5yMVtgwXmrasZxTvKbrAj+KWJpjrJHrIR84r9W277J44NMeZ5RhRW2uoDmuBslPnA==}
     engines: {node: '>=8'}
+
+  '@snazzah/emoji-sync@0.1.1':
+    resolution: {integrity: sha512-vTluLaYUV/zyo2gv0lG8zLjQqrgZCnvUlHRlhoEeTcAu+ckML8VPD3T0o7gXjOP/BcVe40eXfNn+8+KsC2M3pw==}
+    engines: {node: '>=18'}
 
   '@types/body-parser@1.19.5':
     resolution: {integrity: sha512-fB3Zu92ucau0iQ0JMCFQE7b/dv8Ot07NI3KaZIkIUNXq82k4eBAqUaneXfleGY9JWskeS9y+u0nXMyspcuQrCg==}
@@ -2351,6 +2358,10 @@ snapshots:
   '@sentry/utils@7.92.0':
     dependencies:
       '@sentry/types': 7.92.0
+
+  '@snazzah/emoji-sync@0.1.1':
+    dependencies:
+      eventemitter3: 5.0.1
 
   '@types/body-parser@1.19.5':
     dependencies:

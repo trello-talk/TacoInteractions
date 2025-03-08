@@ -4,7 +4,8 @@ import { AutocompleteContext, ButtonStyle, CommandContext, CommandOptionType, Co
 import SlashCommand from '../../command';
 import { defaultContexts, formatTime, getData, noAuthResponse, stripIndentsAndNewlines, toColorInt, truncate, truncateList } from '../../util';
 import { getBoard, getCard } from '../../util/api';
-import { EMOJIS, LABEL_COLORS, LABEL_EMOJIS, STICKER_EMOJIS } from '../../util/constants';
+import { LABEL_COLORS, STICKER_EMOJIS } from '../../util/constants';
+import { manager } from '../../util/emojiManager';
 import { formatNumber } from '../../util/locale';
 
 export default class CardCommand extends SlashCommand {
@@ -51,7 +52,7 @@ export default class CardCommand extends SlashCommand {
           value: stripIndentsAndNewlines`
           ${card.closed ? `🗃️ *${t('card.is_archived')}*` : ''}
           **${t('common.list')}:** ${truncate(board.lists.find((list) => card.idList === list.id).name, 50)}
-          ${card.due ? `**${t('common.due')}:** ${card.dueComplete ? EMOJIS.check : EMOJIS.uncheck} ${formatTime(card.due)}` : ''}
+          ${card.due ? `**${t('common.due')}:** ${manager.getMarkdown(card.dueComplete ? 'check' : 'uncheck')} ${formatTime(card.due)}` : ''}
           ${card.cover?.sharedSourceUrl ? `**${t('common.cover_source')}:** [${t('common.link')}](${card.cover.sharedSourceUrl})` : ''}
           ${
             card.membersVoted.length
@@ -79,7 +80,7 @@ export default class CardCommand extends SlashCommand {
         value: truncateList(
           card.labels.map(
             (label) => oneLine`
-              ${label.color ? LABEL_EMOJIS[label.color.split('_')[0]] : LABEL_EMOJIS.none}
+              ${manager.getMarkdown(label.color ? (`label_${label.color.split('_')[0]}` as any) : 'label_none')}
               ${truncate(label.name, 50) || '*[unnamed]*'}`
           ),
           t
@@ -110,7 +111,7 @@ export default class CardCommand extends SlashCommand {
         value: Object.keys(stickers)
           .map(
             (key) =>
-              `${STICKER_EMOJIS[key] ? `<:_:${STICKER_EMOJIS[key]}>` : key}${stickers[key] > 1 ? ` ${formatNumber(stickers[key], locale)}` : ''}`
+              `${STICKER_EMOJIS[key] ? `<:_:${manager.get(STICKER_EMOJIS[key]).id}>` : key}${stickers[key] > 1 ? ` ${formatNumber(stickers[key], locale)}` : ''}`
           )
           .join(' '),
         inline: true
@@ -125,7 +126,7 @@ export default class CardCommand extends SlashCommand {
           card.checklists.map((checklist) => {
             const completed = !checklist.checkItems.some((item) => item.state === 'incomplete');
             const checkedCount = checklist.checkItems.filter((item) => item.state === 'complete').length;
-            return `${completed ? EMOJIS.check : EMOJIS.uncheck} ${truncate(checklist.name, 50)} (${formatNumber(
+            return `${manager.getMarkdown(completed ? 'check' : 'uncheck')} ${truncate(checklist.name, 50)} (${formatNumber(
               checkedCount,
               locale
             )}/${formatNumber(checklist.checkItems.length, locale)})`;

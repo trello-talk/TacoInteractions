@@ -4,7 +4,7 @@ import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 import SlashCommand from '../../command';
 import { defaultContexts, getData, noAuthResponse, splitMessage, truncate } from '../../util';
 import { getBoard } from '../../util/api';
-import { LABEL_EMOJIS } from '../../util/constants';
+import { manager } from '../../util/emojiManager';
 import { formatNumber } from '../../util/locale';
 import { createListPrompt } from '../../util/prompt';
 
@@ -66,7 +66,7 @@ export default class LabelsCommand extends SlashCommand {
           labels
             .map(
               (label) => oneLine`
-                ${label.color ? LABEL_EMOJIS[label.color.split('_')[0]] : LABEL_EMOJIS.none}
+                ${manager.getMarkdown(label.color ? (`label_${label.color.split('_')[0]}` as any) : 'label_none')}
                 ${truncate(label.name, 50) || '*[unnamed]*'}`
             )
             .join('\n')

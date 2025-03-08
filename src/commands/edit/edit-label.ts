@@ -3,7 +3,7 @@ import { AutocompleteContext, CommandContext, CommandOptionType, SlashCreator } 
 import SlashCommand from '../../command';
 import { defaultContexts, getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { getBoard, uncacheBoard } from '../../util/api';
-import { LABEL_EMOJIS } from '../../util/constants';
+import { manager } from '../../util/emojiManager';
 
 export default class EditLabelCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -105,13 +105,13 @@ export default class EditLabelCommand extends SlashCommand {
     return stripIndentsAndNewlines`
       ${t('edit.header', {
         context: 'label',
-        name: `${label.color ? LABEL_EMOJIS[label.color.split('_')[0]] : LABEL_EMOJIS.none} ${label.name ? truncate(label.name, 100) : '*[unnamed]*'}`
+        name: `${manager.getMarkdown(label.color ? (`label_${label.color.split('_')[0]}` as any) : 'label_none')} ${label.name ? truncate(label.name, 100) : '*[unnamed]*'}`
       })}
       ${ctx.options.name ? t('edit.rename', { name: ctx.options.name }) : ''}
       ${
         color !== undefined
           ? t('edit.recolor', {
-              color: `${color ? LABEL_EMOJIS[color.split('_')[0]] : LABEL_EMOJIS.none} ${t(`common.label_color.${color || 'none'}`)}`
+              color: `${manager.getMarkdown(color ? (`label_${color.split('_')[0]}` as any) : 'label_none')} ${t(`common.label_color.${color || 'none'}`)}`
             })
           : ''
       }

@@ -36,6 +36,7 @@
     "@sentry/integrations": "7.92.0",
     "@sentry/node": "7.92.0",
     "@sentry/tracing": "7.92.0",
+    "@snazzah/emoji-sync": "0.1.1",
     "axios": "0.27.2",
     "cat-loggr": "1.2.2",
     "common-tags": "1.8.2",

@@ -2,6 +2,7 @@ import { ButtonStyle, CommandContext, CommandOptionType, ComponentType, SlashCom
 
 import { defaultContexts, getData } from '../util';
 import { REPOSITORY } from '../util/constants';
+import { manager } from '../util/emojiManager';
 
 export default class BotCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -46,7 +47,7 @@ export default class BotCommand extends SlashCommand {
     switch (ctx.subcommands[0]) {
       case 'info': {
         return {
-          content: '<:tacoHappy:721291245887946783> ' + t('bot.info_content'),
+          content: `${manager.getMarkdown('tacobot')} ${t('bot.info_content')}`,
           ephemeral: true,
           components: [
             {
@@ -57,7 +58,7 @@ export default class BotCommand extends SlashCommand {
                   style: ButtonStyle.LINK,
                   label: 'tacobot.app',
                   url: 'https://tacobot.app',
-                  emoji: { id: '721291245887946783' }
+                  emoji: manager.getPartial('tacobot')
                 }
               ]
             }
@@ -96,7 +97,7 @@ export default class BotCommand extends SlashCommand {
                   style: ButtonStyle.LINK,
                   label: t('bot.github_button'),
                   url: REPOSITORY,
-                  emoji: { id: '770770773497348146' }
+                  emoji: manager.getPartial('github')
                 }
               ]
             }

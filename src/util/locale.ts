@@ -4,7 +4,7 @@ import i18next, { TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
 
 import { flattenObject } from '.';
-import { isInDist } from './dev';
+import { isInDist } from './env';
 import { prisma } from './prisma';
 
 export interface LanguageInfo {

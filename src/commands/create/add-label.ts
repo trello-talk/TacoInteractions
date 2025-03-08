@@ -3,7 +3,7 @@ import { CommandContext, CommandOptionType, SlashCreator } from 'slash-create';
 import SlashCommand from '../../command';
 import { defaultContexts, getData, noAuthResponse, truncate } from '../../util';
 import { getBoard, uncacheBoard } from '../../util/api';
-import { LABEL_EMOJIS } from '../../util/constants';
+import { manager } from '../../util/emojiManager';
 
 export default class AddLabelCommand extends SlashCommand {
   constructor(creator: SlashCreator) {
@@ -82,7 +82,7 @@ export default class AddLabelCommand extends SlashCommand {
     await uncacheBoard(userData.currentBoard);
 
     return t('addlabel.done', {
-      label: `${ctx.options.color ? LABEL_EMOJIS[ctx.options.color] : LABEL_EMOJIS.none} ${truncate(name, 100)}`
+      label: `${manager.getMarkdown(ctx.options.color ? (`label_${ctx.options.color}` as any) : 'label_none')} ${truncate(name, 100)}`
     });
   }
 }

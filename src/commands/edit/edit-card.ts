@@ -4,7 +4,7 @@ import SlashCommand from '../../command';
 import { defaultContexts, getData, noAuthResponse, stripIndentsAndNewlines, truncate } from '../../util';
 import { ActionType, createAction } from '../../util/actions';
 import { getBoard, getCard, uncacheBoard, uncacheCard } from '../../util/api';
-import { LABEL_EMOJIS } from '../../util/constants';
+import { manager } from '../../util/emojiManager';
 import { createSelectPrompt } from '../../util/prompt';
 
 export default class EditCardCommand extends SlashCommand {
@@ -158,7 +158,7 @@ export default class EditCardCommand extends SlashCommand {
             placeholder: t('edit.labels_placeholder'),
             display: board.labels.map((l) => ({
               label: truncate(l.name, 100) || '[unnamed]',
-              emoji: { id: (l.color ? LABEL_EMOJIS[l.color.split('_')[0]] : LABEL_EMOJIS.none).split(':')[2].replace('>', '') }
+              emoji: manager.getPartial(l.color ? (`label_${l.color.split('_')[0]}` as any) : 'label_none')
             }))
           },
           ctx.messageID!,

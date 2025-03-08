@@ -30,7 +30,7 @@ import {
 } from '../util';
 import { ActionType, createAction } from '../util/actions';
 import { getBoard, getChannels, getWebhooks } from '../util/api';
-import { EMOJIS } from '../util/constants';
+import { manager } from '../util/emojiManager';
 import { formatNumber, langs } from '../util/locale';
 import { prisma } from '../util/prisma';
 import { createFiltersPrompt, createListPrompt, createQueryPrompt, createSelectPrompt } from '../util/prompt';
@@ -417,7 +417,7 @@ export default class WebhookCommand extends SlashCommand {
               displayedWebhooks
                 .map(
                   (w) => oneLine`
-                    ${w.active ? EMOJIS.check : EMOJIS.uncheck}
+                    ${manager.getMarkdown(w.active ? 'check' : 'uncheck')}
                     \`${w.id}\` ${w.name || `*${t('webhook.unnamed')}*`}
                   `
                 )
@@ -457,7 +457,7 @@ export default class WebhookCommand extends SlashCommand {
               title: webhook.name || t('webhook.unnamed'),
               url: `https://trello.com/b/${webhook.modelID}?utm_source=tacobot.app`,
               description: stripIndentsAndNewlines`
-                ${webhook.active ? EMOJIS.check : EMOJIS.uncheck} ${t('webhook.active')}
+                ${manager.getMarkdown(webhook.active ? 'check' : 'uncheck')} ${t('webhook.active')}
                 **${t('webhook.id')}:** \`${webhook.id}\`
                 **${t('webhook.style')}:** ${t(`webhook.styles.${webhook.style}.name`)}
                 **${t('webhook.locale')}:** ${webhookLocale}
@@ -1002,14 +1002,9 @@ export default class WebhookCommand extends SlashCommand {
             display: availableChannels.map((c) => ({
               label: truncate(c.name, 100),
               description: c.parent_id ? truncate(channels.find((ch) => ch.id === c.parent_id).name, 100) : '',
-              emoji: {
-                id:
-                  c.type === ChannelType.GUILD_NEWS
-                    ? '658522693058166804'
-                    : c.type === ChannelType.GUILD_FORUM
-                      ? '1330683612290617444'
-                      : '585783907841212418'
-              }
+              emoji: manager.getPartial(
+                c.type === ChannelType.GUILD_NEWS ? 'channel_news' : c.type === ChannelType.GUILD_FORUM ? 'channel_forum' : 'channel_text'
+              )
             }))
           },
           ctx.messageID!,

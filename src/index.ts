@@ -1,4 +1,5 @@
-import dotenv from 'dotenv';
+import './util/env';
+
 import fastify from 'fastify';
 import path from 'path';
 import { FastifyServer, InteractionResponseFlags, SlashCreator } from 'slash-create';
@@ -6,17 +7,13 @@ import { FastifyServer, InteractionResponseFlags, SlashCreator } from 'slash-cre
 import { logger } from './logger';
 import { deleteInteraction, getData } from './util';
 import { Action, actions, load as loadActions } from './util/actions';
-import { isInDist } from './util/dev';
+import { manager } from './util/emojiManager';
 import { cron as influxCron, onCommandRun } from './util/influx';
 import { init as initLocale } from './util/locale';
 import { prisma } from './util/prisma';
 import { handlePrompt } from './util/prompt';
 import { client, connect } from './util/redis';
 import { close as closeSentry, reportErrorFromComponent, reportErrorFromModal } from './util/sentry';
-
-let dotenvPath = path.join(process.cwd(), '.env');
-if (isInDist) dotenvPath = path.join(process.cwd(), '..', '.env');
-dotenv.config({ path: dotenvPath });
 
 export const server = fastify();
 
@@ -48,6 +45,7 @@ server.addHook('onSend', (request, reply, payload, done) => {
 });
 
 creator.on('debug', (message) => logger.log(message));
+manager.on('debug', (message) => logger.log('[emoji-sync]', message));
 creator.on('warn', (message) => logger.warn(message));
 creator.on('error', (error) => logger.error(error));
 creator.on('synced', () => logger.info('Commands synced!'));
@@ -209,6 +207,8 @@ creator.on('modalInteraction', async (ctx) => {
   await connect();
   await prisma.$connect();
   await loadActions();
+  await manager.loadFromFolder(path.join(__dirname, '..', 'emojis'));
+  await manager.sync();
   await creator.startServer();
   influxCron.start();
 
