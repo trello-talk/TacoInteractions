@@ -37,7 +37,7 @@ RUN pnpm dlx prisma generate
 FROM --platform=$BUILDPLATFORM node:18.20.5-alpine3.20
 
 RUN apk add --update --no-cache dumb-init git
-RUN npm install -g pnpm@9
+RUN npm install -g pnpm@9 prisma
 
 WORKDIR /app
 
