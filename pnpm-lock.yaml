@@ -30,8 +30,8 @@ importers:
         specifier: 7.92.0
         version: 7.92.0
       '@snazzah/emoji-sync':
-        specifier: 0.1.1
-        version: 0.1.1
+        specifier: 0.1.2
+        version: 0.1.2
       axios:
         specifier: 0.27.2
         version: 0.27.2
@@ -535,8 +535,8 @@ packages:
     resolution: {integrity: sha512-3nEfrQ1z28b/2zgFGANPh5yMVtgwXmrasZxTvKbrAj+KWJpjrJHrIR84r9W277J44NMeZ5RhRW2uoDmuBslPnA==}
     engines: {node: '>=8'}
 
-  '@snazzah/emoji-sync@0.1.1':
-    resolution: {integrity: sha512-vTluLaYUV/zyo2gv0lG8zLjQqrgZCnvUlHRlhoEeTcAu+ckML8VPD3T0o7gXjOP/BcVe40eXfNn+8+KsC2M3pw==}
+  '@snazzah/emoji-sync@0.1.2':
+    resolution: {integrity: sha512-zom5q/RtxDOc5X5tCliHO17xHVyq8dBtNF2YAo8en7pZuikWFyh8fZr++JCAbz9UAs9PZeBLSMzvbmMzZ5Qw8w==}
     engines: {node: '>=18'}
 
   '@types/body-parser@1.19.5':
@@ -2365,7 +2365,7 @@ snapshots:
     dependencies:
       '@sentry/types': 7.92.0
 
-  '@snazzah/emoji-sync@0.1.1':
+  '@snazzah/emoji-sync@0.1.2':
     dependencies:
       eventemitter3: 5.0.1
 
