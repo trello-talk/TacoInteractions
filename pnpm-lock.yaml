@@ -18,8 +18,8 @@ importers:
         specifier: 1.33.2
         version: 1.33.2
       '@prisma/client':
-        specifier: 6.0.1
-        version: 6.0.1(prisma@6.0.1)
+        specifier: 6.19.3
+        version: 6.19.3(prisma@6.0.1)(typescript@5.3.3)
       '@sentry/integrations':
         specifier: 7.92.0
         version: 7.92.0
@@ -480,13 +480,16 @@ packages:
     resolution: {integrity: sha512-cq8o4cWH0ibXh9VGi5P20Tu9XF/0fFXl9EUinr9QfTM7a7p0oTA4iJRCQWppXR1Pg8dSM0UCItCkPwsk9qWWYA==}
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
 
-  '@prisma/client@6.0.1':
-    resolution: {integrity: sha512-60w7kL6bUxz7M6Gs/V+OWMhwy94FshpngVmOY05TmGD0Lhk+Ac0ZgtjlL6Wll9TD4G03t4Sq1wZekNVy+Xdlbg==}
+  '@prisma/client@6.19.3':
+    resolution: {integrity: sha512-mKq3jQFhjvko5LTJFHGilsuQs+W+T3Gm451NzuTDGQxwCzwXHYnIu2zGkRoW+Exq3Rob7yp2MfzSrdIiZVhrBg==}
     engines: {node: '>=18.18'}
     peerDependencies:
       prisma: '*'
+      typescript: '>=5.1.0'
     peerDependenciesMeta:
       prisma:
+        optional: true
+      typescript:
         optional: true
 
   '@prisma/debug@6.0.1':
@@ -2300,9 +2303,10 @@ snapshots:
 
   '@pkgr/core@0.1.1': {}
 
-  '@prisma/client@6.0.1(prisma@6.0.1)':
+  '@prisma/client@6.19.3(prisma@6.0.1)(typescript@5.3.3)':
     optionalDependencies:
       prisma: 6.0.1
+      typescript: 5.3.3
 
   '@prisma/debug@6.0.1': {}
 
