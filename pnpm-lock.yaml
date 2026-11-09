@@ -85,8 +85,8 @@ importers:
         specifier: 4.17.21
         version: 4.17.21
       '@types/i18next-fs-backend':
-        specifier: 1.1.5
-        version: 1.1.5
+        specifier: 1.2.0
+        version: 1.2.0
       '@types/node':
         specifier: 20.9.0
         version: 20.9.0
@@ -557,8 +557,9 @@ packages:
   '@types/http-errors@2.0.4':
     resolution: {integrity: sha512-D0CFMMtydbJAegzOyHjtiKPLlvnm3iTZyZRSZoLq2mRhDdmLfIWOCYPfQJ4cu2erKghU++QvjcUjp/5h7hESpA==}
 
-  '@types/i18next-fs-backend@1.1.5':
-    resolution: {integrity: sha512-QKKYWkfQ13spBwa+5/lBThkPkMv8svU6a5Z0Bz96IuN+HupJZXVAbP93p5bK7iOcY7Y/g/W9Y6qy5z0i0NpTog==}
+  '@types/i18next-fs-backend@1.2.0':
+    resolution: {integrity: sha512-30XnjBF+SLndemvooRQRtcoD5xmF2nNNTa5RqE63+OWssaZOxN9r895ZvXUMbkk8YZr1Cy3scpQBZ6YXLH+jEg==}
+    deprecated: This is a stub types definition. i18next-fs-backend provides its own type definitions, so you do not need this installed.
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -1311,9 +1312,6 @@ packages:
   i18next-fs-backend@2.3.1:
     resolution: {integrity: sha512-tvfXskmG/9o+TJ5Fxu54sSO5OkY6d+uMn+K6JiUGLJrwxAVfer+8V3nU8jq3ts9Pe5lXJv4b1N7foIjJ8Iy2Gg==}
 
-  i18next@21.10.0:
-    resolution: {integrity: sha512-YeuIBmFsGjUfO3qBmMOc0rQaun4mIpGKET5WDwvu8lU7gvwpcariZLNtL0Fzj+zazcHUrlXHiptcFhBMFaxzfg==}
-
   i18next@23.7.13:
     resolution: {integrity: sha512-DbCPlw6VmURSZa43iOnycxq9o15e+WuBWDBZ3aj+gQZcDz4sgnuKwrcwmP1n8gSSCwCN7CRFGTpnwTd93A16Mg==}
 
@@ -1450,9 +1448,10 @@ packages:
     resolution: {integrity: sha512-wpxZs9NoxZaJESJGIZTyDEaYpl0FKSA+FB9aJiyemKhMwkxQg63h4T1KJgUGHpTqPDNRcmmYLugrRjJlBtWvRA==}
     hasBin: true
 
-  jschardet@3.1.4:
-    resolution: {integrity: sha512-/kmVISmrwVwtyYU40iQUOp3SUPk2dhNCMsZBQX0R1/jZ8maaXJ/oZIzUOiyOqcgtLnETFKYChbJ5iDC/eWmFHg==}
-    engines: {node: '>=0.1.90'}
+  jschardet@4.1.0:
+    resolution: {integrity: sha512-ighRZ11mb6l4m+xSKoivuqNj44qkObODXsAnnkkfYcY4JfYRnEgAe/w1c3mbnJtTQmLtfebAUfXGsUGUJImexg==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
@@ -2277,7 +2276,7 @@ snapshots:
   '@microsoft/eslint-formatter-sarif@3.1.0':
     dependencies:
       eslint: 8.57.1
-      jschardet: 3.1.4
+      jschardet: 4.1.0
       lodash: 4.17.21
       utf8: 3.0.0
     transitivePeerDependencies:
@@ -2396,9 +2395,9 @@ snapshots:
 
   '@types/http-errors@2.0.4': {}
 
-  '@types/i18next-fs-backend@1.1.5':
+  '@types/i18next-fs-backend@1.2.0':
     dependencies:
-      i18next: 21.10.0
+      i18next-fs-backend: 2.3.1
 
   '@types/json-schema@7.0.15': {}
 
@@ -3340,10 +3339,6 @@ snapshots:
 
   i18next-fs-backend@2.3.1: {}
 
-  i18next@21.10.0:
-    dependencies:
-      '@babel/runtime': 7.25.6
-
   i18next@23.7.13:
     dependencies:
       '@babel/runtime': 7.25.6
@@ -3477,7 +3472,7 @@ snapshots:
     dependencies:
       argparse: 2.0.1
 
-  jschardet@3.1.4: {}
+  jschardet@4.1.0: {}
 
   json-buffer@3.0.1: {}
 
